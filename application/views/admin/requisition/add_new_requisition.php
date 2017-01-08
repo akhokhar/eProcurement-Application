@@ -1,4 +1,9 @@
 
+<!-- Date Picker -->
+<link rel="stylesheet" href="<?php echo $includes_dir; ?>admin/plugins/datepicker/datepicker3.css">
+<!-- Select2 -->
+<link rel="stylesheet" href="<?php echo $includes_dir; ?>admin/plugins/select2/select2.min.css">
+
 <!-- start: MAIN CONTAINER -->
 <div class="main-container">
     <div class="navbar-content">
@@ -37,10 +42,6 @@
         <!-- /.modal -->
         <!-- end: SPANEL CONFIGURATION MODAL FORM -->
         <div class="container">
-			<?php
-            $attributes = array('class' => '', 'role' => 'form', 'data-toggle' => 'validator', 'id' => 'generalRequisitionForm');
-            echo form_open_multipart('', $attributes);
-            ?>
             <!-- start: PAGE HEADER -->
             <div class="row">
                 <div class="col-sm-12">
@@ -70,9 +71,7 @@
                     <div class="page-header row">
                         <h1 class="col-sm-6">Add New Requisition <small></small></h1>
                         <div class="col-md-2 pull-right">
-                            <button class="btn btn-yellow btn-block" id="submit_btn" type="button">
-                                Submit <i class="fa fa-arrow-circle-right"></i>
-                            </button>
+                        	<button type="submit" class="btn btn-primary pull-right" disabled>Create Requisition</button>
                         </div>
                     </div>
                     <!-- end: PAGE TITLE & BREADCRUMB -->
@@ -98,13 +97,17 @@
                                             </a>
                                         </li>
                                         <li>
-                                            <a data-toggle="tab" href="#panel_tab_item">
+                                            <a data-toggle="tab" href="#panel_tab_items">
                                                 Items
                                             </a>
                                         </li>
                                     </ul>
                                     <div class="tab-content">
                                         <div id="panel_tab_general" class="tab-pane active">
+										<?php
+                                        $attributes = array('class' => '', 'method' => 'post', 'role' => 'form', 'data-toggle' => 'validator', 'id' => 'generalRequisitionForm');
+                                        echo form_open_multipart('', $attributes);
+                                        ?>
                                             <div class="panel-body">
                                               <div class="row">
                                                 <div class="col-md-6">
@@ -182,8 +185,8 @@
                                                           echo form_dropdown('donor', $donors, '', $dropdown_data);
                                                           ?>
                                                     </div>
-                                                  </div>
-                                                  <div class="col-md-6">
+                                                </div>
+                                                <div class="col-md-6">
                                                     <div class="form-group">
                                                         <label for="requiredUntilDate">
                                                         	Required until Date <span class="symbol required"></span>
@@ -263,77 +266,104 @@
                                                           echo form_dropdown('approvingAuthority', $approvingAuthorities, '', $dropdown_data);
                                                           ?>
                                                     </div>
+                                                </div>
+                                              </div>
+                                              <hr />
+                                              <div class="row">
+                                                <div class="col-md-2 pull-right">
+                                                    <a href="#panel_tab_items" data-toggle="tab" class="btn btn-teal ladda-button next_tab">
+                                                        Next <i class="fa fa-arrow-circle-right"></i>
+                                                    </a>
+                                                </div>
+                                              </div>
+                                          </div> 
+                            			<?php echo form_close(); ?>
+                                        </div> 
+                                                    
+                                        <div id="panel_tab_items" class="tab-pane">
+                                        <!-- form start -->
+                                        <?php
+                                        $attributes = array('class' => '', 'method' => 'post', 'role' => 'form', 'data-toggle' => 'validator', 'name' => 'addItemForm', 'id' => 'addItemForm');
+                                        echo form_open_multipart('', $attributes);
+                                        ?>
+                                        	<div class="panel-body">
+                                                <div class="row">
+                                                  <div class="col-md-12">
+                                                    <div class="form-group">
+                                                        <label for="itemName">Item Name</label>
+                                                        <input type="text" class="form-control" name="itemName" required id="itemName">
+                                                    </div>
+                                                    <div class="form-group">
+                                                      <label for="itemDescription">Item Description</label>
+                                                      <textarea class="form-control" name="itemDescription" required id="itemDescription" placeholder="Item Description"></textarea>
+                                                    </div>
                                                   </div>
                                                 </div>
-              </div>
-              <div class="box-footer pull-right-container">
-                <button type="submit" class="btn btn-primary pull-right" disabled>Create Requisition</button>
-              </div>
-                                                    
-                                                    
-                                                    
-                                                   
-                                                    <hr />
-                                                    <div class="row">
-                                                        <div class="col-md-2 pull-right">
-                                                            <a href="#panel_tab_category" data-toggle="tab" class="btn btn-teal ladda-button next_tab">
-                                                                Next <i class="fa fa-arrow-circle-right"></i>
-                                                            </a>
+                                                <div class="row">
+                                                  <div class="col-md-4">
+                                                    <div class="form-group">
+                                                        <label for="costCenter">Cost Center</label>
+                                                        <input type="text" class="form-control" name="costCenter" required id="costCenter">
+                                                    </div>
+                                                  </div>
+                                                  <div class="col-md-4">
+                                                    <div class="form-group">
+                                                        <label for="unit">Unit</label>
+                                                        <input type="text" class="form-control" name="unit" required id="unit">
+                                                    </div>
+                                                  </div>
+                                                  <div class="col-md-4">
+                                                    <div class="form-group">
+                                                        <label for="quantity">Quantity</label>
+                                                        <input type="number" class="form-control" name="quantity" required id="quantity" min="1">
+                                                    </div>
+                                                  </div>
+                                                </div>
+                                                <div class="row">
+                                                  <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="unitPrice">Estimated Unit Value (Rs)</label>
+                                                        <input type="number" class="form-control" name="unitPrice" required id="unitPrice" min="1">
+                                                    </div>
+                                                  </div>
+                                                  <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="totalPrice">Estimated Total Unit Value (Rs)</label>
+                                                        <input type="number" class="form-control" readonly name="totalPrice" required id="totalPrice" min="1" value="0">
+                                                    </div>
+                                                  </div>
+                                                </div>
+                                                
+                                                <hr />
+                                                <div class="row">
+                                                    <div class="col-md-2 pull-left">
+                                                        <a href="#panel_tab_general" data-toggle="tab" class="btn btn-light-grey next_tab">
+                                                            <i class="fa fa-arrow-circle-left"></i> Back
+                                                        </a>
+                                                    </div>
+                                                    <div class="col-md-2 pull-right">
+                                                        <button type="submit" class="btn btn-primary pull-right" id="addItem">Add Item</button>
+                                                    </div>
+                                                </div>
+                                                
+                                                 <!-- additem requisition table data -->
+                                                <div class="row">
+                                                    <div class="col-xs-12">
+                                                      <div class="box box-danger">
+                                                        <div class="box-header with-border">
+                                                          <h3 class="box-title">Requisition Items</h3>
+                                                        </div>
+                                                          <div class="box-body">
+                                                              <table id="itemsDataTable"  class="table table-bordered table-hover"></table>
+                                                          </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                            <?php echo form_close(); ?>
+                                                  
+                                              </div>
+                                        <?php echo form_close(); ?>
                                         </div>
-                                        <div id="panel_tab_category" class="tab-pane">
-                                            <div class="panel-body">
-                                                <div role="form" class="form-horizontal">
-                                                    <div class="form-group">
-                                                        <label class="col-sm-2 control-label" for="form-field-1">
-                                                            Parent Category <span class="symbol required"></span>
-                                                        </label>
-                                                        <div class="col-sm-9">
-                                                            <select id="form-field-select-1" name="product_cat_id" class="product_cat_id form-control">
-                                                                <option value="">--Select Category--</option>
-                                                                <?php
-                                                                if($parent_categories) {
-                                                                    foreach($parent_categories as $get_record) {
-                                                                        echo '<option value="' . $get_record['cat_id'] . '">' . $get_record['cat_title'] . '</option>';
-                                                                    }
-                                                                }
-                                                                ?>
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label class="col-sm-2 control-label" for="form-field-1">
-                                                            Category
-                                                        </label>
-                                                        <div class="col-sm-9" id="multi-selecter-box">
-                                                            <select name="category_id[]" id="form-field-select-4" multiple="multiple" class="category_id form-control">
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                                                    <div id="custom_fields">
-
-                                                    </div>
-                                                    <hr />
-                                                    <div class="row">
-                                                        <div class="col-md-2 pull-left">
-                                                            <a href="#panel_tab_general" data-toggle="tab" class="btn btn-light-grey next_tab">
-                                                                <i class="fa fa-arrow-circle-left"></i> Back
-                                                            </a>
-                                                        </div>
-                                                        <div class="col-md-2 pull-right">
-                                                            <a href="#panel_tab_data" data-toggle="tab" class="btn btn-teal ladda-button next_tab">
-                                                                Next <i class="fa fa-arrow-circle-right"></i>
-                                                            </a>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        
+                                            
                                     </div>
                                 </div>
                             </div>
@@ -371,9 +401,140 @@
 
 <!-- start: JAVASCRIPTS REQUIRED FOR THIS PAGE ONLY -->
 <script src="<?php echo $includes_dir; ?>admin/plugins/lou-multi-select/js/jquery.multi-select.js" type="text/javascript"></script>
+<!-- DataTables -->
+<script src="<?php echo $includes_dir; ?>admin/plugins/datatables/jquery.dataTables.min.js"></script>
+<script src="<?php echo $includes_dir; ?>admin/plugins/datatables/dataTables.bootstrap.min.js"></script>
+<!-- datepicker -->
+<script src="<?php echo $includes_dir; ?>admin/plugins/datepicker/bootstrap-datepicker.js"></script>
+<!-- Select2 -->
+<script src="<?php echo $includes_dir; ?>admin/plugins/select2/select2.full.min.js"></script>
+
 <script src="<?php echo $includes_dir; ?>admin/plugins/summernote/build/summernote.min.js"></script>
 <script src="<?php echo $includes_dir; ?>admin/js/form-elements.js"></script>
 
+<script type="text/javascript">
+$(function () {
+    //Date picker
+    $('.datepicker').datepicker({
+      autoclose: true
+    });
+  //select 2
+  $('.select2').select2({
+    width: '100%'
+  });
+
+  //calculate total cost
+  $('#quantity, #unitPrice').on('change', function() { 
+    var quantity = $('#quantity').val();
+    var unitPrice = $('#unitPrice').val();
+    var totalPrice = Number(quantity) * Number(unitPrice);
+    $('#totalPrice').val(totalPrice);
+  });
+  
+  //initializing new array
+  var requisitionItems = [];
+
+  //add header to table from form
+  function addformHeaderToTable(formId, tableId, firstColName, editDeleteColName) {
+    var formData = $(formId).serializeArray();
+    var thLabel = '';
+    var thHtml = '';
+    var tableHead = '<thead></thead>';
+    $(tableId).html(tableHead);
+    thHtml = (!!firstColName) ? '<th>' + firstColName + '</th>' : '';
+    for (i=0; i < formData.length; i++) {
+      thdLabel = $(formId).find('label[for=' + formData[i].name + ']').text();
+      thHtml += '<th>' + thdLabel + '</th>';
+    }
+    thHtml += (!!editDeleteColName) ? '<th>' + editDeleteColName + '</th>' : '';
+    $(tableId).find('thead').append(thHtml);
+  }
+  addformHeaderToTable('#addItemForm', '#itemsDataTable', 'S.No.', 'Remove');
+  
+  //validate form data
+  $('#addItemForm').validator();
+  
+  //addItemForm Object Creation and add into Table
+  function addformDataToTable(formId, tableId, firstCol, edit, remove) {
+    var tableBody = '<tbody></tbody>';
+    $(tableId).append(tableBody);
+    //if no data in table
+    /*console.log($(tableId).find('tbody tr'))
+    if ($(tableId).find('tbody tr').length == 0) {
+      $(tableId).addClass('hidden');
+      $(tableId).after('<h3>No Data Found.</h3>');
+    }
+    else {alert('a')
+      $(tableId).removeClass('hidden');
+      $(tableId).after('h3').remove();
+    }*/
+    $(formId).validator().on('submit', function(e) {
+      if (!$(formId).find(':submit').hasClass('disabled')) {
+        var formData = $(formId).serializeArray();
+        var tableDataLength = $(tableId).find('tbody tr').length;
+        requisitionItems[tableDataLength] = formData;
+        var numRows = tableDataLength + 1;
+        var tdHtml = '<tr>';
+        tdHtml += (firstCol) ? '<td>' + numRows + '</td>' : '';
+        for (i=0; i < formData.length; i++) {
+          tdHtml += '<td>' + formData[i].value + '</td>';
+        }
+        tdHtml += (edit && remove) ? '<td>' : '';
+        tdHtml += (edit) ? '<td><a id="editRow"><span class="glyphicon glyphicon-edit"></span></a></td>' : '';
+        tdHtml += (remove) ? '<td><a id="removeRow"><span class="glyphicon glyphicon-remove"></span></a></td>' : '';
+        tdHtml += (edit && remove) ? '</td>' : '';
+        tdHtml += '</tr>';
+        $(tableId).find('tbody').append(tdHtml);
+        $(formId)[0].reset();
+      }
+      console.log(requisitionItems)
+      e.preventDefault();
+    });
+  }
+  addformDataToTable('#addItemForm', '#itemsDataTable', true, false, true);
+  
+  //enable general requisition button
+  $('#addItemForm').validator().on('submit', function(e) {
+      enableDisableGeneralButton();
+      e.preventDefault();
+    });
+  
+  function enableDisableGeneralButton() {
+    var numRows = $('#itemsDataTable').find('tbody tr').length;
+      if (!!numRows) {
+        $('#generalRequisitionForm').find(':submit').removeAttr('disabled').removeClass('disabled');
+      }
+      else {
+        $('#generalRequisitionForm').find(':submit').prop('disabled', true);
+      }
+  }
+
+  //remove row
+  function removeRowFromTable(removeButtonId, tableId) {
+    $(tableId).on('click', removeButtonId, function(e) {
+      var tRindex = $(this).parents('tr').index();
+      requisitionItems.splice(tRindex, 1);
+      $(this).parents('tr').remove();
+      $(tableId).find('tbody tr').each(function(index, element) {
+          $(element).children('td:eq(0)').text(index + 1);
+      });
+      enableDisableGeneralButton();
+      e.preventDefault();
+    });
+  }
+  removeRowFromTable('#removeRow', '#itemsDataTable');
+
+  //data table
+    /*$('#itemsDataTable').DataTable({
+      'paging': true,
+      'lengthChange': false,
+      'searching': false,
+      'ordering': true,
+      'info': true,
+      'autoWidth': false
+    });*/
+});
+</script>
 <!-- The template to display files available for upload -->
 <script id="template-upload" type="text/x-tmpl">
     {% console.log(o.options.fileInput[0].id); for (var i=0, file; file=o.files[i]; i++) { %}
