@@ -98,7 +98,7 @@
     
     
     $(function () {
-                var chart = new Highcharts.Chart({
+                /*var chart = new Highcharts.Chart({
                     chart: {
                         renderTo: 'container',
                         type: 'line',
@@ -169,7 +169,7 @@
                         chart.setTitle({text: "Sales chart of Order"});
                         chart.xAxis[0].setCategories([<?php if(count($get_graph_day)>0){foreach ($get_graph_day as $key => $graph_day) {echo $key.",";}} ?>]);
 
-                    } /*else {
+                    } */ /*else {
                         chart.addSeries({
                             name: 'Order By Year(s)',
                             type: 'column',
@@ -179,7 +179,7 @@
                         chart.yAxis[0].setTitle({text: "#Orders"});
                         chart.setTitle({text: "Sales chart of completed order"});
                     }*/
-                });
+                /*});*/
             });
 
 
