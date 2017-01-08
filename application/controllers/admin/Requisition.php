@@ -3,7 +3,7 @@
 if (!defined('BASEPATH'))
     exit('No direct script access allowed');
 
-class Procurement extends CI_Controller {
+class Requisition extends CI_Controller {
     
     public $uri_privileged;
 
@@ -87,7 +87,7 @@ class Procurement extends CI_Controller {
     | start: index function
     |------------------------------------------------
     |
-    | This function show all procurements
+    | This function show all requisitions
     |
    */
     function index() {
@@ -107,17 +107,17 @@ class Procurement extends CI_Controller {
         $this->data['message'] = $this->session->flashdata('message');
         
         // unshift crumb
-        $this->breadcrumbs->unshift('Procurements', base_url().'admin/procurement');
+        $this->breadcrumbs->unshift('Requisitions', base_url().'admin/requisition');
         
         
-        $btn_array["Add"]["action"] = "admin/procurement/add/";
+        $btn_array["Add"]["action"] = "admin/requisition/add/";
         $btn_array["checkbox_disabled"]["action"] = "admin/product/delete_checked_checkbox/";
         $add_category = $this->menu_model->get_privilege_name($btn_array);
         
-        $this->data['page_title'] = 'Procurements';
+        $this->data['page_title'] = 'requisitions';
         
         $this->load->view('admin/includes/header', $this->data);
-        $this->load->view('admin/procurement/view_procurement', $this->data);
+        $this->load->view('admin/requisition/requisitions', $this->data);
         
     }
     /*---- end: index function ----*/
@@ -128,7 +128,7 @@ class Procurement extends CI_Controller {
     | start: add function
     |------------------------------------------------
     |
-    | This function add new procurement
+    | This function add new requisition
     |
    */
     function add() {
@@ -136,21 +136,21 @@ class Procurement extends CI_Controller {
         // Check user has privileges to add product, else display a message to notify the user they do not have valid privileges.
         if (! $this->flexi_auth->is_privileged($this->uri_privileged))
         {
-                $this->session->set_flashdata('message', '<p class="error_msg">You do not have access privileges to add procurement.</p>');
-                redirect('admin/procurement');		
+                $this->session->set_flashdata('message', '<p class="error_msg">You do not have access privileges to add requisition.</p>');
+                redirect('admin/requisition');		
         }
         
         // start: add breadcrumbs
-        $this->breadcrumbs->push('Add Procurement', base_url().'admin/procurement/add_procurement');
+        $this->breadcrumbs->push('Add Requisition', base_url().'admin/requisition/add_new_requisition');
         
         // unshift crumb
-        $this->breadcrumbs->unshift('Procurements', base_url().'admin/procurement');
+        $this->breadcrumbs->unshift('Requisitions', base_url().'admin/requisition');
         
         
-        $this->data['page_title'] = 'Add Procurement';
+        $this->data['page_title'] = 'Add New Requisition';
         
         $this->load->view('admin/includes/header', $this->data);
-        $this->load->view('admin/procurement/add_procurement', $this->data);
+        $this->load->view('admin/requisition/add_new_requisition', $this->data);
         
     }
     /*---- end: add_product function ----*/
