@@ -64,12 +64,12 @@
                     <?php } ?>
                     <!-- end: Success and error message -->
                     <div class="page-header row">
-                        <h1 class="col-sm-6">Catalog <small>view all Procurements</small></h1>
+                        <h1 class="col-sm-6">Catalog <small>view all Requisitions</small></h1>
                         <!-- start: ADD NEW PRODUCT -->
                         <?php if ($this->flexi_auth->is_privileged($add_product)) { ?>
                             <div class="col-md-2 pull-right">
-                                <a class="btn btn-teal btn-block" href="<?php echo $base_url; ?>admin/procurement/add">
-                                    Add Procurement
+                                <a class="btn btn-teal btn-block" href="<?php echo $base_url; ?>admin/requisition/add">
+                                    Add Requisition
                                 </a>
                             </div>
                         <?php } ?>
@@ -229,7 +229,6 @@
                         <div class="panel-heading">
                             <i class="fa fa-external-link-square"></i>
                             Catalog
-                            
                         </div>
                         <div class="panel-body">
                             <?php
@@ -374,7 +373,7 @@
                 { "orderable": false, "targets": 0 },
                 //{ "orderable": false, "targets": 1 },
                 { "orderable": false, "targets": 2 },
-                { "orderable": false, "targets": 7 }
+                { "orderable": false, "targets": 9 }
             ],
             "columns": [
                 null,
@@ -382,6 +381,8 @@
                 { "width": "10%" },
                 { "width": "30%" },
                 { "width": "10%" },
+                null,
+                null,
                 null,
                 null,
                 { "width": "11%" }
@@ -393,7 +394,7 @@
                 $(".group1").colorbox();
             }
         }).on( 'draw', function () {
-            $('tr td:nth-child(1), tr td:nth-child(3), tr td:nth-child(7)').each(function (){
+            $('tr td:nth-child(1), tr td:nth-child(3), tr td:nth-child(10)').each(function (){
                   $(this).addClass('center')
             })
             

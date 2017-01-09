@@ -113,7 +113,7 @@
                                                 <div class="col-md-6">
                                                     <div class="form-group">
                                                         <label for="requisitionDate">
-                                                            Date <span class="symbol required"></span>
+                                                            Requisition Date <span class="symbol required"></span>
                                                         </label>
                                                         <div class="input-group date">
                                                           <div class="input-group-addon">

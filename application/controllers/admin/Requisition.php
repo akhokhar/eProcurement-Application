@@ -69,7 +69,8 @@ class Requisition extends CI_Controller {
         $check_slash = ($check_slash == "/")?$this->data['sub_menu']:$this->data['sub_menu']."/";
         $check_slash = str_replace("//","/",$check_slash);
 
-
+		$this->load->model('admin/requisition_model');
+		
         $this->uri_privileged = $this->menu_model->get_privilege_name($check_slash);
         $this->data['menu_title'] = $this->uri_privileged;
 
@@ -95,7 +96,7 @@ class Requisition extends CI_Controller {
         // Check user has privileges to view product, else display a message to notify the user they do not have valid privileges.
         if (! $this->flexi_auth->is_privileged($this->uri_privileged))
         {
-                $this->session->set_flashdata('message', '<p class="error_msg">You do not have access privileges to view product.</p>');
+                $this->session->set_flashdata('message', '<p class="error_msg">You do not have access privileges to view requisitions.</p>');
                 if($this->flexi_auth->is_admin())
                     redirect('auth_admin');
                 else
@@ -111,10 +112,10 @@ class Requisition extends CI_Controller {
         
         
         $btn_array["Add"]["action"] = "admin/requisition/add/";
-        $btn_array["checkbox_disabled"]["action"] = "admin/product/delete_checked_checkbox/";
+        //$btn_array["checkbox_disabled"]["action"] = "admin/product/delete_checked_checkbox/";
         $add_category = $this->menu_model->get_privilege_name($btn_array);
         
-        $this->data['page_title'] = 'requisitions';
+        $this->data['page_title'] = 'Requisitions';
         
         $this->load->view('admin/includes/header', $this->data);
         $this->load->view('admin/requisition/requisitions', $this->data);
@@ -141,10 +142,40 @@ class Requisition extends CI_Controller {
         }
         
         // start: add breadcrumbs
-        $this->breadcrumbs->push('Add Requisition', base_url().'admin/requisition/add_new_requisition');
+        $this->breadcrumbs->push('Add Requisition', base_url().'admin/requisition/add');
         
         // unshift crumb
         $this->breadcrumbs->unshift('Requisitions', base_url().'admin/requisition');
+		
+		if($this->input->post()) {
+            
+            //echo '<pre>'; print_r($this->input->post()); die();
+            
+            // load validation helper
+            $this->load->library('form_validation');
+            
+            $this->form_validation->set_rules('requisitionDate', 'Requisition Date', 'required');
+            $this->form_validation->set_rules('requiredUntilDate', 'Required Until Date', 'required');
+            $this->form_validation->set_rules('project', 'Project', 'required');
+            $this->form_validation->set_rules('budgetHead', 'Budget Head', 'required');
+            $this->form_validation->set_rules('location', 'Location', 'required');
+            $this->form_validation->set_rules('donor', 'Donor', 'required');
+            $this->form_validation->set_rules('approvingAuthority', 'Approving Authority', 'required');
+            
+            if ($this->form_validation->run()) {
+                
+                //echo '<pre>'; print_r($this->input->post()); die();
+                
+                if($this->requisition_model->add_requisition()) {
+                    //echo '<pre>'; print_r($this->input->post()); die();
+                    $this->session->set_flashdata('message', '<p class="status_msg">Requisition inserted successfully.</p>');
+                    $product_id = $this->session->flashdata('requisition_id');
+                    redirect('admin/requisition/view_requisition_detail/'.$requisition_id);
+                }
+                
+            }
+            
+        }
         
         
         $this->data['page_title'] = 'Add New Requisition';
@@ -153,6 +184,80 @@ class Requisition extends CI_Controller {
         $this->load->view('admin/requisition/add_new_requisition', $this->data);
         
     }
-    /*---- end: add_product function ----*/
+    /*---- end: add function ----*/
+	
+	
+	/*
+    |------------------------------------------------
+    | start: edit_product function
+    |------------------------------------------------
+    |
+    | This function update requisition
+    |
+   */
+    function edit($requisition_id) {
+        
+        // Check user has privileges to edit requisition, else display a message to notify the user they do not have valid privileges.
+        if (! $this->flexi_auth->is_privileged($this->uri_privileged))
+        {
+                $this->session->set_flashdata('message', '<p class="error_msg">You do not have access privileges to edit requisition.</p>');
+                redirect('admin/requisition');
+        }
+        
+        // active menu
+        $this->data['sub_menu'] = $this->data['uri_1'].'/requisition/';
+        
+        // start: add breadcrumbs
+        $this->breadcrumbs->push('Edit Requisition', base_url().'admin/requisition/edit');
+        
+        // unshift crumb
+        $this->breadcrumbs->unshift('Catalog', base_url().'admin/requisition');
+        
+        if($this->input->post()) {
+            
+            //echo '<pre>'; print_r($this->input->post()); die();
+            
+            // load validation helper
+            $this->load->library('form_validation');
+            
+            $this->form_validation->set_rules('requisitionDate', 'Requisition Date', 'required');
+            $this->form_validation->set_rules('requiredUntilDate', 'Required Until Date', 'required');
+            $this->form_validation->set_rules('project', 'Project', 'required');
+            $this->form_validation->set_rules('budgetHead', 'Budget Head', 'required');
+            $this->form_validation->set_rules('location', 'Location', 'required');
+            $this->form_validation->set_rules('donor', 'Donor', 'required');
+            $this->form_validation->set_rules('approvingAuthority', 'Approving Authority', 'required');
+            
+            if ($this->form_validation->run()) {
+                
+                if($this->requisition_model->edit_requisition($requisition_id)) {
+                    //echo '<pre>'; print_r($this->input->post()); die();
+                    $this->session->set_flashdata('message', '<p class="status_msg">Requisition updated successfully.</p>');
+                    redirect('admin/requisition/view_requisition_detail/'.$requisition_id);
+                }
+                
+            }
+            
+        }
+        
+        // ************************************
+        // start: get requisition by id
+        // ************************************
+        $db_where_column    = array('requisition_id');
+        $db_where_value     = array($requisition_id);
+        
+        $this->data['requisition'] = $this->requisition_model->get_requisition($db_where_column, $db_where_value);
+        $this->data['requisition'] = $this->data['requisition'][0];
+        
+		
+        $this->data['currentPage'] = $this;
+
+        $this->data['page_title'] = 'Update Requisition';
+        
+        $this->load->view('admin/includes/header', $this->data);
+        $this->load->view('admin/requisition/edit_requisition', $this->data);
+        
+    }
+    /*---- end: edit_requisition function ----*/
     
 }
