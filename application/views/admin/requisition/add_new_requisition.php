@@ -71,7 +71,7 @@
                     <div class="page-header row">
                         <h1 class="col-sm-6">Add New Requisition <small></small></h1>
                         <div class="col-md-2 pull-right">
-                        	<button type="submit" class="btn btn-primary pull-right" disabled>Create Requisition</button>
+                        	<button type="button" class="btn btn-primary pull-right" id="newRequisitionButton" disabled>Create Requisition</button>
                         </div>
                     </div>
                     <!-- end: PAGE TITLE & BREADCRUMB -->
@@ -452,7 +452,7 @@ $(function () {
   addformHeaderToTable('#addItemForm', '#itemsDataTable', 'S.No.', 'Remove');
   
   //validate form data
-  $('#addItemForm').validator();
+  //$('#addItemForm').validator();
   
   //addItemForm Object Creation and add into Table
   function addformDataToTable(formId, tableId, firstCol, edit, remove) {
@@ -468,7 +468,8 @@ $(function () {
       $(tableId).removeClass('hidden');
       $(tableId).after('h3').remove();
     }*/
-    $(formId).validator().on('submit', function(e) {
+    //$(formId).validator().on('submit', function(e) {
+	$(formId).on('submit', function(e) {
       if (!$(formId).find(':submit').hasClass('disabled')) {
         var formData = $(formId).serializeArray();
         var tableDataLength = $(tableId).find('tbody tr').length;
@@ -487,25 +488,35 @@ $(function () {
         $(tableId).find('tbody').append(tdHtml);
         $(formId)[0].reset();
       }
-      console.log(requisitionItems)
       e.preventDefault();
     });
   }
   addformDataToTable('#addItemForm', '#itemsDataTable', true, false, true);
   
+  $('#newRequisitionButton').on('click', function(e) {
+	  $.ajax({
+		  type: "POST",
+		  url:"requisition/add",
+		  data: {requisition: $('#generalRequisitionForm').serialize(), items: requisitionItems},
+		  success: function(response) {
+			  	console.log(response);
+			  }
+	  });
+  });
   //enable general requisition button
-  $('#addItemForm').validator().on('submit', function(e) {
+  //$('#addItemForm').validator().on('submit', function(e) {
+  $('#addItemForm').on('submit', function(e) {
       enableDisableGeneralButton();
       e.preventDefault();
-    });
+  });
   
   function enableDisableGeneralButton() {
     var numRows = $('#itemsDataTable').find('tbody tr').length;
       if (!!numRows) {
-        $('#generalRequisitionForm').find(':submit').removeAttr('disabled').removeClass('disabled');
+        $('#newRequisitionButton').removeAttr('disabled').removeClass('disabled');
       }
       else {
-        $('#generalRequisitionForm').find(':submit').prop('disabled', true);
+        $('#newRequisitionButton').prop('disabled', true);
       }
   }
 
@@ -533,113 +544,10 @@ $(function () {
       'info': true,
       'autoWidth': false
     });*/
+	
 });
 </script>
-<!-- The template to display files available for upload -->
-<script id="template-upload" type="text/x-tmpl">
-    {% console.log(o.options.fileInput[0].id); for (var i=0, file; file=o.files[i]; i++) { %}
-    <tr class="template-upload fade">
-    <td>
-    <span class="preview"></span>
-    </td>
-    <td>
-    <p class="name">{%=file.name%}</p>
-    <strong class="error text-danger"></strong>
-    </td>
-    <td>
-                
-    {% if(o.options.fileInput[0].id == 'file_images') { %}
-        Main Image&nbsp;&nbsp;
-        <input type="radio" {% var fileType = file.name.split('.').pop(), allowdtypes = 'jpeg,jpg,png,gif'; if (allowdtypes.indexOf(fileType.toLowerCase()) < 0) { %} disabled="disabled"  {% } %} value="" name="main_image" class="main_image">
-    {% } %}
-    
-    {% if(o.options.fileInput[0].id == 'file_thumbnail') { %}
-        Main Thumbnail&nbsp;&nbsp;
-        <input type="radio" {% var fileType = file.name.split('.').pop(), allowdtypes = 'jpeg,jpg,png,gif'; if (allowdtypes.indexOf(fileType.toLowerCase()) < 0) { %} disabled="disabled"  {% } %} value="" name="main_thumbnail" class="main_thumbnail">
-    {% } %}
-    
-    
-    </td>
-    <td>
-    <p class="size">Processing...</p>
-    <div class="progress progress-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="progress-bar progress-bar-success" style="width:0%;"></div></div>
-    </td>
-    <td>
-    {% if (!i && !o.options.autoUpload) { %}
-    <button class="btn btn-primary start" disabled>
-    <i class="glyphicon glyphicon-upload"></i>
-    <span>Start</span>
-    </button>
-    {% } %}
-    {% if (!i) { %}
-    <button class="btn btn-warning cancel">
-    <i class="glyphicon glyphicon-ban-circle"></i>
-    <span>Cancel</span>
-    </button>
-    {% } %}
-    </td>
-    </tr>
-    {% } %}
-</script>
-<!-- The template to display files available for download -->
-<script id="template-download" type="text/x-tmpl">
-    {% console.log(o); for (var i=0, file; file=o.files[i]; i++) { %}
-    <tr class="template-download fade">
-    <td>
-    <span class="preview">
-    {% if (file.thumbnailUrl) { %}
-    <a href="{%=file.url%}" title="{%=file.name%}" download="{%=file.name%}" data-gallery><img width="150" height="150" src="{%=file.thumbnailUrl%}"></a>
-    {% } else { %}
-    <video src="{%=file.url%}" width="150" height="150" controls></video>
-    {% } %}
-    </span>
-    <input type="hidden" value="{%=file.id%}" name="images_id[]">
-    </td>
-    <td>
-    <p class="name">
-    {% if (file.url) { %}
-    <a href="{%=file.url%}" title="{%=file.name%}" download="{%=file.name%}" {%=file.thumbnailUrl?'data-gallery':''%}>{%=file.name%}</a>
-    {% } else { %}
-    <span>{%=file.name%}</span>
-    {% } %}
-    </p>
-    {% if (file.error) { %}
-    <div><span class="label label-danger">Error</span> {%=file.error%}</div>
-    {% } %}
-    </td>
-    <td>
-    
-    {% if(o.options.fileInput[0].id == 'file_images') { %}
-        Main Image&nbsp;&nbsp;
-        <input type="radio" {% var fileType = file.name.split('.').pop(), allowdtypes = 'jpeg,jpg,png,gif'; if (allowdtypes.indexOf(fileType.toLowerCase()) < 0) { %} disabled="disabled"  {% } %} value="{%=file.id%}" name="main_image" class="main_image">
-    {% } %}
-    
-    {% if(o.options.fileInput[0].id == 'file_thumbnail') { %}
-        Main Thumbnail&nbsp;&nbsp;
-        <input type="radio" {% var fileType = file.name.split('.').pop(), allowdtypes = 'jpeg,jpg,png,gif'; if (allowdtypes.indexOf(fileType.toLowerCase()) < 0) { %} disabled="disabled"  {% } %} value="{%=file.id%}" name="main_thumbnail" class="main_thumbnail">
-    {% } %}
-    
-    </td>
-    <td>
-    <span class="size">{%=o.formatFileSize(file.size)%}</span>
-    </td>
-    <td>
-    {% if (file.deleteUrl) { %}
-    <button class="btn btn-danger delete" data-type="{%=file.deleteType%}" data-url="{%=file.deleteUrl%}"{% if (file.deleteWithCredentials) { %} data-xhr-fields='{"withCredentials":true}'{% } %}>
-    <i class="glyphicon glyphicon-trash"></i>
-    <span>Delete</span>
-    </button>
-    <input type="checkbox" name="delete" value="1" class="toggle">
-    {% } else { %}
-    <button class="btn btn-warning cancel">
-    <i class="glyphicon glyphicon-ban-circle"></i>
-    <span>Cancel</span>
-    </button>
-    {% } %}
-    </td>
-    </tr>
-    {% } %}
-</script>
+
 <!-- The jQuery UI widget factory, can be omitted if jQuery UI is already included -->
 <script src="<?php echo $includes_dir; ?>admin/plugins/jQuery-File-Upload/js/vendor/jquery.ui.widget.js"></script>
 <!-- The Templates plugin is included to render the upload/download listings -->
@@ -651,24 +559,6 @@ $(function () {
 
 <!-- blueimp Gallery script -->
 <script src="<?php echo $includes_dir; ?>admin/plugins/blueimp/jquery.blueimp-gallery.min.js"></script>
-<!-- The Iframe Transport is required for browsers without support for XHR file uploads -->
-<script src="<?php echo $includes_dir; ?>admin/plugins/jQuery-File-Upload/js/jquery.iframe-transport.js"></script>
-<!-- The basic File Upload plugin -->
-<script src="<?php echo $includes_dir; ?>admin/plugins/jQuery-File-Upload/js/jquery.fileupload.js"></script>
-<!-- The File Upload processing plugin -->
-<script src="<?php echo $includes_dir; ?>admin/plugins/jQuery-File-Upload/js/jquery.fileupload-process.js"></script>
-<!-- The File Upload image preview & resize plugin -->
-<script src="<?php echo $includes_dir; ?>admin/plugins/jQuery-File-Upload/js/jquery.fileupload-image.js"></script>
-<!-- The File Upload audio preview plugin -->
-<script src="<?php echo $includes_dir; ?>admin/plugins/jQuery-File-Upload/js/jquery.fileupload-audio.js"></script>
-<!-- The File Upload video preview plugin -->
-<script src="<?php echo $includes_dir; ?>admin/plugins/jQuery-File-Upload/js/jquery.fileupload-video.js"></script>
-<!-- The File Upload validation plugin -->
-<script src="<?php echo $includes_dir; ?>admin/plugins/jQuery-File-Upload/js/jquery.fileupload-validate.js"></script>
-<!-- The File Upload user interface plugin -->
-<script src="<?php echo $includes_dir; ?>admin/plugins/jQuery-File-Upload/js/jquery.fileupload-ui.js"></script>
-<!-- The main application script -->
-<script src="<?php echo $includes_dir; ?>admin/plugins/jQuery-File-Upload/js/main.js"></script>
 <!-- The XDomainRequest Transport is included for cross-domain file deletion for IE 8 and IE 9 -->
 <!--[if (gte IE 8)&(lt IE 10)]>
 <script src="js/cors/jquery.xdr-transport.js"></script>
@@ -686,8 +576,8 @@ $(function () {
     // atart: validation
     // ==============================
     var FormValidator = function () {
-        var productForm = function () {
-            var form1 = $('#product_form');
+        var generalRequisitionForm = function () {
+            var form1 = $('#generalRequisitionForm');
             var errorHandler1 = $('.errorHandler', form1);
             var successHandler1 = $('.successHandler', form1);
             $('#generalRequisitionForm').validate({
@@ -733,12 +623,14 @@ $(function () {
                     }
                 },
                 messages: {
-                    product_title: "Please specify product title",
-                    product_cat_id: "Please select category",
-                    product_model: "Please specify product model",
-                    product_price: "Please specify product price",
-                    product_status: "Please select product status",
-                    product_house_status: "Please select warehouse status",
+                    RequisitionDate: "Please specify product title",
+                    refNumber: "Please select category",
+                    budgetHead: "Please specify product model",
+                    donor: "Please specify product price",
+                    requiredUntilDate: "Please select product status",
+                    location: "Please select warehouse status",
+                    project: "Please select warehouse status",
+                    approvingAuthority: "Please select warehouse status"
                 },
                 invalidHandler: function (event, validator) { //display error alert on form submit
                     successHandler1.hide();
@@ -774,15 +666,106 @@ $(function () {
                     errorHandler1.hide();
                     // submit form
                     //$('#form').submit();
-                    HTMLFormElement.prototype.submit.call($('#product_form')[0]);
+                    HTMLFormElement.prototype.submit.call($('#generalRequisitionForm')[0]);
                 }
             });
         };
 
+		var addItemForm = function () {
+            var form1 = $('#addItemForm');
+            var errorHandler1 = $('.errorHandler', form1);
+            var successHandler1 = $('.successHandler', form1);
+            $('#addItemForm').validate({
+                errorElement: "span", // contain the error msg in a span tag
+                errorClass: 'help-block',
+                errorPlacement: function (error, element) {
+                    if ( element.is(":radio") ||  element.is(":checkbox"))
+                    {
+                        error.appendTo( element.parents('.container_radio') );
+                    }
+                    else{
+                        error.insertAfter(element);
+                    }
+
+                        // for other inputs, just perform default behavior
+                },
+                ignore: ".ignore",
+                rules: {
+                    itemName: {
+                        required: true
+                    },
+                    itemDescription: {
+                        required: true
+                    },
+                    costCenter: {
+                        required: true
+                    },
+                    unit: {
+                        required: true
+                    },
+                    quantity: {
+                        required: true
+                    },
+                    unitPrice: {
+                        required: true
+                    },
+                    totalPrice: {
+                        required: true
+                    }
+                },
+                messages: {
+                    itemName: "Please specify product title",
+                    itemDescription: "Please select category",
+                    costCenter: "Please specify product model",
+                    unit: "Please specify product price",
+                    quantity: "Please select product status",
+                    unitPrice: "Please select warehouse status",
+                    totalPrice: "Please select warehouse status"
+                },
+                invalidHandler: function (event, validator) { //display error alert on form submit
+                    successHandler1.hide();
+                    errorHandler1.show();
+                },
+                highlight: function (element) {
+                    $(element).closest('.help-block').removeClass('valid');
+                    // display OK icon
+                    $(element).closest('.form-group').removeClass('has-success').addClass('has-error').find('.symbol').removeClass('ok').addClass('required');
+                    // add the Bootstrap error class to the control group
+                    
+                    var tab_pane_id = $(element).closest('.form-group').parents('.tab-pane').attr('id');
+                    $('a[href=#'+tab_pane_id+']').parent('li').addClass('has-error-tab');                    
+                },
+                unhighlight: function (element) { // revert the change done by hightlight
+                    $(element).closest('.form-group').removeClass('has-error');
+                    // set error class to the control group
+                    
+                    var tab_pane = $(element).closest('.form-group').parents('.tab-pane');
+                    
+                    if(tab_pane.find('.has-error').length == 0) {
+                        var tab_pane_id = tab_pane.attr('id');
+                        $('a[href=#'+tab_pane_id+']').parent().removeClass('has-error-tab');
+                    }
+                },
+                success: function (label, element) {
+                    label.addClass('help-block valid');
+                    // mark the current input as valid and display OK icon
+                    $(element).closest('.form-group').removeClass('has-error').addClass('has-success').find('.symbol').removeClass('required').addClass('ok');
+                },
+                submitHandler: function (form) {
+                    successHandler1.show();
+                    errorHandler1.hide();
+                    // submit form
+                    //$('#form').submit();
+                    HTMLFormElement.prototype.submit.call($('#addItemForm')[0]);
+                }
+            });
+        };
+		
         return {
             //main function to initiate pages
             init: function () {
-                productForm();
+                addItemForm();
+                generalRequisitionForm();
             }
         };
     }();
@@ -826,54 +809,7 @@ $(function () {
         Main.init();
         FormElements.init();
         FormValidator.init();
-
-        $(".product_cat_id").change(function () {
-         
-            var category_id = $(this).val();
-            
-            if(category_id == '') {
-                $("#custom_fields").html('');
-            }
-            
-            $.ajax({
-                url: '<?php echo base_url(); ?>admin/product/get_category_by_parent',
-                type: 'POST',
-                dataType: "JSON",
-                data: {category_id: category_id},
-                success: function(response) {
-                    
-                    var multi_select = $('#multi-selecter-box');
-                    
-                    multi_select.empty();
-                    
-                    multi_select.append('<select name="category_id[]" id="form-field-select-4" multiple="multiple" class="category_id form-control"></select>');
-                    
-                    var select = $('.category_id');
-         
-                    if(response.length != 0) {
-                        $.each(response, function (i, fb) {
-                            if(fb.cat_id != category_id) {
-                                console.log(fb);
-                                select.append('<option custom_id="" value="' + fb.cat_id + '">' + fb.cat_title + '</option>');
-                            }
-                        });
-                    }
-                    
-                    $('.category_id').multiSelect({
-                        selectableHeader: "<div class='custom-header'>Selectable items</div>",
-                        selectionHeader: "<div class='custom-header'>Selection items</div>",
-                    })
-                },
-                error: function () {
-                    console.log('Error in retrieving Site.');
-                }
-            });
-
-            if(category_id != ""){
-                $("#custom_fields").load("<?php echo base_url(); ?>admin/product/get_custom_fields/"+true, { category: category_id} );
-            }
-        });
-         
+  
         $('#submit_btn').click(function() {
         //alert('TESTING');
             /*if($('body').hasClass('has-error')) {
@@ -953,82 +889,6 @@ $(function () {
             
         })
         
-        
-        $('.price_value').keyup(function() {
-            
-            var price_value     = parseFloat($(this).val());
-            var price_value_id  = $(this).attr('id');
-            var discount_type   = $("input[name=product_disc_type]:checked").val()
-            
-            if(typeof discount_type == 'undefined') {
-                return false;
-            }
-            
-            if(price_value_id == 'product_price') {
-                var product_discount = parseFloat($('#product_discount').val());
-                var product_price = price_value;
-            }
-            else {
-                var product_price  = parseFloat($('#product_price').val());
-                var product_discount = price_value;
-            }
-            
-            if(product_price == '' && product_discount == '') {
-                return false;
-            }
-            
-            if(discount_type == '1') { 
-                if(product_discount < product_price) {
-                    var discount_value = product_price-product_discount;
-                }
-                
-                if(product_discount >= product_price) {
-                    var count_length = $("product_discount").text().length;
-                    $("#product_discount").attr('maxlength', count_length);
-                    $("#product_discount").val('');
-                }
-                else {
-                    $("#product_discount").removeAttr('maxlength');
-                }
-                    
-            }
-            else if(discount_type == '2') {
-                if(product_discount < 100) {
-                    var discount_persent_value = (product_discount/100)*product_price;
-                    discount_value = product_price-discount_persent_value
-                }
-                
-                //alert(product_discount);
-                if(product_discount > 99) {
-                    $("#product_discount").attr('maxlength', '2');
-                    $("#product_discount").val('');
-                }
-                else {
-                    $("#product_discount").removeAttr('maxlength');
-                }
-            }
-            
-            $('#discount_value').val(discount_value.toFixed(2));
-        })
-        /* ========== end: discount type ========== */
-        
-        $(".open_popup").click(function(){
-            $('#event-management').modal('show');
-        })
-        //https://www.youtube.com/embed/C0DPdy98e4c
-        //https://www.youtube.com/watch?v=nPSbOsOJ9Ro
-        $(".save-event").click(function(){
-            $('#event-management').modal('hide');
-            var videoName = $.trim($('#videoName').val());
-            var videoUrl = $.trim($('#videoUrl').val());
-            if(videoUrl != ""){
-                videoUrl = videoUrl.split("=");
-                videoUrl = "<?php echo $this->config->item("youtube_http"); ?>"+videoUrl[1];
-            $(".video_url").append("<tr class='template-download fade in'><td><input type='hidden' name='videoName[]' value='"+videoName+"'><input type='hidden' name='videoUrl[]' value='"+videoUrl+"'><iframe width='150' height='150' src='"+videoUrl+"'></iframe></td><td>"+videoName+"</td><td>&nbsp;</td><td>0 MB</td><td><button data-type='DELETE' class='btn btn-danger delete'><i class='glyphicon glyphicon-trash'></i><span>Delete</span></button>&nbsp;<input type='checkbox' class='toggle' value='1' name='delete'></td></tr>");
-            $('#videoName').val("");
-            $('#videoUrl').val("");
-         }
-        });
         $('.btn-danger').prop("disabled", false); // its by default set to disable thats why place that line
         
     });
