@@ -74,11 +74,14 @@
                         	<button type="button" class="btn btn-primary pull-right" id="newRequisitionButton" disabled>Create Requisition</button>
                         </div>
                     </div>
+                    
                     <!-- end: PAGE TITLE & BREADCRUMB -->
                 </div>
             </div>
             <!-- end: PAGE HEADER -->
-            
+            <!--Error and success messages-->
+            <div id="msg_success"></div>
+            <div id="msg_error"></div>
                 <!-- start: PAGE CONTENT -->
                 <div class="row">
                     <div class="col-sm-12">
@@ -329,7 +332,7 @@
                                                   <div class="col-md-6">
                                                     <div class="form-group">
                                                         <label for="totalPrice">Estimated Total Unit Value (Rs)</label>
-                                                        <input type="number" class="form-control" readonly name="totalPrice" required id="totalPrice" min="1" value="0">
+                                                        <input type="number" class="form-control" readonly name="totalPrice" required id="totalPrice" value="0">
                                                     </div>
                                                   </div>
                                                 </div>
@@ -413,6 +416,10 @@
 <script src="<?php echo $includes_dir; ?>admin/js/form-elements.js"></script>
 
 <script type="text/javascript">
+
+var isItemFormValidated = false;
+var isRequisitionFormValidated = false;
+
 $(function () {
     //Date picker
     $('.datepicker').datepicker({
@@ -453,7 +460,6 @@ $(function () {
   
   //validate form data
   //$('#addItemForm').validator();
-  
   //addItemForm Object Creation and add into Table
   function addformDataToTable(formId, tableId, firstCol, edit, remove) {
     var tableBody = '<tbody></tbody>';
@@ -470,7 +476,7 @@ $(function () {
     }*/
     //$(formId).validator().on('submit', function(e) {
 	$(formId).on('submit', function(e) {
-      if (!$(formId).find(':submit').hasClass('disabled')) {
+      if (isItemFormValidated) {
         var formData = $(formId).serializeArray();
         var tableDataLength = $(tableId).find('tbody tr').length;
         requisitionItems[tableDataLength] = formData;
@@ -494,13 +500,25 @@ $(function () {
   addformDataToTable('#addItemForm', '#itemsDataTable', true, false, true);
   
   $('#newRequisitionButton').on('click', function(e) {
-	  $.ajax({
-		  type: "POST",
-		  url:"requisition/add",
-		  data: {requisition: $('#generalRequisitionForm').serialize(), items: requisitionItems},
-		  success: function(response) {
-			  	console.log(response);
-			  }
+	  $('#generalRequisitionForm').trigger('submit', function(e) {
+		  if (isRequisitionFormValidated) {
+			  $.ajax({
+				  type: "POST",
+				  url:"<?php echo base_url().BASE_DIR; ?>requisition/add",
+				  dataType: "json",  
+				  cache:false,
+				  data: {form_data: true, requisition: $('#generalRequisitionForm').serializeArray(), items: requisitionItems},
+				  success: function(response) {
+					  if (!!response.msg_success) {
+						$('#msg_success').text(response.msg_success);
+					  }
+					  if (!!response.msg_error) {
+						$('#msg_error').text(response.msg_error);
+					  }
+				  }
+			  });
+		  }
+          e.preventDefault();
 	  });
   });
   //enable general requisition button
@@ -569,12 +587,13 @@ $(function () {
 <!-- end: JAVASCRIPTS REQUIRED FOR THIS PAGE ONLY -->
 
 
-
 <script>    
 
     // ==============================
     // atart: validation
     // ==============================
+	var emptyMsg = " cannot be empty";
+	
     var FormValidator = function () {
         var generalRequisitionForm = function () {
             var form1 = $('#generalRequisitionForm');
@@ -597,7 +616,6 @@ $(function () {
                 ignore: ".ignore",
                 rules: {
                     RequisitionDate: {
-                        minlength: 2,
                         required: true
                     },
                     refNumber: {
@@ -623,14 +641,14 @@ $(function () {
                     }
                 },
                 messages: {
-                    RequisitionDate: "Please specify product title",
-                    refNumber: "Please select category",
-                    budgetHead: "Please specify product model",
-                    donor: "Please specify product price",
-                    requiredUntilDate: "Please select product status",
-                    location: "Please select warehouse status",
-                    project: "Please select warehouse status",
-                    approvingAuthority: "Please select warehouse status"
+                    RequisitionDate: "Requisition Date" + emptyMsg,
+                    refNumber: "Reference Number" + emptyMsg,
+                    budgetHead: "Budget Head" + emptyMsg,
+                    donor: "Donor" + emptyMsg,
+                    requiredUntilDate: "Required Until Date" + emptyMsg,
+                    location: "Location" + emptyMsg,
+                    project: "Project" + emptyMsg,
+                    approvingAuthority: "Approving Authority" + emptyMsg
                 },
                 invalidHandler: function (event, validator) { //display error alert on form submit
                     successHandler1.hide();
@@ -641,14 +659,14 @@ $(function () {
                     // display OK icon
                     $(element).closest('.form-group').removeClass('has-success').addClass('has-error').find('.symbol').removeClass('ok').addClass('required');
                     // add the Bootstrap error class to the control group
-                    
+                    isRequisitionFormValidated = false;
                     var tab_pane_id = $(element).closest('.form-group').parents('.tab-pane').attr('id');
                     $('a[href=#'+tab_pane_id+']').parent('li').addClass('has-error-tab');                    
                 },
                 unhighlight: function (element) { // revert the change done by hightlight
                     $(element).closest('.form-group').removeClass('has-error');
                     // set error class to the control group
-                    
+                    isRequisitionFormValidated = true;
                     var tab_pane = $(element).closest('.form-group').parents('.tab-pane');
                     
                     if(tab_pane.find('.has-error').length == 0) {
@@ -708,19 +726,15 @@ $(function () {
                     },
                     unitPrice: {
                         required: true
-                    },
-                    totalPrice: {
-                        required: true
                     }
                 },
                 messages: {
-                    itemName: "Please specify product title",
-                    itemDescription: "Please select category",
-                    costCenter: "Please specify product model",
-                    unit: "Please specify product price",
-                    quantity: "Please select product status",
-                    unitPrice: "Please select warehouse status",
-                    totalPrice: "Please select warehouse status"
+                    itemName: "Item Name" + emptyMsg,
+                    itemDescription: "Item Description" + emptyMsg,
+                    costCenter: "Cost Center" + emptyMsg,
+                    unit: "Unit" + emptyMsg,
+                    quantity: "Quantity" + emptyMsg,
+                    unitPrice: "Unit Price" + emptyMsg
                 },
                 invalidHandler: function (event, validator) { //display error alert on form submit
                     successHandler1.hide();
@@ -732,6 +746,7 @@ $(function () {
                     $(element).closest('.form-group').removeClass('has-success').addClass('has-error').find('.symbol').removeClass('ok').addClass('required');
                     // add the Bootstrap error class to the control group
                     
+					isItemFormValidated = false;
                     var tab_pane_id = $(element).closest('.form-group').parents('.tab-pane').attr('id');
                     $('a[href=#'+tab_pane_id+']').parent('li').addClass('has-error-tab');                    
                 },
@@ -741,6 +756,7 @@ $(function () {
                     
                     var tab_pane = $(element).closest('.form-group').parents('.tab-pane');
                     
+					isItemFormValidated = true;
                     if(tab_pane.find('.has-error').length == 0) {
                         var tab_pane_id = tab_pane.attr('id');
                         $('a[href=#'+tab_pane_id+']').parent().removeClass('has-error-tab');
@@ -749,13 +765,14 @@ $(function () {
                 success: function (label, element) {
                     label.addClass('help-block valid');
                     // mark the current input as valid and display OK icon
+					
                     $(element).closest('.form-group').removeClass('has-error').addClass('has-success').find('.symbol').removeClass('required').addClass('ok');
                 },
                 submitHandler: function (form) {
                     successHandler1.show();
                     errorHandler1.hide();
                     // submit form
-                    //$('#form').submit();
+                    //$('#addItemForm').submit();
                     HTMLFormElement.prototype.submit.call($('#addItemForm')[0]);
                 }
             });
@@ -773,27 +790,6 @@ $(function () {
     
     jQuery(document).ready(function () {
         
-        $(".discount_div input:radio").click(function(){		
-	        		
-            var val= $("input[name=product_disc_type]:checked").val();		
-
-            if(val==1){		
-                $('#product_discount').prop('readonly',false);		
-                $('#product_discount').val('');		
-                $('#discount_value').val('');		
-            }		
-            if(val==2){		
-                $('#product_discount').prop('readonly',false);		
-                $('#product_discount').val('');		
-                $('#discount_value').val('');		
-            }		
-            if(val==0){		
-                $('#product_discount').prop('readonly',true);		
-                $('#product_discount').val('0');		
-                $('#discount_value').val('0');		
-            }		
-        });
-        
         $('.next_tab').click(function() {
             var href = $(this).attr('href'); //alert(href);
             
@@ -810,28 +806,6 @@ $(function () {
         FormElements.init();
         FormValidator.init();
   
-        $('#submit_btn').click(function() {
-        //alert('TESTING');
-            /*if($('body').hasClass('has-error')) {
-                $('.has-error').each(function() {
-                    alert('REHMAN');
-                })
-            }*/
-
-            $('textarea[name="product_policy"]').html($('#product_policy').code());
-            $('textarea[name="product_description"]').html($('#product_description').code());
-            $('textarea[name="pack_include"]').html($('#pack_include').code());
-        
-            $('#product_form').attr('action', '<?php echo current_url(); ?>');
-            $('#product_form').submit();
-        
-        });
-        
-        $('#submit_btn_upload').click(function() {
-            
-            $('#product_form').attr('action', '<?php echo $base_url; ?>admin/product/file_upload');
-        
-        });
         
         
         $('.category_id').multiSelect({
