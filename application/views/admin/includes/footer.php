@@ -2,7 +2,7 @@
 <div class="footer clearfix">
     <div class="footer-inner">
         <!--2014 &copy; clip-one by cliptheme.-->
-        <?php echo ($this->session->userdata('footer_message')) ? $this->session->userdata('footer_message') : '@copyright 2016, sapphire.co'; ?>
+        <?php echo ($this->session->userdata('footer_message')) ? $this->session->userdata('footer_message') : '@copyright 2017'; ?>
     </div>
     <div class="footer-items">
         <span class="go-top"><i class="clip-chevron-up"></i></span>
