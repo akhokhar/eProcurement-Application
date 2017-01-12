@@ -70,6 +70,7 @@ class Requisition extends CI_Controller {
         $check_slash = str_replace("//","/",$check_slash);
 
 		$this->load->model('admin/requisition_model');
+		$this->load->model('admin/general_model');
 		
         $this->uri_privileged = $this->menu_model->get_privilege_name($check_slash);
         $this->data['menu_title'] = $this->uri_privileged;
@@ -148,10 +149,8 @@ class Requisition extends CI_Controller {
         $this->breadcrumbs->unshift('Requisitions', base_url().'admin/requisition');
 		
 		if($this->input->post()) {
-            
             //echo '<pre>'; print_r($this->input->post()); die();
-            
-            // load validation helper
+			// load validation helper
             $this->load->library('form_validation');
             
             $this->form_validation->set_rules('requisitionDate', 'Requisition Date', 'required');
@@ -164,18 +163,70 @@ class Requisition extends CI_Controller {
             
             if ($this->form_validation->run()) {
                 
-                //echo '<pre>'; print_r($this->input->post()); die();
+				if($requisition_id = $this->requisition_model->add_requisition()) {
+					// If Requisition added successfully, then add items
+					// Item work goes here....
+					foreach($_POST as $post){
+						
+						//Set Parameters for adding items to requisition
+						$itemName = '';
+						$itemDesc = '';
+						$costCenter = '';
+						$unit = '';
+						$quantity = '';
+						$unitPrice = '';
+						$totalPrice = '';
+						
+						$itemCounter = 0;
+						foreach($_POST['items'] as $items){
+							$fieldName = $item[$itemCounter]['name'];
+							$fieldValue = $item[$itemCounter]['value'];
+							
+							if($fieldName == "itemName"){
+								$itemName = $fieldValue;
+							}
+							if($fieldName == "itemDescription"){
+								$itemDesc = $fieldValue;
+							}
+							if($fieldName == "costCenter"){
+								$costCenter = $fieldValue;
+							}
+							if($fieldName == "unit"){
+								$unit = $fieldValue;
+							}
+							if($fieldName == "quantity"){
+								$quantity = $fieldValue;
+							}
+							if($fieldName == "unitPrice"){
+								$unitPrice = $fieldValue;
+							}
+							if($fieldName == "totalPrice"){
+								$totalPrice = $fieldValue;
+							}
+							
+							// Calling method to add requisition item.
+							$this->requisition_model->add_requisition_item($requisition_id, $itemName, $itemDesc, $costCenter, $unit, $quantity, $unitPrice);
+							
+							$itemCounter++;
+						}
+					
+					}
+					
+					$return['msg_success'] = 'Requisition Added Successfully.';
+                } else{
+					$return['msg_error'] = 'Something went wrong, please try again.';
+				}
                 
-                if($this->requisition_model->add_requisition()) {
-                    //echo '<pre>'; print_r($this->input->post()); die();
-                    $this->session->set_flashdata('message', '<p class="status_msg">Requisition inserted successfully.</p>');
-                    $product_id = $this->session->flashdata('requisition_id');
-                    redirect('admin/requisition/view_requisition_detail/'.$requisition_id);
-                }
-                
-            }
+            } else{
+				$return['msg_error'] = 'Please fill all required fields.';
+			}
             
         }
+		
+		$this->data['projects'] = $this->general_model->list_projects();
+		$this->data['budgetHeads'] = $this->general_model->list_budget_head();
+		$this->data['locations'] = $this->general_model->list_locations();
+		$this->data['donors'] = $this->general_model->list_donors();
         
         
         $this->data['page_title'] = 'Add New Requisition';

@@ -245,13 +245,11 @@
                                                     <input type="checkbox" class="flat-grey">
                                                 </label>
                                             </div>--></th>
-                                        <th class="center">ID</th>
-                                        <th class="center">Requisition Number</th>
-                                        <th>Requisition Date</th>
-                                        <th class="hidden-xs">Category</th>
-                                        <th class="hidden-xs">Price</th>
-                                        <th class="hidden-xs">Quantity</th>
-                                        <th class="hidden-xs">Status</th>
+                                        <th class="center">Project</th>
+                                        <th class="center">Budget Head</th>
+                                        <th class="hidden-xs">Location</th>
+                                        <th class="hidden-xs">Donor</th>
+                                        <th class="hidden-xs">Approving Authority</th>
                                         <th class="center">Action</th>
                                     </tr>
                                 </thead>
@@ -374,17 +372,16 @@
                 { "orderable": false, "targets": 0 },
                 //{ "orderable": false, "targets": 1 },
                 { "orderable": false, "targets": 2 },
-                { "orderable": false, "targets": 7 }
+                { "orderable": false, "targets": 5 }
             ],
             "columns": [
                 null,
                 null,
-                { "width": "10%" },
-                { "width": "30%" },
-                { "width": "10%" },
+                null,
+				null,
                 null,
                 null,
-                { "width": "11%" }
+                null
             ],
             "pageLength": 20,
             "lengthMenu": [[10, 20, 50, -1], [10, 20, 50, "All"]],

@@ -178,7 +178,7 @@ class server_datatables extends CI_Controller {
         $dataCount = $this->requisition_model->get_requisition($db_where_column, $db_where_value, $db_where_column_or, $db_where_value_or);
         // end: get all requisitions or search requisition
         
-        $dt_column = array('requisition_id', 'requisition_num', 'date_req', 'date_req_until', 'is_approved', 'status');
+        $dt_column = array('project_name', 'budget_head', 'location_name', 'donor_name', 'approved_rejected_by');
         
         $data = array();
         $i = 0;

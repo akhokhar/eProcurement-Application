@@ -34,9 +34,53 @@ class Requisition_model extends CI_Model {
         
         $requisition_id = $this->db->insert_id();
 
-        if($requisition_id){
-            //Requisition Item Work will go here.
+        $this->db->trans_complete();
+        
+        if($this->db->trans_status() === FALSE) {
+            $this->db->trans_rollback();
+            return FALSE;
+        } else {
+            $b = $this->db->trans_commit();
+            
+            //$this->session->set_flashdata('requisition_id', $requisition_id);
+            return $requisition_id;
         }
+        
+    }
+    /*---- end: add_requisition function ----*/
+	
+	/*
+    |------------------------------------------------
+    | start: add_requisition_item function
+    |------------------------------------------------
+    |
+    | This function add item of the requisition
+	| @param: requisition_id
+    |
+    */
+    function add_requisition_item($requisition_id, $itemName, $itemDesc, $costCenter, $unit, $quantity, $unitPrice) {
+        
+        $requisition   = $this->input->post();
+        $user_id    = $this->flexi_auth->get_user_id();
+        
+        $data = array(
+                'item_name'				=> $itemName,
+                'item_desc'            	=> $itemDesc,
+                'cost_center'			=> $costCenter,
+                'unit'          		=> $unit,
+                'quantity'       		=> $quantity,
+                'unit_price'            => $unitPrice,
+                'requisition_id'      	=> $requisition_id,
+				'date_created'			=> date("Y-m-d H:i:s", time()),
+				'status'				=> 1,
+        ); 
+        
+        $this->db->trans_begin();
+        
+        $this->db->set($data);
+        $this->db->insert('requisition_item');
+        
+        $requisition_item_id = $this->db->insert_id();
 
         $this->db->trans_complete();
         
@@ -46,12 +90,12 @@ class Requisition_model extends CI_Model {
         } else {
             $b = $this->db->trans_commit();
             
-            $this->session->set_flashdata('requisition_id', $requisition_id);
-            return TRUE;
+            //$this->session->set_flashdata('requisition_item_id', $requisition_item_id);
+            return $requisition_item_id;
         }
         
     }
-    /*---- end: add_requisition function ----*/
+    /*---- end: add_requisition_item function ----*/
     
     /*
     |------------------------------------------------
@@ -67,7 +111,8 @@ class Requisition_model extends CI_Model {
         if($db_select_column)
             $this->db->select($db_select_column);
         else
-            $this->db->select('*, r.*');
+            //$this->db->select('*, r.*');
+            $this->db->select('r.requisition_id, p.project_name, b.budget_head, l.location_name, d.donar_name, r.approved_rejected_by');
 
         if($db_where_column_or) {
             foreach($db_where_column_or as $key => $column) {
@@ -96,7 +141,10 @@ class Requisition_model extends CI_Model {
         }
         
         $this->db->where('r.status', 1);
-        //$this->db->join('product_tag pt', 'pt.pt_type = p.product_tag_image', 'LEFT');
+        $this->db->join('project p', 'r.projuct_id = p.project_id', 'LEFT');
+        $this->db->join('location l', 'r.location_id = l.location_id', 'LEFT');
+        $this->db->join('donor d', 'r.donor_id = d.donor_id', 'LEFT');
+        $this->db->join('budget_head b', 'r.budget_head_id = b.budget_head_id', 'LEFT');
 		$result = $this->db->get('requisition r');
         
         if($result->num_rows() > 0) {

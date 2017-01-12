@@ -158,12 +158,7 @@
                                                                     'class'         => 'form-control select2',
                                                                     'required'	  => 'required'
                                                           );
-														  $budgetHeads = array(
-                                                                    ''              => 'Select',
-                                                                    'of'         	=> 'Office',
-                                                                    'fl'	  		=> 'Field'
-                                                          );
-                                                          echo form_dropdown('budgetHead', $budgetHeads, '', $dropdown_data);
+														  echo form_dropdown('budgetHead', $budgetHeads, '', $dropdown_data);
                                                           ?>
                                                     </div>
                                                     <div class="form-group">
@@ -176,13 +171,7 @@
                                                                     'class'         => 'form-control select2',
                                                                     'required'	  => 'required'
                                                           );
-														  $donors = array(
-                                                                    ''              => 'Select',
-                                                                    'USAid'         => 'USAid',
-                                                                    'EU'	  		=> 'EU',
-                                                                    'Oxfam'	  	 => 'Oxfam'
-                                                          );
-                                                          echo form_dropdown('donor', $donors, '', $dropdown_data);
+														  echo form_dropdown('donor', $donors, '', $dropdown_data);
                                                           ?>
                                                     </div>
                                                 </div>
@@ -219,13 +208,7 @@
                                                                     'class'         => 'form-control select2',
                                                                     'required'	  => 'required'
                                                           );
-														  $projects = array(
-                                                                    ''              => 'Select',
-                                                                    'Project 1'     => 'Project 1',
-                                                                    'Project 2'	 => 'Project 2',
-                                                                    'Project 3'	 => 'Project 3'
-                                                          );
-                                                          echo form_dropdown('project', $projects, '', $dropdown_data);
+														  echo form_dropdown('project', $projects, '', $dropdown_data);
                                                           ?>
                                                     </div>
                                                     <div class="form-group">
@@ -238,13 +221,7 @@
                                                                     'class'         => 'form-control select2',
                                                                     'required'	  => 'required'
                                                           );
-														  $locations = array(
-                                                                    ''              => 'Select',
-                                                                    'Hyderabad'     => 'Hyderabad',
-                                                                    'Jamshoro'	  => 'Jamshoro',
-                                                                    'Hala'	 	  => 'Hala'
-                                                          );
-                                                          echo form_dropdown('location', $locations, '', $dropdown_data);
+														  echo form_dropdown('location', $locations, '', $dropdown_data);
                                                           ?>
                                                     </div>
                                                     <div class="form-group">
