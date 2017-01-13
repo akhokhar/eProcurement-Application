@@ -147,17 +147,24 @@ class Requisition extends CI_Controller {
 			// load validation helper
             $this->load->library('form_validation');
             
-            $this->form_validation->set_rules('requisitionDate', 'Requisition Date', 'required');
+            /*$this->form_validation->set_rules('requisitionDate', 'Requisition Date', 'required');
             $this->form_validation->set_rules('requiredUntilDate', 'Required Until Date', 'required');
             $this->form_validation->set_rules('project', 'Project', 'required');
             $this->form_validation->set_rules('budgetHead', 'Budget Head', 'required');
             $this->form_validation->set_rules('location', 'Location', 'required');
             $this->form_validation->set_rules('donor', 'Donor', 'required');
-            $this->form_validation->set_rules('approvingAuthority', 'Approving Authority', 'required');
+            $this->form_validation->set_rules('approvingAuthority', 'Approving Authority', 'required');*/
             
-            if ($this->form_validation->run()) {
+            if ($this->form_validation->run() || true) {
                 
-				if($requisition_id = $this->requisition_model->add_requisition()) {
+				$requisition = array();
+				foreach($_POST['requisition'] as $req){
+					$fieldName = $req['name'];
+					$fieldValue = $req['value'];
+					
+					$requisition[$fieldName] = $fieldValue;
+				}
+				if($requisition_id = $this->requisition_model->add_requisition($requisition)) {
 					// If Requisition added successfully, then add items
 					// Item work goes here....
 					foreach($_POST as $post){

@@ -61,12 +61,6 @@
                         </li>
                         -->
                     </ol>
-                    <!-- start: Success and error message -->
-                    <?php if (!empty($message)) { ?>
-                        <div id="message">
-                            <?php echo $message; ?>
-                        </div>
-                    <?php } ?>
                     <!-- end: Success and error message -->
                     <div class="page-header row">
                         <h1 class="col-sm-6">Add New Requisition <small></small></h1>
@@ -557,7 +551,7 @@ $(function () {
 				  url:"<?php echo base_url().BASE_DIR; ?>requisition/add",
 				  dataType: "json",  
 				  cache:false,
-				  data: $('#generalRequisitionForm').serialize() + '&items=' + requisitionItems,
+				  data: {requisition: $('#generalRequisitionForm').serializeArray(), items: requisitionItems},
 				  success: function(response) {
 					  if (!!response.msg_success) {
 						$('#message').removeClass('alert-error');

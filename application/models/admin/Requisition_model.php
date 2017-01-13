@@ -10,9 +10,9 @@ class Requisition_model extends CI_Model {
     | This function add new requisition
     |
     */
-    function add_requisition() {
+    function add_requisition($requisition) {
         
-        $requisition   = $this->input->post();
+        //$requisition   = $this->input->post();
         $user_id    = $this->flexi_auth->get_user_id();
         
         $data = array(
