@@ -1,5 +1,4 @@
 <?php
-
 if (!defined('BASEPATH'))
     exit('No direct script access allowed');
 
@@ -116,7 +115,7 @@ class Requisition extends CI_Controller {
         //$btn_array["checkbox_disabled"]["action"] = "admin/product/delete_checked_checkbox/";
         $add_category = $this->menu_model->get_privilege_name($btn_array);
         
-        $this->data['page_title'] = 'Requisitions';
+        $this->data['page_title'] = 'List Requisitions';
         
         $this->load->view('admin/includes/header', $this->data);
         $this->load->view('admin/requisition/requisitions', $this->data);
@@ -142,11 +141,6 @@ class Requisition extends CI_Controller {
                 redirect('admin/requisition');		
         }
         
-        // start: add breadcrumbs
-        $this->breadcrumbs->push('Add Requisition', base_url().'admin/requisition/add');
-        
-        // unshift crumb
-        $this->breadcrumbs->unshift('Requisitions', base_url().'admin/requisition');
 		
 		if($this->input->post()) {
             //echo '<pre>'; print_r($this->input->post()); die();
@@ -217,23 +211,34 @@ class Requisition extends CI_Controller {
 					$return['msg_error'] = 'Something went wrong, please try again.';
 				}
                 
-            } else{
+            }
+			else {
+
 				$return['msg_error'] = 'Please fill all required fields.';
 			}
             
+			echo json_encode($return);
+			die();
         }
 		
-		$this->data['projects'] = $this->general_model->list_projects();
-		$this->data['budgetHeads'] = $this->general_model->list_budget_head();
-		$this->data['locations'] = $this->general_model->list_locations();
-		$this->data['donors'] = $this->general_model->list_donors();
-        
-        
-        $this->data['page_title'] = 'Add New Requisition';
-        
-        $this->load->view('admin/includes/header', $this->data);
-        $this->load->view('admin/requisition/add_new_requisition', $this->data);
-        
+		else {
+			// start: add breadcrumbs
+			$this->breadcrumbs->push('Add Requisition', base_url().'admin/requisition/add');
+			
+			// unshift crumb
+			$this->breadcrumbs->unshift('Requisitions', base_url().'admin/requisition');
+			
+			$this->data['projects'] = $this->general_model->list_projects();
+			$this->data['budgetHeads'] = $this->general_model->list_budget_head();
+			$this->data['locations'] = $this->general_model->list_locations();
+			$this->data['donors'] = $this->general_model->list_donors();
+			
+			
+			$this->data['page_title'] = 'Add New Requisition';
+			
+			$this->load->view('admin/includes/header', $this->data);
+			$this->load->view('admin/requisition/add_new_requisition', $this->data);
+			}
     }
     /*---- end: add function ----*/
 	
