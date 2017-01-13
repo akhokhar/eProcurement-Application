@@ -1,5 +1,4 @@
 <?php
-
 if (!defined('BASEPATH'))
     exit('No direct script access allowed');
 
@@ -114,7 +113,11 @@ class Requisition extends CI_Controller {
         $btn_array["checkbox_disabled"]["action"] = "admin/product/delete_checked_checkbox/";
         $add_category = $this->menu_model->get_privilege_name($btn_array);
         
+<<<<<<< Updated upstream
         $this->data['page_title'] = 'requisitions';
+=======
+        $this->data['page_title'] = 'List Requisitions';
+>>>>>>> Stashed changes
         
         $this->load->view('admin/includes/header', $this->data);
         $this->load->view('admin/requisition/requisitions', $this->data);
@@ -140,18 +143,136 @@ class Requisition extends CI_Controller {
                 redirect('admin/requisition');		
         }
         
+<<<<<<< Updated upstream
         // start: add breadcrumbs
         $this->breadcrumbs->push('Add Requisition', base_url().'admin/requisition/add_new_requisition');
         
         // unshift crumb
         $this->breadcrumbs->unshift('Requisitions', base_url().'admin/requisition');
+=======
+		if ($this->input->post()) {
+            
+            //echo '<pre>'; print_r($this->input->post()); die();
+            
+            // load validation helper
+            $this->load->library('form_validation');
+            
+			//Requisition Details Form
+            $this->form_validation->set_rules('requisitionDate', 'Requisition Date', 'required');
+            $this->form_validation->set_rules('requiredUntilDate', 'Required Until Date', 'required');
+            $this->form_validation->set_rules('project', 'Project', 'required');
+            $this->form_validation->set_rules('budgetHead', 'Budget Head', 'required');
+            $this->form_validation->set_rules('location', 'Location', 'required');
+            $this->form_validation->set_rules('donor', 'Donor', 'required');
+            $this->form_validation->set_rules('approvingAuthority', 'Approving Authority', 'required');
+			
+			//Requisition Items Form
+            /*$this->form_validation->set_rules('requisitionDate', 'Requisition Date', 'required');
+            $this->form_validation->set_rules('requiredUntilDate', 'Required Until Date', 'required');
+            $this->form_validation->set_rules('project', 'Project', 'required');
+            $this->form_validation->set_rules('budgetHead', 'Budget Head', 'required');
+            $this->form_validation->set_rules('location', 'Location', 'required');
+            $this->form_validation->set_rules('donor', 'Donor', 'required');
+            $this->form_validation->set_rules('approvingAuthority', 'Approving Authority', 'required');*/
+            
+            if ($this->form_validation->run() === TRUE) {
+                
+                //echo '<pre>'; print_r($this->input->post()); die();
+                $return['msg_success'] = 'Requisition Added Successfully.';
+                /*if($this->requisition_model->add_requisition()) {
+                    //echo '<pre>'; print_r($this->input->post()); die();
+                    $this->session->set_flashdata('message', '<p class="status_msg">Requisition inserted successfully.</p>');
+                    $product_id = $this->session->flashdata('requisition_id');
+                    redirect('admin/requisition/view_requisition_detail/'.$requisition_id);
+                }*/
+                
+            }
+			else {
+				$return['msg_error'] = 'Please fill all required fields.';
+			}
+            
+			echo json_encode($return);
+			die();
+        }
+		else {
+		
+			// start: add breadcrumbs
+			$this->breadcrumbs->push('Add Requisition', base_url().'admin/requisition/add');
+			
+			// unshift crumb
+			$this->breadcrumbs->unshift('Requisitions', base_url().'admin/requisition');
+			
+			$this->data['page_title'] = 'Add New Requisition';
+			
+			$this->load->view('admin/includes/header', $this->data);
+			$this->load->view('admin/requisition/add_new_requisition', $this->data);			
+		}
+    }
+	
+	
+    function add_process() {
+>>>>>>> Stashed changes
         
+		$return = array();
+		
+        // Check user has privileges to add product, else display a message to notify the user they do not have valid privileges.
+        if (! $this->flexi_auth->is_privileged($this->uri_privileged))
+        {
+			//$this->session->set_flashdata('message', '<p class="error_msg"></p>');
+			//redirect('admin/requisition');
+			$return['msg_error'] = 'You do not have access privileges to add requisition.';
+			echo json_encode($return);
+			die();
+        }
         
-        $this->data['page_title'] = 'Add New Requisition';
+		if ($this->input->post()) {
+            
+            //echo '<pre>'; print_r($this->input->post()); die();
+            
+            // load validation helper
+            $this->load->library('form_validation');
+            
+			//Requisition Details Form
+            $this->form_validation->set_rules('requisitionDate', 'Requisition Date', 'required');
+            $this->form_validation->set_rules('requiredUntilDate', 'Required Until Date', 'required');
+            $this->form_validation->set_rules('project', 'Project', 'required');
+            $this->form_validation->set_rules('budgetHead', 'Budget Head', 'required');
+            $this->form_validation->set_rules('location', 'Location', 'required');
+            $this->form_validation->set_rules('donor', 'Donor', 'required');
+            $this->form_validation->set_rules('approvingAuthority', 'Approving Authority', 'required');
+			
+			//Requisition Items Form
+            /*$this->form_validation->set_rules('requisitionDate', 'Requisition Date', 'required');
+            $this->form_validation->set_rules('requiredUntilDate', 'Required Until Date', 'required');
+            $this->form_validation->set_rules('project', 'Project', 'required');
+            $this->form_validation->set_rules('budgetHead', 'Budget Head', 'required');
+            $this->form_validation->set_rules('location', 'Location', 'required');
+            $this->form_validation->set_rules('donor', 'Donor', 'required');
+            $this->form_validation->set_rules('approvingAuthority', 'Approving Authority', 'required');*/
+            
+            if ($this->form_validation->run() === TRUE) {
+                
+                //echo '<pre>'; print_r($this->input->post()); die();
+                $return['msg_success'] = 'Requisition Added Successfully.';
+                /*if($this->requisition_model->add_requisition()) {
+                    //echo '<pre>'; print_r($this->input->post()); die();
+                    $this->session->set_flashdata('message', '<p class="status_msg">Requisition inserted successfully.</p>');
+                    $product_id = $this->session->flashdata('requisition_id');
+                    redirect('admin/requisition/view_requisition_detail/'.$requisition_id);
+                }*/
+                
+            }
+			else {
+				$return['msg_error'] = 'Please fill all required fields.';
+			}
+            
+        }
+		else {			
+			$return['msg_error'] = 'Please submit form to add requisition.';
+		}
         
-        $this->load->view('admin/includes/header', $this->data);
-        $this->load->view('admin/requisition/add_new_requisition', $this->data);
-        
+		echo json_encode($return);
+        die();
     }
     /*---- end: add_product function ----*/
     
