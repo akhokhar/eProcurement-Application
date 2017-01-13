@@ -70,9 +70,6 @@
                     <!-- end: Success and error message -->
                     <div class="page-header row">
                         <h1 class="col-sm-6">Add New Requisition <small></small></h1>
-                        <div class="col-md-2 pull-right">
-                        	<button type="button" class="btn btn-primary pull-right" id="newRequisitionButton" disabled>Create Requisition</button>
-                        </div>
                     </div>
                     
                     <!-- end: PAGE TITLE & BREADCRUMB -->
@@ -80,8 +77,7 @@
             </div>
             <!-- end: PAGE HEADER -->
             <!--Error and success messages-->
-            <div id="msg_success"></div>
-            <div id="msg_error"></div>
+            <div id="message" class="alert no-display"></div>
                 <!-- start: PAGE CONTENT -->
                 <div class="row">
                     <div class="col-sm-12">
@@ -124,13 +120,14 @@
                                                           </div>
                                                           <?php
                                                           $input_data = array(
-                                                                    'type'          => 'text',
-                                                                    'name'          => 'requisitionDate',
-                                                                    'id'            => 'requisitionDate',
-																	'required'	  => 'required',
-                                                                    'value'         => set_value('requisitionDate'),
-                                                                    'class'         => 'form-control pull-right datepicker',
-                                                                    'placeholder'   => 'DD/MM/YYYY'
+                                                                    'type'          		=> 'text',
+                                                                    'name'         		=> 'requisitionDate',
+                                                                    'id'            	  => 'requisitionDate',
+																	'required'	  		=> 'required',
+                                                                    'data-required-error' => 'Requisition Date cannot be empty',
+                                                                    'value'         	   => set_value('requisitionDate'),
+                                                                    'class'         	   => 'form-control pull-right datepicker',
+                                                                    'placeholder'   		 => 'DD/MM/YYYY'
                                                           );
                                                           echo form_input($input_data);
                                                           ?>
@@ -157,9 +154,10 @@
                                                         </label>
                                                         <?php
                                                           $dropdown_data = array(
-                                                                    'id'            => 'budgetHead',
-                                                                    'class'         => 'form-control select2',
-                                                                    'required'	  => 'required'
+                                                                    'id'            	  => 'budgetHead',
+                                                                    'class'         	   => 'form-control select2',
+                                                                    'required'	  		=> 'required',
+                                                                    'data-required-error' => 'Select a Budget Head'
                                                           );
 														  echo form_dropdown('budgetHead', $budgetHeads, '', $dropdown_data);
                                                           ?>
@@ -170,9 +168,10 @@
                                                         </label>
                                                         <?php
                                                           $dropdown_data = array(
-                                                                    'id'            => 'donor',
-                                                                    'class'         => 'form-control select2',
-                                                                    'required'	  => 'required'
+                                                                    'id'            	  => 'donor',
+                                                                    'class'         	   => 'form-control select2',
+                                                                    'required'	  		=> 'required',
+                                                                    'data-required-error' => 'Select a Donor'
                                                           );
 														  echo form_dropdown('donor', $donors, '', $dropdown_data);
                                                           ?>
@@ -193,6 +192,7 @@
                                                                     'name'          => 'requiredUntilDate',
                                                                     'id'            => 'requiredUntilDate',
 																	'required'	  => 'required',
+                                                                    'data-required-error' => 'Required Until Date cannot be empty',
                                                                     'value'         => set_value('requiredUntilDate'),
                                                                     'class'         => 'form-control pull-right datepicker',
                                                                     'placeholder'   => 'DD/MM/YYYY'
@@ -209,7 +209,8 @@
                                                           $dropdown_data = array(
                                                                     'id'            => 'project',
                                                                     'class'         => 'form-control select2',
-                                                                    'required'	  => 'required'
+                                                                    'required'	  => 'required',
+                                                                    'data-required-error' => 'Select a Project'
                                                           );
 														  echo form_dropdown('project', $projects, '', $dropdown_data);
                                                           ?>
@@ -222,7 +223,8 @@
                                                           $dropdown_data = array(
                                                                     'id'            => 'location',
                                                                     'class'         => 'form-control select2',
-                                                                    'required'	  => 'required'
+                                                                    'required'	  => 'required',
+                                                                    'data-required-error' => 'Select a Location'
                                                           );
 														  echo form_dropdown('location', $locations, '', $dropdown_data);
                                                           ?>
@@ -235,7 +237,8 @@
                                                           $dropdown_data = array(
                                                                     'id'            => 'approvingAuthority',
                                                                     'class'         => 'form-control select2',
-                                                                    'required'	  => 'required'
+                                                                    'required'	  => 'required',
+                                                                    'data-required-error' => 'Select an Approving Authority'
                                                           );
 														  $approvingAuthorities = array(
                                                                     ''              => 'Select',
@@ -251,9 +254,12 @@
                                               <hr />
                                               <div class="row">
                                                 <div class="col-md-2 pull-right">
-                                                    <a href="#panel_tab_items" data-toggle="tab" class="btn btn-teal ladda-button next_tab">
+                                                    <!--<a href="#panel_tab_items" data-toggle="tab" class="btn btn-teal ladda-button next_tab">
                                                         Next <i class="fa fa-arrow-circle-right"></i>
-                                                    </a>
+                                                    </a>-->
+                                                    <div class="col-md-2 pull-right">
+                                                        <button type="submit" class="btn btn-primary pull-right" id="newRequisitionButton" disabled>Create Requisition</button>
+                                                    </div>
                                                 </div>
                                               </div>
                                           </div> 
@@ -271,11 +277,22 @@
                                                   <div class="col-md-12">
                                                     <div class="form-group">
                                                         <label for="itemName">Item Name</label>
-                                                        <input type="text" class="form-control" name="itemName" required id="itemName">
+                                                        <?php
+                                                          $input_data = array(
+                                                                    'type'          		=> 'text',
+                                                                    'name'          		=> 'itemName',
+                                                                    'id'            	  => 'itemName',
+                                                                    'required'      		=> 'required',
+                                                                    'data-required-error' => 'Item Name cannot be empty',
+                                                                    'value'         	   => set_value('itemName'),
+                                                                    'class'         	   => 'form-control'
+                                                          );
+                                                          echo form_input($input_data);
+                                                          ?>
                                                     </div>
                                                     <div class="form-group">
                                                       <label for="itemDescription">Item Description</label>
-                                                      <textarea class="form-control" name="itemDescription" required id="itemDescription" placeholder="Item Description"></textarea>
+                                                      <textarea class="form-control" name="itemDescription" id="itemDescription" required="required" data-required-error = "Item Description cannot be empty" placeholder="Item Description"></textarea>
                                                     </div>
                                                   </div>
                                                 </div>
@@ -283,19 +300,53 @@
                                                   <div class="col-md-4">
                                                     <div class="form-group">
                                                         <label for="costCenter">Cost Center</label>
-                                                        <input type="text" class="form-control" name="costCenter" required id="costCenter">
+                                                        <?php
+                                                          $input_data = array(
+                                                                    'type'          		=> 'text',
+                                                                    'name'          		=> 'costCenter',
+                                                                    'id'            	  => 'costCenter',
+                                                                    'required'      		=> 'required',
+                                                                    'data-required-error' => 'Cost Center cannot be empty',
+                                                                    'value'        	   => set_value('costCenter'),
+                                                                    'class'         	   => 'form-control'
+                                                          );
+                                                          echo form_input($input_data);
+                                                          ?>
                                                     </div>
                                                   </div>
                                                   <div class="col-md-4">
                                                     <div class="form-group">
                                                         <label for="unit">Unit</label>
-                                                        <input type="text" class="form-control" name="unit" required id="unit">
+                                                        <?php
+                                                          $input_data = array(
+                                                                    'type'          		=> 'text',
+                                                                    'name'          		=> 'unit',
+                                                                    'id'            	  => 'unit',
+                                                                    'required'      		=> 'required',
+                                                                    'data-required-error' => 'Unit cannot be empty',
+                                                                    'value'         	   => set_value('unit'),
+                                                                    'class'         	   => 'form-control'
+                                                          );
+                                                          echo form_input($input_data);
+                                                          ?>
                                                     </div>
                                                   </div>
                                                   <div class="col-md-4">
                                                     <div class="form-group">
                                                         <label for="quantity">Quantity</label>
-                                                        <input type="number" class="form-control" name="quantity" required id="quantity" min="1">
+                                                        <?php
+                                                          $input_data = array(
+                                                                    'type'          		=> 'number',
+                                                                    'name'          		=> 'quantity',
+                                                                    'id'            	  => 'quantity',
+                                                                    'required'     	    => 'required',
+                                                                    'data-required-error' => 'Quantity cannot be empty',
+																	'min'		   		 => 1,
+                                                                    'value'         	   => set_value('quantity'),
+                                                                    'class'         	   => 'form-control'
+                                                          );
+                                                          echo form_input($input_data);
+                                                          ?>
                                                     </div>
                                                   </div>
                                                 </div>
@@ -303,13 +354,35 @@
                                                   <div class="col-md-6">
                                                     <div class="form-group">
                                                         <label for="unitPrice">Estimated Unit Value (Rs)</label>
-                                                        <input type="number" class="form-control" name="unitPrice" required id="unitPrice" min="1">
+                                                        <?php
+                                                          $input_data = array(
+                                                                    'type'          		=> 'number',
+                                                                    'name'          		=> 'unitPrice',
+                                                                    'id'            	  => 'unitPrice',
+                                                                    'required'     		=> 'required',
+                                                                    'data-required-error' => 'Unit Price cannot be empty',
+																	'min'		   		 => 1,
+                                                                    'value'        	   => set_value('unitPrice'),
+                                                                    'class'         	   => 'form-control'
+                                                          );
+                                                          echo form_input($input_data);
+                                                          ?>
                                                     </div>
                                                   </div>
                                                   <div class="col-md-6">
                                                     <div class="form-group">
                                                         <label for="totalPrice">Estimated Total Unit Value (Rs)</label>
-                                                        <input type="number" class="form-control" readonly name="totalPrice" required id="totalPrice" value="0">
+                                                        <?php
+                                                          $input_data = array(
+                                                                    'type'          => 'number',
+                                                                    'name'          => 'totalPrice',
+                                                                    'id'            => 'totalPrice',
+                                                                    'readonly'      => 'readonly',
+                                                                    'value'         => 0,
+                                                                    'class'         => 'form-control'
+                                                          );
+                                                          echo form_input($input_data);
+                                                          ?>
                                                     </div>
                                                   </div>
                                                 </div>
@@ -394,8 +467,6 @@
 
 <script type="text/javascript">
 
-var isItemFormValidated = false;
-var isRequisitionFormValidated = false;
 
 $(function () {
     //Date picker
@@ -434,9 +505,10 @@ $(function () {
     $(tableId).find('thead').append(thHtml);
   }
   addformHeaderToTable('#addItemForm', '#itemsDataTable', 'S.No.', 'Remove');
-  
+
   //validate form data
-  //$('#addItemForm').validator();
+  $('#addItemForm').validator();
+
   //addItemForm Object Creation and add into Table
   function addformDataToTable(formId, tableId, firstCol, edit, remove) {
     var tableBody = '<tbody></tbody>';
@@ -451,9 +523,10 @@ $(function () {
       $(tableId).removeClass('hidden');
       $(tableId).after('h3').remove();
     }*/
-    //$(formId).validator().on('submit', function(e) {
-	$(formId).on('submit', function(e) {
-      if (isItemFormValidated) {
+    $(formId).validator().on('submit', function(e) {
+	//$(formId).on('submit', function(e) {alert(isItemFormValidated)
+      //if (isItemFormValidated) {
+	if (!$(formId).find(':submit').hasClass('disabled')) {
         var formData = $(formId).serializeArray();
         var tableDataLength = $(tableId).find('tbody tr').length;
         requisitionItems[tableDataLength] = formData;
@@ -476,31 +549,51 @@ $(function () {
   }
   addformDataToTable('#addItemForm', '#itemsDataTable', true, false, true);
   
-  $('#newRequisitionButton').on('click', function(e) {
-	  $('#generalRequisitionForm').trigger('submit', function(e) {
-		  if (isRequisitionFormValidated) {
+  $('#generalRequisitionForm').validator().on('submit', function(e) {
+	  //$('#generalRequisitionForm').validator().trigger('submit', function(e) {
+		  //if (isRequisitionFormValidated) {
 			  $.ajax({
 				  type: "POST",
 				  url:"<?php echo base_url().BASE_DIR; ?>requisition/add",
 				  dataType: "json",  
 				  cache:false,
-				  data: {form_data: true, requisition: $('#generalRequisitionForm').serializeArray(), items: requisitionItems},
+				  data: $('#generalRequisitionForm').serialize() + '&items=' + requisitionItems,
 				  success: function(response) {
 					  if (!!response.msg_success) {
-						$('#msg_success').text(response.msg_success);
+						$('#message').removeClass('alert-error');
+						$('#message').removeClass('no-display');
+						$('#message').addClass('alert-success');
+						$('#message').text(response.msg_success);
 					  }
 					  if (!!response.msg_error) {
-						$('#msg_error').text(response.msg_error);
+						$('#message').removeClass('alert-success');
+						$('#message').removeClass('no-display');
+						$('#message').addClass('alert-error');
+						$('#message').text(response.msg_error);
 					  }
 				  }
 			  });
-		  }
+		  //}
           e.preventDefault();
-	  });
+	  //});
   });
   //enable general requisition button
-  //$('#addItemForm').validator().on('submit', function(e) {
-  $('#addItemForm').on('submit', function(e) {
+  $('#addItemForm').validator().on('submit', function(e) {
+  //$('#addItemForm').on('submit', function(e) {
+	  /*if(tab_pane.find('.has-error').length == 0) {
+		var tab_pane_id = tab_pane.attr('id');
+		$('a[href=#'+tab_pane_id+']').parent().removeClass('has-error-tab');
+	  }
+	 
+	 if ($('#addItemForm').('.with-errors.').text()) {
+		var tab_pane_id = $(element).closest('.form-group').parents('.tab-pane').attr('id');
+		$('a[href=#'+tab_pane_id+']').parent('li').addClass('has-error-tab'); 
+		var tab_pane = $(element).closest('.form-group').parents('.tab-pane');
+	 }
+	if(tab_pane.find('.has-error').length == 0) {
+		var tab_pane_id = tab_pane.attr('id');
+		$('a[href=#'+tab_pane_id+']').parent().removeClass('has-error-tab');
+	}*/
       enableDisableGeneralButton();
       e.preventDefault();
   });
@@ -540,7 +633,16 @@ $(function () {
       'autoWidth': false
     });*/
 	
+	
+	//setting dynamic validation messages
+	$("form").find(".form-group").append('<div class="help-block with-errors"></div>');
+	/*var emptyMsg = ' cannot be empty';
+	$("form").find(":input").each(function(index, element) {
+       $(this).after('<div class="help-block with-errors">' + $(this).prev("label").text() + emptyMsg + '</div>'); 
+    });*/
+	
 });
+
 </script>
 
 <!-- The jQuery UI widget factory, can be omitted if jQuery UI is already included -->
@@ -554,6 +656,8 @@ $(function () {
 
 <!-- blueimp Gallery script -->
 <script src="<?php echo $includes_dir; ?>admin/plugins/blueimp/jquery.blueimp-gallery.min.js"></script>
+<!-- Validation -->
+<script src="<?php echo $includes_dir; ?>admin/plugins/bootstrap-validation/validator.min.js"></script>
 <!-- The XDomainRequest Transport is included for cross-domain file deletion for IE 8 and IE 9 -->
 <!--[if (gte IE 8)&(lt IE 10)]>
 <script src="js/cors/jquery.xdr-transport.js"></script>
@@ -569,7 +673,7 @@ $(function () {
     // ==============================
     // atart: validation
     // ==============================
-	var emptyMsg = " cannot be empty";
+	/*var emptyMsg = " cannot be empty";
 	
     var FormValidator = function () {
         var generalRequisitionForm = function () {
@@ -638,7 +742,8 @@ $(function () {
                     // add the Bootstrap error class to the control group
                     isRequisitionFormValidated = false;
                     var tab_pane_id = $(element).closest('.form-group').parents('.tab-pane').attr('id');
-                    $('a[href=#'+tab_pane_id+']').parent('li').addClass('has-error-tab');                    
+                    $('a[href=#'+tab_pane_id+']').parent('li').addClass('has-error-tab');      
+					                
                 },
                 unhighlight: function (element) { // revert the change done by hightlight
                     $(element).closest('.form-group').removeClass('has-error');
@@ -716,6 +821,7 @@ $(function () {
                 invalidHandler: function (event, validator) { //display error alert on form submit
                     successHandler1.hide();
                     errorHandler1.show();
+					isItemFormValidated = false;
                 },
                 highlight: function (element) {
                     $(element).closest('.help-block').removeClass('valid');
@@ -723,7 +829,6 @@ $(function () {
                     $(element).closest('.form-group').removeClass('has-success').addClass('has-error').find('.symbol').removeClass('ok').addClass('required');
                     // add the Bootstrap error class to the control group
                     
-					isItemFormValidated = false;
                     var tab_pane_id = $(element).closest('.form-group').parents('.tab-pane').attr('id');
                     $('a[href=#'+tab_pane_id+']').parent('li').addClass('has-error-tab');                    
                 },
@@ -733,7 +838,6 @@ $(function () {
                     
                     var tab_pane = $(element).closest('.form-group').parents('.tab-pane');
                     
-					isItemFormValidated = true;
                     if(tab_pane.find('.has-error').length == 0) {
                         var tab_pane_id = tab_pane.attr('id');
                         $('a[href=#'+tab_pane_id+']').parent().removeClass('has-error-tab');
@@ -748,6 +852,7 @@ $(function () {
                 submitHandler: function (form) {
                     successHandler1.show();
                     errorHandler1.hide();
+					isItemFormValidated = true;
                     // submit form
                     //$('#addItemForm').submit();
                     HTMLFormElement.prototype.submit.call($('#addItemForm')[0]);
@@ -762,7 +867,7 @@ $(function () {
                 generalRequisitionForm();
             }
         };
-    }();
+    }();*/
     /* ========== end: validation ========== */
     
     jQuery(document).ready(function () {
@@ -781,7 +886,7 @@ $(function () {
 
         Main.init();
         FormElements.init();
-        FormValidator.init();
+       // FormValidator.init();
   
         
         
