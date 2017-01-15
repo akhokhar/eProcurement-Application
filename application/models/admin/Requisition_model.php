@@ -106,13 +106,13 @@ class Requisition_model extends CI_Model {
     | requisition get by id and other cloumn
     |
     */
-    function get_requisition($db_where_column, $db_where_value, $db_where_column_or = null, $db_where_value_or = null, $db_limit = null, $db_order = null, $db_select_column = null) {
+    function get_requisition($db_where_column = null, $db_where_value = null, $db_where_column_or = null, $db_where_value_or = null, $db_limit = null, $db_order = null, $db_select_column = null) {
         
         if($db_select_column)
             $this->db->select($db_select_column);
         else
             //$this->db->select('*, r.*');
-            $this->db->select('r.requisition_id, p.project_name, b.budget_head, l.location_name, d.donar_name, r.approved_rejected_by');
+            $this->db->select('r.requisition_id, r.requisition_num, r.date_req, r.date_req_until, p.project_name, b.budget_head, l.location_name, d.donor_name, r.approved_rejected_by');
 
         if($db_where_column_or) {
             foreach($db_where_column_or as $key => $column) {
@@ -141,7 +141,7 @@ class Requisition_model extends CI_Model {
         }
         
         $this->db->where('r.status', 1);
-        $this->db->join('project p', 'r.projuct_id = p.project_id', 'LEFT');
+        $this->db->join('project p', 'r.project_id = p.project_id', 'LEFT');
         $this->db->join('location l', 'r.location_id = l.location_id', 'LEFT');
         $this->db->join('donor d', 'r.donor_id = d.donor_id', 'LEFT');
         $this->db->join('budget_head b', 'r.budget_head_id = b.budget_head_id', 'LEFT');
@@ -151,9 +151,13 @@ class Requisition_model extends CI_Model {
             $data = array();
             foreach($result->result_array() as $key => $get_record) {
                 $data[$key] = $get_record;
-                
+                $item_data = array();
                 if(isset($get_record['requisition_id'])) {
                     $requisition_id = $get_record['requisition_id'];
+					$item_data = $this->get_requisition_items($requisition_id);
+					if ($item_data) {
+						$data[$key]['items'] = $item_data;
+					}
                 }
             }
             return $data;
@@ -164,6 +168,62 @@ class Requisition_model extends CI_Model {
     }
     /*---- end: get_requisition function ----*/
     
+	/*---- start: get requisition items ----*/
+    function get_requisition_items($requisition_id = null, $db_where_column = null, $db_where_value = null, $db_where_column_or = null, $db_where_value_or = null, $db_limit = null, $db_order = null, $db_select_column = null) {
+        
+        if($db_select_column)
+            $this->db->select($db_select_column);
+        else
+            //$this->db->select('*, r.*');
+            $this->db->select('ri.*');
+
+        if($db_where_column_or) {
+            foreach($db_where_column_or as $key => $column) {
+                if (!empty($db_where_value_or[$key])) {
+                    $this->db->or_where($column, $db_where_value_or[$key]);
+                }
+            }
+        }
+        
+        if($db_where_column) {
+            foreach ($db_where_column as $key => $column) {
+                if ($db_where_value[$key]!="") {
+                    $this->db->where($column, $db_where_value[$key]);
+                }
+            }
+        }
+        
+        if ($db_limit) {
+            $this->db->limit($db_limit['limit'], $db_limit['pageStart']);
+        }
+        
+        if($db_order) {
+            foreach($db_order as $get_order) {
+                $this->db->order_by($get_order['title'], $get_order['order_by']);
+            } 
+        }
+        
+		if ($requisition_id) {
+        	$this->db->where('ri.requisition_item_id', $requisition_id);
+		}
+		$result = $this->db->get('requisition_item ri');
+        
+        if($result->num_rows() > 0) {
+            $data = array();
+            foreach($result->result_array() as $key => $get_record) {
+                $data[$key] = $get_record;
+                
+                if(isset($get_record['requisition_item_id'])) {
+                    $requisition_item_id = $get_record['requisition_item_id'];
+                }
+            }
+            return $data;
+        }
+        else{
+            return FALSE;
+		}
+    }
+	/*---- end: get requisition items ----*/
     
     function delete_requisition($requisition_id) {
         

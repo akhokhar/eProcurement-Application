@@ -64,12 +64,12 @@
                     <?php } ?>
                     <!-- end: Success and error message -->
                     <div class="page-header row">
-                        <h1 class="col-sm-6">Catalog <small>view all Procurements</small></h1>
+                        <h1 class="col-sm-6">View all Requisitions</h1>
                         <!-- start: ADD NEW PRODUCT -->
                         <?php if ($this->flexi_auth->is_privileged($add_product)) { ?>
                             <div class="col-md-2 pull-right">
-                                <a class="btn btn-teal btn-block" href="<?php echo $base_url; ?>admin/procurement/add">
-                                    Add Procurement
+                                <a class="btn btn-teal btn-block" href="<?php echo $base_url; ?>admin/requisition/add">
+                                    Add New Requisition
                                 </a>
                             </div>
                         <?php } ?>
@@ -87,119 +87,125 @@
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <i class="fa fa-external-link-square"></i>
-                            Search Catalog
+                            Search Requisition(s)
                             
                         </div>
                         <?php
-                        $attributes = array('class' => 'form-horizontal', 'role' => 'cat_form', 'id' => 'search_form');
+                        $attributes = array('class' => 'form-horizontal', 'role' => 'requisitionForm', 'id' => 'search_form');
                         //echo form_open($base_url.'admin/search/product_search', $attributes);
                         echo form_open(current_url(), $attributes);
                         ?>
                             <div class="panel-body">
-                                <div class="form-group col-md-3">
-                                    <label class="col-sm-4 control-label" for="form-field-1">
-                                        Name
+                                <div class="form-group col-md-4">
+                                    <label class="col-sm-5 control-label" for="requisitionDate">
+                                        Requisition Date
                                     </label>
-                                    <div class="col-sm-8">
-                                        <?php
-                                        $input_data = array(
-                                                'type'          => 'text',
-                                                'name'          => 'product_title',
-                                                'id'            => 'product_title',
-                                                'value'         => (isset($_POST['product_title'])) ? $_POST['product_title'] : '',
-                                                'class'         => 'form-control',
-                                                'placeholder'   => ''
-                                        );
-
-                                        echo form_input($input_data);
-                                        ?>
-                                    </div>
-                                </div>
-                                <div class="form-group col-md-3">
-                                    <label class="col-sm-3 control-label" for="form-field-1">
-                                        Price
-                                    </label>
-                                    <div class="col-sm-9">
-                                        <?php
-                                        $input_data = array(
-                                                'type'          => 'text',
-                                                'name'          => 'product_org_price',
-                                                'id'            => 'product_org_price',
-                                                'value'         => (isset($_POST['product_org_price'])) ? $_POST['product_org_price'] : '',
-                                                'class'         => 'form-control',
-                                                'placeholder'   => ''
-                                        );
-
-                                        echo form_input($input_data);
-                                        ?>
-                                    </div>
-                                </div>
-                                <div class="form-group col-md-3">
-                                    <label class="col-sm-4 control-label" for="form-field-1">
-                                        Model
-                                    </label>
-                                    <div class="col-sm-8">
-                                        <?php
-                                        $input_data = array(
-                                                'type'          => 'text',
-                                                'name'          => 'product_model',
-                                                'id'            => 'product_model',
-                                                'value'         => (isset($_POST['product_model'])) ? $_POST['product_model'] : '',
-                                                'class'         => 'form-control',
-                                                'placeholder'   => ''
-                                        );
-
-                                        echo form_input($input_data);
-                                        ?>
+                                    <div class="col-sm-7">
+                                        <div class="input-group date">
+                                          <div class="input-group-addon">
+                                            <i class="fa fa-calendar"></i>
+                                          </div>
+											<?php
+                                            $input_data = array(
+                                                    'type'          => 'text',
+                                                    'name'          => 'requisitionDate',
+                                                    'id'            => 'requisitionDate',
+                                                    'value'         => set_value('requisitionDate'),
+                                                    'class'         => 'form-control pull-right datepicker',
+                                                    'placeholder'   => 'DD/MM/YYYY'
+                                            );
+    
+                                            echo form_input($input_data);
+                                            ?>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="form-group col-md-4">
-                                    <label class="col-sm-3 control-label" for="form-field-1">
-                                        Status
+                                    <label class="col-sm-4 control-label" for="requiredUntilDate">
+                                        Until Date
+                                    </label>
+                                    <div class="col-sm-8">
+                                        <div class="input-group date">
+                                          <div class="input-group-addon">
+                                            <i class="fa fa-calendar"></i>
+                                          </div>
+                                          <?php
+                                          $input_data = array(
+                                                    'type'          => 'text',
+                                                    'name'          => 'requiredUntilDate',
+                                                    'id'            => 'requiredUntilDate',
+                                                    'value'         => set_value('requiredUntilDate'),
+                                                    'class'         => 'form-control pull-right datepicker',
+                                                    'placeholder'   => 'DD/MM/YYYY'
+                                          );
+                                          echo form_input($input_data);
+                                          ?>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <label class="col-sm-4 control-label" for="approvingAuthority">
+                                        Approving Authority
+                                    </label>
+                                    <div class="col-sm-8">
+										<?php
+                                          $dropdown_data = array(
+                                                    'id'            => 'approvingAuthority',
+                                                    'class'         => 'form-control select2'
+                                          );
+                                          $approvingAuthorities = array(
+                                                    ''              => 'Select',
+                                                    'Manager 1'     => 'Manager 1',
+                                                    'Manager 2'	 => 'Manager 2',
+                                                    'Manager 3'	 => 'Manager 3'
+                                          );
+                                          echo form_dropdown('approvingAuthority', $approvingAuthorities, '', $dropdown_data);
+                                          ?>
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <label class="col-sm-3 control-label" for="location">
+                                        Location
                                     </label>
                                     <div class="col-sm-9">
-                                        <select name="product_status" id="product_status" class="form-control">
-                                            <option value="">Select Status</option>
-                                            <?php
-                                            if($product_ststus) {
-                                                foreach($product_ststus as $get_data) {
-                                                    $select = (isset($_POST['product_status']) && ($_POST['product_status'] == $get_data)) ? 'selected="selected"' : '';
-                                                    echo '<option '.$select.' value="' . $get_data . '">' . $get_data . '</option>';
-                                                }
-                                            }
-                                            ?>
-                                        </select>
+                                        <?php
+										  $dropdown_data = array(
+													'id'            => 'location',
+													'class'         => 'form-control select2'
+										  );
+										  echo form_dropdown('location', $locations, '', $dropdown_data);
+										  ?>
                                     </div>
                                 </div>
                                 
                                 <div class="form-group col-md-3">
-                                    <label class="col-sm-4 control-label" for="form-field-1">
-                                        Featured
+                                    <label class="col-sm-4 control-label" for="project">
+                                        Project
                                     </label>
                                     <div class="col-sm-8">
-                                        <select name="product_featured" id="product_featured" class="form-control">
-                                            <option value="">Select</option>
-                                            <option <?php echo  (isset($_POST['product_featured']) && ($_POST['product_featured'] == 1)) ? 'selected="selected"' : ''; ?> value="1">Yes</option>
-                                            <option <?php echo  (isset($_POST['product_featured']) && ($_POST['product_featured'] == 0 && $_POST['product_featured']!="")) ? 'selected="selected"' : ''; ?> value="0">No</option>
-                                        </select>
+                                        <?php
+										  $dropdown_data = array(
+													'id'            => 'project',
+													'class'         => 'form-control select2'
+										  );
+										  echo form_dropdown('project', $projects, '', $dropdown_data);
+										  ?>
                                     </div>
                                     
                                 </div>
                                 
                                 <div class="form-group col-md-3">
-                                    <label class="col-sm-3 control-label" for="form-field-tag"> 
-                                        Tag 
+                                    <label class="col-sm-3 control-label" for="donor"> 
+                                        Donor 
                                     </label>
                                     <div class="col-sm-9">
-                                        <select name="product_tag_image" id="product_tag_image" class="form-control">
-                                            <option value="">Product Tag Image</option>
-                                            <!--<option <?php //echo  (isset($_POST['product_tag_image']) && ($_POST['product_tag_image'] == "new")) ? 'selected="selected"' : ''; ?> value="new">New</option>
-                                            <option <?php //echo  (isset($_POST['product_tag_image']) && ($_POST['product_tag_image'] == "sale")) ? 'selected="selected"' : ''; ?> value="sale">Sale</option>
-                                            -->
-                                            <?php foreach ($get_product_tag as $tag_type) { ?>
-                                                <option <?php echo  (isset($_POST['product_tag_image']) && ($_POST['product_tag_image'] == $tag_type["ptt_id"])) ? 'selected="selected"' : ''; ?> value="<?php echo $tag_type["ptt_id"]; ?>"><?php echo $tag_type["ptt_name"]; ?></option>
-                                            <?php } ?>
-                                        </select>
+                                        <?php
+										  $dropdown_data = array(
+													'id'            	  => 'donor',
+													'class'         	   => 'form-control select2'
+										  );
+										  echo form_dropdown('donor', $donors, '', $dropdown_data);
+										  ?>
                                     </div>
                                 </div>
                                 
@@ -228,7 +234,7 @@
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <i class="fa fa-external-link-square"></i>
-                            Catalog
+                            Requisition(s)
                             
                         </div>
                         <div class="panel-body">
@@ -245,8 +251,10 @@
                                                     <input type="checkbox" class="flat-grey">
                                                 </label>
                                             </div>--></th>
+                                        <th class="center">Requisition#</th>
+                                        <th class="center">Date Requested</th>
+                                        <th class="center">Needed Till</th>
                                         <th class="center">Project</th>
-                                        <th class="center">Budget Head</th>
                                         <th class="hidden-xs">Location</th>
                                         <th class="hidden-xs">Donor</th>
                                         <th class="hidden-xs">Approving Authority</th>
@@ -347,9 +355,9 @@
             "serverSide": true,
             "searching": false,
             "ajax": {
-                "url": "<?php echo $base_url; ?>admin/server_datatables/get_requisition",
+                "url": "<?php echo base_url(); ?>admin/server_datatables/get_requisition",
                 "type": "POST",
-                "data": function ( d ) {
+                "data": function ( d ) {console.log(d);
                     var top_search_like = {
                         prod_product_title: $('#product_title').val(),                        
                         prod_product_model: $('#product_model').val()
@@ -379,6 +387,8 @@
                 null,
                 null,
 				null,
+                null,
+                null,
                 null,
                 null,
                 null
