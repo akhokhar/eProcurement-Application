@@ -116,6 +116,8 @@ class Requisition extends CI_Controller {
         $add_category = $this->menu_model->get_privilege_name($btn_array);
         
         $this->data['page_title'] = 'List Requisitions';
+		
+		$this->requisition_model->get_requisition();
         
         $this->load->view('admin/includes/header', $this->data);
         $this->load->view('admin/requisition/requisitions', $this->data);
@@ -158,7 +160,7 @@ class Requisition extends CI_Controller {
             if ($this->form_validation->run() || true) {
                 
 				$requisition = array();
-				foreach($_POST['requisition'] as $req){
+				foreach($this->input->post('requisition') as $req){
 					$fieldName = $req['name'];
 					$fieldValue = $req['value'];
 					
@@ -167,7 +169,7 @@ class Requisition extends CI_Controller {
 				if($requisition_id = $this->requisition_model->add_requisition($requisition)) {
 					// If Requisition added successfully, then add items
 					// Item work goes here....
-					foreach($_POST as $post){
+					foreach($this->input->post('items') as $items){
 						
 						//Set Parameters for adding items to requisition
 						$itemName = '';
@@ -178,10 +180,10 @@ class Requisition extends CI_Controller {
 						$unitPrice = '';
 						$totalPrice = '';
 						
-						$itemCounter = 0;
-						foreach($_POST['items'] as $items){
-							$fieldName = $item[$itemCounter]['name'];
-							$fieldValue = $item[$itemCounter]['value'];
+						foreach($items as $item){
+						
+							$fieldName = $item['name'];
+							$fieldValue = $item['value'];
 							
 							if($fieldName == "itemName"){
 								$itemName = $fieldValue;
@@ -205,12 +207,11 @@ class Requisition extends CI_Controller {
 								$totalPrice = $fieldValue;
 							}
 							
-							// Calling method to add requisition item.
-							$this->requisition_model->add_requisition_item($requisition_id, $itemName, $itemDesc, $costCenter, $unit, $quantity, $unitPrice);
-							
-							$itemCounter++;
 						}
-					
+						
+						// Calling method to add requisition item.
+						$this->requisition_model->add_requisition_item($requisition_id, $itemName, $itemDesc, $costCenter, $unit, $quantity, $unitPrice);
+						
 					}
 					
 					$return['msg_success'] = 'Requisition Added Successfully.';
@@ -323,4 +324,8 @@ class Requisition extends CI_Controller {
     }
     /*---- end: edit_requisition function ----*/
     
+	function view_all() {
+		$this->index();
+	}
+	
 }

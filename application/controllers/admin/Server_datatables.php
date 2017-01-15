@@ -91,7 +91,7 @@ class server_datatables extends CI_Controller {
         //echo '<pre>'; print_r($this->input->post()); die();
         
         // database column for searching
-        $db_column = array('r.requisition_id', 'r.requisition_num', 'r.date_req', 'r.date_req_until', 'r.is_approved', 'r.status');
+        $db_column = array('r.requisition_id', 'r.requisition_num', 'r.date_req', 'r.date_req_until', 'r.approved_rejected_by', 'r.status');
         
         // load requisition model
         $this->load->model('admin/requisition_model');
@@ -99,8 +99,8 @@ class server_datatables extends CI_Controller {
         // *****************************************
         // start: get all requitision or search requisition
         // *****************************************
-        $db_where_column    = array();
-        $db_where_value     = array();
+        $db_where_column    = array('r.status');
+        $db_where_value     = array(1);
         $db_where_column_or = array();
         $db_where_value_or  = array();
         $db_limit           = array();
@@ -178,18 +178,18 @@ class server_datatables extends CI_Controller {
         $dataCount = $this->requisition_model->get_requisition($db_where_column, $db_where_value, $db_where_column_or, $db_where_value_or);
         // end: get all requisitions or search requisition
         
-        $dt_column = array('project_name', 'budget_head', 'location_name', 'donor_name', 'approved_rejected_by');
+        $dt_column = array('requisition_num', 'date_req', 'date_req_until', 'project_name', 'location_name', 'donor_name', 'approved_rejected_by');
         
         $data = array();
         $i = 0;
         
         if($dataRecord) {
             
-            $view = "admin/requisition/view_requisition_detail/";
-            $edit = "admin/requisition/add_requisition/";
-            $remove = "admin/requisition/delete_requisition/";
+            $view = "admin/requisition/view/";
+            $edit = "admin/requisition/edit/";
+            $remove = "";//"admin/requisition/delete_requisition/";
 
-            $btn_arr_responce = $this->create_action_array($view,$edit,$remove); 
+            $btn_arr_responce = $this->create_action_array($view,$edit,$remove);
             foreach($dataRecord as $key => $value) {
                 
                 $btn_array_checked_checkbox = "admin/product/delete_checked_checkbox/";
@@ -201,9 +201,9 @@ class server_datatables extends CI_Controller {
                                     <input type="checkbox" '.$checkbox.' name="requisition['.$value['requisition_id'].']" class="flat-grey deleteThis">
                                 </label></div>';
                 
-                /*foreach($dt_column as $get_dt_column) {
+                foreach($dt_column as $get_dt_column) {
                     
-                    if($get_dt_column == 'product_title'){
+                    /*if($get_dt_column == 'product_title'){
                         $data[$i][] = '<a href="'.base_url().'admin/product/view_product_detail/'.$value['product_id'].'">'.$value[$get_dt_column].'</a>';
                     }
                     else if($get_dt_column == 'product_quantity'){
@@ -213,18 +213,18 @@ class server_datatables extends CI_Controller {
                         
                         $data[$i][] = number_format($value[$get_dt_column],2);
                     }
-                    else {
+                    else {*/
                         $data[$i][] = $value[$get_dt_column];
-                    }
+                    //}
                     
-                }*/
+                }
 
                 /***** start: delete and edit button *****/
                 $action_btn = '';
                 
                 $action_btn .= '<div class="visible-md visible-lg hidden-sm hidden-xs">';
-                
-                $action_btn .= $this->create_action_buttons($btn_arr_responce,$value['product_id']);
+
+                $action_btn .= $this->create_action_buttons($btn_arr_responce,$value['requisition_id']);
                 
                 $action_btn .= '</div>';
                 
@@ -1253,11 +1253,11 @@ class server_datatables extends CI_Controller {
     function create_action_buttons($data,$id){
         $action_btn = "";
         foreach ($data as $keys => $record) {
-
             // Dynamic Work for the previliges
             if ($this->flexi_auth->is_privileged($record['title']))
-                $action_btn .= '<a href="' . base_url() . $record['action'] . $id . '" class="' . $record['aClass'] . '" data-placement="top" data-original-title="' . $keys . '"><i class="' . $record['iClass'] . '"></i></a>';
+               $action_btn .= '<a href="' . base_url() . $record['action'] . $id . '" class="' . $record['aClass'] . '" data-placement="top" data-original-title="' . $keys . '">' . $keys . '<i class="' . $record['iClass'] . '"></i></a>';
         }
+			
         return $action_btn;
         
     }

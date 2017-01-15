@@ -270,7 +270,9 @@
                                                 <div class="row">
                                                   <div class="col-md-12">
                                                     <div class="form-group">
-                                                        <label for="itemName">Item Name</label>
+                                                        <label for="itemName">
+                                                        	Item Name <span class="symbol required"></span>
+                                                        </label>
                                                         <?php
                                                           $input_data = array(
                                                                     'type'          		=> 'text',
@@ -285,7 +287,9 @@
                                                           ?>
                                                     </div>
                                                     <div class="form-group">
-                                                      <label for="itemDescription">Item Description</label>
+                                                      <label for="itemDescription">
+                                                      	Item Description <span class="symbol required"></span>
+                                                      </label>
                                                       <textarea class="form-control" name="itemDescription" id="itemDescription" required="required" data-required-error = "Item Description cannot be empty" placeholder="Item Description"></textarea>
                                                     </div>
                                                   </div>
@@ -293,7 +297,9 @@
                                                 <div class="row">
                                                   <div class="col-md-4">
                                                     <div class="form-group">
-                                                        <label for="costCenter">Cost Center</label>
+                                                        <label for="costCenter">
+                                                        	Cost Center <span class="symbol required"></span>
+                                                        </label>
                                                         <?php
                                                           $input_data = array(
                                                                     'type'          		=> 'text',
@@ -310,7 +316,9 @@
                                                   </div>
                                                   <div class="col-md-4">
                                                     <div class="form-group">
-                                                        <label for="unit">Unit</label>
+                                                        <label for="unit">
+                                                        	Unit <span class="symbol required"></span>
+                                                        </label>
                                                         <?php
                                                           $input_data = array(
                                                                     'type'          		=> 'text',
@@ -327,7 +335,9 @@
                                                   </div>
                                                   <div class="col-md-4">
                                                     <div class="form-group">
-                                                        <label for="quantity">Quantity</label>
+                                                        <label for="quantity">
+                                                        	Quantity <span class="symbol required"></span>
+                                                        </label>
                                                         <?php
                                                           $input_data = array(
                                                                     'type'          		=> 'number',
@@ -347,7 +357,9 @@
                                                 <div class="row">
                                                   <div class="col-md-6">
                                                     <div class="form-group">
-                                                        <label for="unitPrice">Estimated Unit Value (Rs)</label>
+                                                        <label for="unitPrice">
+                                                        	Estimated Unit Value (Rs) <span class="symbol required"></span>
+                                                        </label>
                                                         <?php
                                                           $input_data = array(
                                                                     'type'          		=> 'number',
