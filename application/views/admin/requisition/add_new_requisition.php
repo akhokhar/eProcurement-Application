@@ -570,6 +570,9 @@ $(function () {
 						$('#message').removeClass('no-display');
 						$('#message').addClass('alert-success');
 						$('#message').text(response.msg_success);
+						$('#generalRequisitionForm')[0].reset();
+						requisitionItems = [];
+						$('#itemsDataTable tbody').html("");
 					  }
 					  if (!!response.msg_error) {
 						$('#message').removeClass('alert-success');
