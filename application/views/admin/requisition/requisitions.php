@@ -357,7 +357,7 @@
             "ajax": {
                 "url": "<?php echo base_url(); ?>admin/server_datatables/get_requisition",
                 "type": "POST",
-                "data": function ( d ) {console.log(d);
+                "data": function ( d ) {
                     var top_search_like = {
                         prod_product_title: $('#product_title').val(),                        
                         prod_product_model: $('#product_model').val()
