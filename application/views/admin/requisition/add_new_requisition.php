@@ -151,7 +151,9 @@
                                                                     'id'            	  => 'budgetHead',
                                                                     'class'         	   => 'form-control select2',
                                                                     'required'	  		=> 'required',
-                                                                    'data-required-error' => 'Select a Budget Head'
+																	'pattern'				 => '/^[1-9][0-9]*$/',
+                                                                    'data-required-error' => 'Select a Budget Head',
+                                                                    'data-pattern-error' => 'Select a Budget Head'
                                                           );
 														  echo form_dropdown('budgetHead', $budgetHeads, '', $dropdown_data);
                                                           ?>
@@ -411,6 +413,7 @@
                                                       <div class="box box-danger">
                                                         <div class="box-header with-border">
                                                           <h3 class="box-title">Requisition Items</h3>
+                                                          <strong class="pull-right">Total Items Added: <span id="totalRequisitionItems">0</span></strong>
                                                         </div>
                                                           <div class="box-body">
                                                               <table id="itemsDataTable"  class="table table-bordered table-hover"></table>
@@ -549,6 +552,7 @@ $(function () {
         tdHtml += '</tr>';
         $(tableId).find('tbody').append(tdHtml);
         $(formId)[0].reset();
+		$('#totalRequisitionItems').text(tableDataLength+1);
       }
       e.preventDefault();
     });
@@ -626,6 +630,8 @@ $(function () {
       $(tableId).find('tbody tr').each(function(index, element) {
           $(element).children('td:eq(0)').text(index + 1);
       });
+	  
+	  $('#totalRequisitionItems').text($('#itemsDataTable').find('tbody tr').length);
       enableDisableGeneralButton();
       e.preventDefault();
     });

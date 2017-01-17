@@ -1,4 +1,3 @@
-
 <!-- start: MAIN CONTAINER -->
 <div class="main-container">
     <div class="navbar-content">
@@ -64,16 +63,29 @@
                     <?php } ?>
                     <!-- end: Success and error message -->
                     <div class="page-header row">
-                        <h1 class="col-sm-6">Catalog <small>view all Requisitions</small></h1>
-                        <!-- start: ADD NEW PRODUCT -->
-                        <?php if ($this->flexi_auth->is_privileged($add_product)) { ?>
-                            <div class="col-md-2 pull-right">
-                                <a class="btn btn-teal btn-block" href="<?php echo $base_url; ?>admin/requisition/add">
-                                    Add Requisition
-                                </a>
-                            </div>
-                        <?php } ?>
-                        <!-- end: ADD NEW PRODUCT -->
+                        <h1 class="col-sm-6"><?php echo $page_title; ?></h1>
+                        <div class="col-sm-6">
+                            <?php
+								$attributes = array('role' => 'form', 'data-toggle' => 'validator', 'name' => 'changeApproveStatus', 'id' => 'changeApproveStatus');
+								echo form_open('', $attributes);
+							?>
+                            <label for="approve_reject">Approve / Reject</label>
+                            <?php
+                              $dropdown_data = array(
+                                        'id'            	  => 'approve_reject',
+                                        'class'         	   => 'form-control',
+                                        'required'	  		=> 'required',
+                                        'data-required-error' => 'Select'
+                              );
+							  $approve_reject = array(
+							  			1	=>	'Approve',
+										0	=>	'Reject'
+									);
+                              echo form_dropdown('approve_reject', $approve_reject, '', $dropdown_data);
+                              ?>
+                              <button type="submit" class="btn btn-primary pull-right" id="changeApproveStatusButton">Change Status</button>
+                            <?php echo form_close(); ?>
+                         </div>
                     </div>
                     <!-- end: PAGE TITLE & BREADCRUMB -->
                 </div>
@@ -87,133 +99,48 @@
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <i class="fa fa-external-link-square"></i>
-                            Search Catalog
-                            
+                            Requisition Details
                         </div>
-                        <?php
-                        $attributes = array('class' => 'form-horizontal', 'role' => 'cat_form', 'id' => 'search_form');
-                        //echo form_open($base_url.'admin/search/product_search', $attributes);
-                        echo form_open(current_url(), $attributes);
-                        ?>
-                            <div class="panel-body">
-                                <div class="form-group col-md-3">
-                                    <label class="col-sm-4 control-label" for="form-field-1">
-                                        Name
-                                    </label>
-                                    <div class="col-sm-8">
-                                        <?php
-                                        $input_data = array(
-                                                'type'          => 'text',
-                                                'name'          => 'product_title',
-                                                'id'            => 'product_title',
-                                                'value'         => (isset($_POST['product_title'])) ? $_POST['product_title'] : '',
-                                                'class'         => 'form-control',
-                                                'placeholder'   => ''
-                                        );
-
-                                        echo form_input($input_data);
-                                        ?>
-                                    </div>
-                                </div>
-                                <div class="form-group col-md-3">
-                                    <label class="col-sm-3 control-label" for="form-field-1">
-                                        Price
-                                    </label>
-                                    <div class="col-sm-9">
-                                        <?php
-                                        $input_data = array(
-                                                'type'          => 'text',
-                                                'name'          => 'product_org_price',
-                                                'id'            => 'product_org_price',
-                                                'value'         => (isset($_POST['product_org_price'])) ? $_POST['product_org_price'] : '',
-                                                'class'         => 'form-control',
-                                                'placeholder'   => ''
-                                        );
-
-                                        echo form_input($input_data);
-                                        ?>
-                                    </div>
-                                </div>
-                                <div class="form-group col-md-3">
-                                    <label class="col-sm-4 control-label" for="form-field-1">
-                                        Model
-                                    </label>
-                                    <div class="col-sm-8">
-                                        <?php
-                                        $input_data = array(
-                                                'type'          => 'text',
-                                                'name'          => 'product_model',
-                                                'id'            => 'product_model',
-                                                'value'         => (isset($_POST['product_model'])) ? $_POST['product_model'] : '',
-                                                'class'         => 'form-control',
-                                                'placeholder'   => ''
-                                        );
-
-                                        echo form_input($input_data);
-                                        ?>
-                                    </div>
-                                </div>
-                                <div class="form-group col-md-4">
-                                    <label class="col-sm-3 control-label" for="form-field-1">
-                                        Status
-                                    </label>
-                                    <div class="col-sm-9">
-                                        <select name="product_status" id="product_status" class="form-control">
-                                            <option value="">Select Status</option>
-                                            <?php
-                                            if($product_ststus) {
-                                                foreach($product_ststus as $get_data) {
-                                                    $select = (isset($_POST['product_status']) && ($_POST['product_status'] == $get_data)) ? 'selected="selected"' : '';
-                                                    echo '<option '.$select.' value="' . $get_data . '">' . $get_data . '</option>';
-                                                }
-                                            }
-                                            ?>
-                                        </select>
-                                    </div>
-                                </div>
-                                
-                                <div class="form-group col-md-3">
-                                    <label class="col-sm-4 control-label" for="form-field-1">
-                                        Featured
-                                    </label>
-                                    <div class="col-sm-8">
-                                        <select name="product_featured" id="product_featured" class="form-control">
-                                            <option value="">Select</option>
-                                            <option <?php echo  (isset($_POST['product_featured']) && ($_POST['product_featured'] == 1)) ? 'selected="selected"' : ''; ?> value="1">Yes</option>
-                                            <option <?php echo  (isset($_POST['product_featured']) && ($_POST['product_featured'] == 0 && $_POST['product_featured']!="")) ? 'selected="selected"' : ''; ?> value="0">No</option>
-                                        </select>
-                                    </div>
-                                    
-                                </div>
-                                
-                                <div class="form-group col-md-3">
-                                    <label class="col-sm-3 control-label" for="form-field-tag"> 
-                                        Tag 
-                                    </label>
-                                    <div class="col-sm-9">
-                                        <select name="product_tag_image" id="product_tag_image" class="form-control">
-                                            <option value="">Product Tag Image</option>
-                                            <!--<option <?php //echo  (isset($_POST['product_tag_image']) && ($_POST['product_tag_image'] == "new")) ? 'selected="selected"' : ''; ?> value="new">New</option>
-                                            <option <?php //echo  (isset($_POST['product_tag_image']) && ($_POST['product_tag_image'] == "sale")) ? 'selected="selected"' : ''; ?> value="sale">Sale</option>
-                                            -->
-                                            <?php foreach ($get_product_tag as $tag_type) { ?>
-                                                <option <?php echo  (isset($_POST['product_tag_image']) && ($_POST['product_tag_image'] == $tag_type["ptt_id"])) ? 'selected="selected"' : ''; ?> value="<?php echo $tag_type["ptt_id"]; ?>"><?php echo $tag_type["ptt_name"]; ?></option>
-                                            <?php } ?>
-                                        </select>
-                                    </div>
-                                </div>
-                                
-                                
-                                <div class="form-group col-md-2 pull-right">
-                                    <div class="col-sm-12">
-                                        <button id="search_btn" class="btn btn-info btn-block" type="submit">
-                                            Search <i class="fa fa-search"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                        <?php echo form_close(); ?>
+                        <div class="panel-body">
+                          <table class="table table-bordered table-hover">
+                            <tr>
+                              <td width="40%">Requisition #</td>
+                              <td><?php echo $requisition['requisition_num']; ?></td>
+                            </tr>
+                            <tr>
+                              <td>Date Requested</td>
+                              <td><?php echo date('d-m-Y', strtotime($requisition['date_req'])); ?></td>
+                            </tr>
+                            <tr>
+                              <td>Date Required Until</td>
+                              <td><?php echo date('d-m-Y', strtotime($requisition['date_req_until'])); ?></td>
+                            </tr>
+                            <tr>
+                              <td>Project</td>
+                              <td><?php echo $requisition['project_name']; ?></td>
+                            </tr>
+                            <tr>
+                              <td>Budget Head</td>
+                              <td><?php echo $requisition['budget_head']; ?></td>
+                            </tr>
+                            <tr>
+                              <td>Location</td>
+                              <td><?php echo $requisition['location_name']; ?></td>
+                            </tr>
+                            <tr>
+                              <td>Donor</td>
+                              <td><?php echo $requisition['donor_name']; ?></td>
+                            </tr>
+                            <tr>
+                              <td>Approving Authority</td>
+                              <td><?php echo $requisition['approving_authority']; ?></td>
+                            </tr>
+                            <tr>
+                              <td><strong>Total of Items</strong></td>
+                              <td><strong><?php echo $requisition['total_price']; ?></strong></td>
+                            </tr>
+                          </table>
+                        </div>
                     </div>
                     <!-- end: TEXT FIELDS PANEL -->
                 </div>
@@ -235,28 +162,8 @@
                             $attributes = array('class' => 'form-horizontal', 'role' => 'cat_form', 'id' => 'cat_form');
                             echo form_open(current_url(), $attributes);
                             ?>
-                            <table class="table table-striped table-bordered table-hover" id="requisition_table">
-                                <thead>
-                                    <tr>
-                                        <th class="center">
-                                            <!--<div class="checkbox-table">
-                                                <label>
-                                                    <input type="checkbox" class="flat-grey">
-                                                </label>
-                                            </div>--></th>
-                                        <th class="center">ID</th>
-                                        <th class="center">Requisition Number</th>
-                                        <th>Requisition Date</th>
-                                        <th class="hidden-xs">Category</th>
-                                        <th class="hidden-xs">Price</th>
-                                        <th class="hidden-xs">Quantity</th>
-                                        <th class="hidden-xs">Status</th>
-                                        <th class="center">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    
-                                </tbody>
+                            <table class="table table-striped table-bordered table-hover" id="itemsDataTable">
+                                
                             </table>
                             <?php if($checkbox_disabled!=""){ ?>
                             <div class="form-group col-md-2 pull-left">
@@ -340,70 +247,51 @@
         });
     
     });
-    
-    
+	
+    var items = <?php echo json_encode($requisition['items']); ?>;
+	var items_array = [];
+	var indx;
+	var showItemCol = ['s.no', 'item_name', 'item_desc', 'cost_center', 'unit', 'quantity', 'unit_price', 'total_item_price'];
+	for (i = 0; i < items.length; i++) {
+		var item_array = [];
+		item_array[0] = i+1;
+		$.map(items[i], function(value, index) {
+			indx = showItemCol.indexOf(index)
+			if (indx < 0) {
+				return;
+			}
+			item_array[indx] = value;
+			return true;
+		});
+		items_array[i] = item_array;
+	}console.log(items_array);
+	
     $(function () {
-        $('#requisition_table').DataTable({
-            "processing": true,
-            "serverSide": true,
-            "searching": false,
-            "ajax": {
-                "url": "<?php echo $base_url; ?>admin/server_datatables/get_requisition",
-                "type": "POST",
-                "data": function ( d ) {
-                    var top_search_like = {
-                        prod_product_title: $('#product_title').val(),                        
-                        prod_product_model: $('#product_model').val()
-                    };
-                    
-                    var top_search = {
-                        prod_product_cat_id: $('#product_cat_id').val(),
-                        prod_product_org_price: $('#product_org_price').val(),
-                        prod_product_status: $('#product_status').val(),
-                        prod_product_featured: $('#product_featured').val(),
-                        prod_product_tag_image: $('#product_tag_image').val()
-                    };
-                    
-                    d.top_search_like = top_search_like;
-                    d.top_search = top_search;
-                }
-            },
-            "order": [[ 1, "desc" ]],
+        $('#itemsDataTable').DataTable({
+            "data": items_array,
+            "order": [[ 0, "asc" ]],
             "columnDefs": [
                 { "orderable": false, "targets": 0 },
                 //{ "orderable": false, "targets": 1 },
                 { "orderable": false, "targets": 2 },
-                { "orderable": false, "targets": 9 }
+                { "orderable": false, "targets": 7 }
             ],
             "columns": [
-                null,
-                null,
-                { "width": "10%" },
-                { "width": "30%" },
-                { "width": "10%" },
-                null,
-                null,
-                null,
-                null,
-                { "width": "11%" }
-            ],
+				{ title: "S.No." },
+				{ title: "Item Name" },
+				{ title: "Item Description" },
+				{ title: "Cost Center" },
+				{ title: "Unit" },
+				{ title: "Quantity", "width": "11%" },
+				{ title: "Estimated Unit Value (Rs)"},
+				{ title: "Estimated Total Unit Value (Rs)" }
+        	],
             "pageLength": 20,
             "lengthMenu": [[10, 20, 50, -1], [10, 20, 50, "All"]],
             "initComplete": function(settings, json) {
                 //alert( 'DataTables has finished its initialisation.' );
                 $(".group1").colorbox();
             }
-        }).on( 'draw', function () {
-            $('tr td:nth-child(1), tr td:nth-child(3), tr td:nth-child(10)').each(function (){
-                  $(this).addClass('center')
-            })
-            
-            $('input[type="checkbox"].flat-grey, input[type="radio"].flat-grey').iCheck({
-                checkboxClass: 'icheckbox_flat-grey',
-                radioClass: 'iradio_flat-grey',
-                increaseArea: '10%' // optional
-            });
-            if($(".tooltips").length) {$('.tooltips').tooltip();}
         });
     });
 </script>

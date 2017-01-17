@@ -118,6 +118,10 @@ class Requisition extends CI_Controller {
         $this->data['page_title'] = 'List Requisitions';
 		
 		$this->requisition_model->get_requisition();
+		
+		$this->data['projects'] = $this->general_model->list_projects();
+		$this->data['locations'] = $this->general_model->list_locations();
+		$this->data['donors'] = $this->general_model->list_donors();
         
         $this->load->view('admin/includes/header', $this->data);
         $this->load->view('admin/requisition/requisitions', $this->data);
@@ -326,6 +330,49 @@ class Requisition extends CI_Controller {
     
 	function view_all() {
 		$this->index();
+	}
+	
+	function view($requisition_id) {
+		if (!isset($requisition_id) || empty($requisition_id)) {
+			redirect('admin/requisition/view_all');
+		}
+		
+        // Check user has privileges to view product, else display a message to notify the user they do not have valid privileges.
+        if (! $this->flexi_auth->is_privileged($this->uri_privileged))
+        {
+                $this->session->set_flashdata('message', '<p class="error_msg">You do not have access privileges to view requisitions.</p>');
+                if($this->flexi_auth->is_admin())
+                    redirect('auth_admin');
+                else
+                    redirect('auth_public');
+        }
+        
+        // Set Flash Message
+        $this->data['message'] = $this->session->flashdata('message');
+        
+        // unshift crumb
+        $this->breadcrumbs->unshift('Requisition Details', base_url().'admin/requisition/view');
+        
+        //$btn_array["checkbox_disabled"]["action"] = "admin/product/delete_checked_checkbox/";
+        $add_category = $this->menu_model->get_privilege_name($btn_array);
+        
+        $this->data['page_title'] = 'Requisition Details';
+		
+		$requisition = $this->requisition_model->get_requisition(array('requisition_id'), array($requisition_id));
+		if(!isset($requisition) || empty($requisition)) {
+			redirect('admin/requisition/view_all');
+		}
+		foreach ($requisition[0]['items'] as $key => $item) {
+			$total_item_price = $item['unit_price'] * $item['quantity'];
+			$requisition[0]['items'][$key]['total_item_price'] = $total_item_price;
+			$total_price += $item['unit_price'] * $item['quantity'];
+		}
+		$requisition[0]['total_price'] = $total_price;
+			
+		$this->data['requisition'] = $requisition[0];
+		
+        $this->load->view('admin/includes/header', $this->data);
+        $this->load->view('admin/requisition/view_requisition', $this->data);
 	}
 	
 }

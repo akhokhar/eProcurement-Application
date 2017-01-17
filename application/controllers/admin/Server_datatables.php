@@ -91,7 +91,7 @@ class server_datatables extends CI_Controller {
         //echo '<pre>'; print_r($this->input->post()); die();
         
         // database column for searching
-        $db_column = array('r.requisition_id', 'r.requisition_num', 'r.date_req', 'r.date_req_until', 'r.approved_rejected_by', 'r.status');
+        $db_column = array('r.requisition_id', 'r.requisition_num', 'r.date_req', 'r.date_req_until', 'r.approving_authority', 'r.status');
         
         // load requisition model
         $this->load->model('admin/requisition_model');
@@ -178,7 +178,7 @@ class server_datatables extends CI_Controller {
         $dataCount = $this->requisition_model->get_requisition($db_where_column, $db_where_value, $db_where_column_or, $db_where_value_or);
         // end: get all requisitions or search requisition
         
-        $dt_column = array('requisition_num', 'date_req', 'date_req_until', 'project_name', 'location_name', 'donor_name', 'approved_rejected_by');
+        $dt_column = array('requisition_num', 'date_req', 'date_req_until', 'project_name', 'location_name', 'donor_name', 'approving_authority');
         
         $data = array();
         $i = 0;
@@ -186,7 +186,7 @@ class server_datatables extends CI_Controller {
         if($dataRecord) {
             
             $view = "admin/requisition/view/";
-            $edit = "admin/requisition/edit/";
+            $edit = "";//"admin/requisition/edit/";
             $remove = "";//"admin/requisition/delete_requisition/";
 
             $btn_arr_responce = $this->create_action_array($view,$edit,$remove);
@@ -1252,10 +1252,17 @@ class server_datatables extends CI_Controller {
     
     function create_action_buttons($data,$id){
         $action_btn = "";
+		$icon_classes = '';
         foreach ($data as $keys => $record) {
             // Dynamic Work for the previliges
+			if ($keys == 'View') {
+				$icon_classes = 'glyphicon glyphicon-eye-open';
+			}
+			else if ($keys == 'Edit') {
+				$icon_classes = 'glyphicon glyphicon-edit';
+			}
             if ($this->flexi_auth->is_privileged($record['title']))
-               $action_btn .= '<a href="' . base_url() . $record['action'] . $id . '" class="' . $record['aClass'] . '" data-placement="top" data-original-title="' . $keys . '">' . $keys . '<i class="' . $record['iClass'] . '"></i></a>';
+               $action_btn .= '<a href="' . base_url() . $record['action'] . $id . '" class="' . $record['aClass'] . '" data-placement="top" data-original-title="' . $keys . '"><i class="' . $record['iClass'] . ' ' . $icon_classes . '"></i></a> &nbsp;&nbsp;&nbsp;';
         }
 			
         return $action_btn;
