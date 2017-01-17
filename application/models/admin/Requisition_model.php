@@ -16,14 +16,16 @@ class Requisition_model extends CI_Model {
         $user_id    = $this->flexi_auth->get_user_id();
         
         $data = array(
-                'date_req'            		=> date("Y-m-d H:i:s", strtotime($requisition['requisitionDate'])),
+                'date_req'            	  => date("Y-m-d H:i:s", strtotime($requisition['requisitionDate'])),
                 'date_req_until'            => date("Y-m-d H:i:s", strtotime($requisition['requiredUntilDate'])),
                 'project_id'			  	=> $requisition['project'],
                 'budget_head_id'          	=> $requisition['budgetHead'],
-                'location_id'       		=> $requisition['location'],
-                'donor_id'            		=> $requisition['donor'],
-                'approved_rejected_by'      => $user_id,
-				'date_created'				=> date("Y-m-d H:i:s", time()),
+                'location_id'       		   => $requisition['location'],
+                'donor_id'            	  => $requisition['donor'],
+                'approving_authority'       => $user_id,
+				'is_approved'			   => 0,
+				'is_tendered'			   => 0,
+				'date_created'			  => date("Y-m-d H:i:s", time()),
 				'status'					=> 1,
         ); 
         
@@ -112,7 +114,7 @@ class Requisition_model extends CI_Model {
             $this->db->select($db_select_column);
         else
             //$this->db->select('*, r.*');
-            $this->db->select('r.requisition_id, r.requisition_num, r.date_req, r.date_req_until, p.project_name, b.budget_head, l.location_name, d.donor_name, r.approved_rejected_by');
+            $this->db->select('r.requisition_id, r.requisition_num, r.date_req, r.date_req_until, p.project_name, b.budget_head, l.location_name, d.donor_name, r.approving_authority');
 
         if($db_where_column_or) {
             foreach($db_where_column_or as $key => $column) {
@@ -204,7 +206,7 @@ class Requisition_model extends CI_Model {
         }
         
 		if ($requisition_id) {
-        	$this->db->where('ri.requisition_item_id', $requisition_id);
+        	$this->db->where('ri.requisition_id', $requisition_id);
 		}
 		$result = $this->db->get('requisition_item ri');
         
