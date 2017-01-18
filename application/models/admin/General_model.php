@@ -107,7 +107,60 @@ class General_model extends CI_Model {
         }
         return $return;
     }
-    /*---- end: list_donors function ----*/
-    
+    /*---- end: list_managers function ----*/
+	
+	/*
+    |--------------------------------------------------------
+    | start: get all managers as dropdown array function 
+    |--------------------------------------------------------
+    |
+    | This function list_managers
+    |
+    */
+    function list_managers() {
+        $this->db->select ( 'ua.uacc_id, up.upro_first_name, up.upro_last_name' );
+
+        $this->db->from ( 'user_accounts ua' );
+		$this->db->join('user_profiles up', 'up.upro_uacc_fk = ua.uacc_id', 'left');
+		$this->db->join('user_groups ug', 'ug.ugrp_id = ua.uacc_group_fk', 'left');
+		$this->db->where ('ug.ugrp_name', 'Manager');
+        $this->db->order_by("up.upro_first_name","ASC");
+
+        $query=$this->db->get();
+        $return = array();
+        $return[0] = "Select Approving Authority";
+        foreach($query->result_array() as $row)
+        {
+            $return[$row["uacc_id"]] = $row["upro_first_name"]." ".$row["upro_last_name"];
+        }
+        return $return;
+    }
+    /*---- end: list_managers function ----*/
+	
+	
+    /*
+    |--------------------------------------------------------
+    | start: get user detail by user Id
+    |--------------------------------------------------------
+    | This function list_managers
+    | @param, $userId
+	| return {userId, firstname, lastname, email, username}
+	| {groupId, groupName, phone}
+    |
+    */
+    function get_user_detail($userId) {
+        $this->db->select ( 'ua.uacc_id, up.upro_first_name, up.upro_last_name, ua.uacc_email, ua.uacc_username, ug.ugrp_id, ug.ugrp_name, up.upro_phone' );
+
+        $this->db->from ( 'user_accounts ua' );
+		$this->db->join('user_profiles up', 'up.upro_uacc_fk = ua.uacc_id', 'LEFT');
+		$this->db->join('user_groups ug', 'ug.ugrp_id = ua.uacc_group_fk', 'LEFT');
+		$this->db->where ('ua.uacc_id', $userId);
+
+        $query=$this->db->get();
+        $return = $query->result_array();
+        
+        return $return[0];
+    }
+    /*---- end: list_managers function ----*/
 }
     
