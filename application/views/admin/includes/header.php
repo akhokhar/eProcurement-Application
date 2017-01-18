@@ -36,16 +36,6 @@
                 <div class="navbar-tools">
                     <!-- start: TOP NAVIGATION MENU -->
                     <ul class="nav navbar-right">
-                        <!-- start: CART DROPDOWN -->
-                        <li class="dropdown">
-                            <a  class="dropdown-toggle" href="<?php echo base_url(); ?>admin/order">
-                                <i class="clip-cart"></i>
-                                <?php if(isset($todays_orders) && $todays_orders != 0){ ?>
-                                <span class="badge"> <?php echo $todays_orders; ?></span>
-                                <?php } ?>
-                            </a>
-                        </li>
-                        <!-- end: CART DROPDOWN -->
                         <!-- start: USER DROPDOWN -->
                         <li class="dropdown current-user">
                             <a data-toggle="dropdown" data-hover="dropdown" class="dropdown-toggle" data-close-others="true" href="#">

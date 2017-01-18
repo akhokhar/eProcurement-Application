@@ -34,7 +34,7 @@ class Auth extends CI_Controller {
 			// Redirect logged in admins (For security, admin users should always sign in via Password rather than 'Remember me'.
 			if ($this->flexi_auth->is_admin()) 
 			{
-				redirect('auth_admin/');
+				redirect('auth_admin/dashboard_main');
 			}
 			else
 			{
@@ -130,13 +130,14 @@ class Auth extends CI_Controller {
 		// Get any status message that may have been set.
 		$this->data['message'] = (! isset($this->data['message'])) ? $this->session->flashdata('message') : $this->data['message'];		
 
-                $this->data['page_title'] = 'Login E-Commerce';
+                $this->data['page_title'] = 'Login';
                 
                 if($this->config->item('flexi_theme')) {
                     $this->load->view('demo/login_view', $this->data);
                 }
                 else {
-                    $this->load->view('admin/login_view', $this->data);
+                    //$this->load->view('admin/login_view', $this->data);
+					$this->load->view('main_login_view', $this->data);
                 }
     }
 
