@@ -129,14 +129,15 @@ class Auth_admin extends CI_Controller {
 	function index()
     {
 		$this->dashboard();
+		//$this->dashboard_main();
 	}
  
  	/**
- 	 * dashboard (Admin)
+ 	 * dashboard (Main)
  	 * The public account dashboard page that acts as the landing page for newly logged in public users.
  	 * The dashboard provides links to some examples of the features available from the flexi auth library.  
  	 */
-    function dashboard()
+    function dashboard_main()
     {
                 
                 // unshift crumb
@@ -144,7 +145,7 @@ class Auth_admin extends CI_Controller {
         
 		$this->data['message'] = $this->session->flashdata('message');
 		
-                $this->data['page_title'] = 'Dashboard';
+                $this->data['page_title'] = 'Apps Dashboard';
                 
                 $btn_array = array();
                 
@@ -156,9 +157,39 @@ class Auth_admin extends CI_Controller {
                     $this->load->view('demo/admin_examples/dashboard_view', $this->data);
                 }
                 else {
-                    $this->load->view('admin/includes/header', $this->data);
-                    $this->load->view('admin/dashboard/dashboard_view', $this->data);
+                    $this->load->view('apps/includes/header', $this->data);
+                    $this->load->view('apps/main_dashboard_view', $this->data);
                 }
+	}
+	
+ 	/**
+ 	 * dashboard (Admin)
+ 	 * The public account dashboard page that acts as the landing page for newly logged in public users.
+ 	 * The dashboard provides links to some examples of the features available from the flexi auth library.  
+ 	 */
+    function dashboard()
+    {
+                
+		// unshift crumb
+		$this->breadcrumbs->unshift('Dashboard', base_url().'auth_admin');
+		
+		$this->data['message'] = $this->session->flashdata('message');
+		
+		$this->data['page_title'] = 'Dashboard';
+		
+		$btn_array = array();
+		
+		
+		// Check Privilege for current user for inner page
+		$user_privileges = $this->menu_model->get_privilege_name($btn_array);
+		
+		if($this->config->item('flexi_theme')) {
+			$this->load->view('demo/admin_examples/dashboard_view', $this->data);
+		}
+		else {
+			$this->load->view('admin/includes/header', $this->data);
+			$this->load->view('admin/dashboard/dashboard_view', $this->data);
+		}
 	}
 
 	###++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++###	
