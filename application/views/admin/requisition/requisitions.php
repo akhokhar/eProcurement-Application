@@ -195,16 +195,20 @@
                                 </div>
                                 
                                 <div class="form-group col-md-3">
-                                    <label class="col-sm-3 control-label" for="donor"> 
-                                        Donor 
+                                    <label class="col-sm-3 control-label" for="is_approved"> 
+                                        Status 
                                     </label>
                                     <div class="col-sm-9">
                                         <?php
 										  $dropdown_data = array(
-													'id'            	  => 'donor',
+													'id'            	  => 'is_approved',
 													'class'         	   => 'form-control select2'
 										  );
-										  echo form_dropdown('donor', $donors, '', $dropdown_data);
+										  $is_approved = array(
+													1	=>	'Approve',
+													0	=>	'Reject'
+										  );
+										  echo form_dropdown('is_approved', $is_approved, '', $dropdown_data);
 										  ?>
                                     </div>
                                 </div>
@@ -256,8 +260,8 @@
                                         <th class="center">Needed Till</th>
                                         <th class="center">Project</th>
                                         <th class="hidden-xs">Location</th>
-                                        <th class="hidden-xs">Donor</th>
                                         <th class="hidden-xs">Approving Authority</th>
+                                        <th class="center">Status</th>
                                         <th class="center">Action</th>
                                     </tr>
                                 </thead>

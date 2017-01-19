@@ -115,7 +115,7 @@ class Requisition_model extends CI_Model {
             $this->db->select($db_select_column);
         else
             //$this->db->select('*, r.*');
-            $this->db->select('r.requisition_id, r.requisition_num, r.date_req, r.date_req_until, p.project_name, b.budget_head, l.location_name, d.donor_name, r.approving_authority, CONCAT(up.upro_first_name, " ", up.upro_last_name) AS approving_authority_name, r.approved_by, r.created_by');
+            $this->db->select('r.requisition_id, r.requisition_num, r.date_req, r.date_req_until, p.project_name, b.budget_head, l.location_name, d.donor_name, r.approving_authority, CONCAT(up.upro_first_name, " ", up.upro_last_name) AS approving_authority_name, r.approved_by, r.created_by, r.is_approved');
 
         if($db_where_column_or) {
             foreach($db_where_column_or as $key => $column) {
