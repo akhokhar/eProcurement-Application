@@ -138,42 +138,40 @@ class Rfq extends CI_Controller {
     | This function add new requisition
     |
    */
-    function add() {
+    function add($requisition_id) {
         
         // Check user has privileges to add product, else display a message to notify the user they do not have valid privileges.
         if (! $this->flexi_auth->is_privileged($this->uri_privileged))
         {
-                $this->session->set_flashdata('message', '<p class="error_msg">You do not have access privileges to add requisition.</p>');
+                $this->session->set_flashdata('message', '<p class="error_msg">You do not have access privileges to add RFQ.</p>');
                 redirect('admin/requisition');		
         }
         
 		
-		if($this->input->post()) {
-            //echo '<pre>'; print_r($this->input->post()); die();
-			// load validation helper
-            $this->load->library('form_validation');
-            
-            /*$this->form_validation->set_rules('requisitionDate', 'Requisition Date', 'required');
-            $this->form_validation->set_rules('requiredUntilDate', 'Required Until Date', 'required');
-            $this->form_validation->set_rules('project', 'Project', 'required');
-            $this->form_validation->set_rules('budgetHead', 'Budget Head', 'required');
-            $this->form_validation->set_rules('location', 'Location', 'required');
-            $this->form_validation->set_rules('donor', 'Donor', 'required');
-            $this->form_validation->set_rules('approvingAuthority', 'Approving Authority', 'required');*/
-            
-            if ($this->form_validation->run() || true) {
-                
+		if(isset($requisition_id) && !empty($requisition_id)) {
+           
 				$requisition = array();
-				foreach($this->input->post('requisition') as $req){
-					$fieldName = $req['name'];
-					$fieldValue = $req['value'];
 					
-					$requisition[$fieldName] = $fieldValue;
+				$requisition = $this->requisition_model->get_requisition(array('requisition_id'), array($requisition_id));
+				if(!isset($requisition) || empty($requisition)) {
+					redirect('admin/rfq/view_all');
 				}
-				if($requisition_id = $this->requisition_model->add_requisition($requisition)) {
-					// If Requisition added successfully, then add items
-					// Item work goes here....
-					foreach($this->input->post('items') as $items){
+				if(!$requisition[0]['is_approved']) {
+					$this->session->set_flashdata('message', '<p class="error_msg">The Requisition is not approved.</p>');
+					redirect('admin/rfq/view_all');
+				}
+					
+				$this->data['vendors'] = $this->general_model->list_vendors(false);
+				
+				foreach ($requisition[0]['items'] as $key => $item) {
+					$total_item_price = $item['unit_price'] * $item['quantity'];
+					$requisition[0]['items'][$key]['total_item_price'] = $total_item_price;
+					$total_price += $item['unit_price'] * $item['quantity'];
+				}
+				$requisition[0]['total_price'] = $total_price;
+					
+				$this->data['requisition'] = $requisition[0];
+					/*foreach($this->input->post('items') as $items){
 						
 						//Set Parameters for adding items to requisition
 						$itemName = '';
@@ -216,24 +214,11 @@ class Rfq extends CI_Controller {
 						// Calling method to add requisition item.
 						$this->requisition_model->add_requisition_item($requisition_id, $itemName, $itemDesc, $costCenter, $unit, $quantity, $unitPrice);
 						
-					}
+					}*/
 					
-					$return['msg_success'] = 'Requisition Added Successfully.';
-                } else{
-					$return['msg_error'] = 'Something went wrong, please try again.';
-				}
-                
-            }
-			else {
-
-				$return['msg_error'] = 'Please fill all required fields.';
-			}
-            
-			echo json_encode($return);
-			die();
-        }
-		
-		else {
+					//$return['msg_success'] = 'Requisition Added Successfully.';
+               
+			
 			// start: add breadcrumbs
 			$this->breadcrumbs->push('Add RFQ', base_url().'admin/rfq/add');
 			
@@ -245,7 +230,10 @@ class Rfq extends CI_Controller {
 			
 			$this->load->view('admin/includes/header', $this->data);
 			$this->load->view('admin/req_for_quotation/add_new_rfq', $this->data);
-			}
+			
+			
+        }
+		
     }
     /*---- end: add function ----*/
 	

@@ -111,6 +111,32 @@ class General_model extends CI_Model {
 	
 	/*
     |--------------------------------------------------------
+    | start: get all vendors as dropdown array function 
+    |--------------------------------------------------------
+    |
+    | This function vendors
+    |
+    */
+    function list_vendors($get_all) {
+        $this->db->select ( 'vendor_id, vendor_name, vendor_address, location_id' );
+
+        $this->db->from ( 'vendor' );
+		$this->db->where ('status', 1);
+        $this->db->order_by("vendor_name","ASC");
+
+        $query=$this->db->get();
+        $return = array();
+        $return[0] = "Select Vendors";
+        foreach($query->result_array() as $row)
+        {
+            $return[$row["vendor_id"]] = ($get_all) ? $row : $row['vendor_name'];
+        }
+        return $return;
+    }
+    /*---- end: list_managers function ----*/
+	
+	/*
+    |--------------------------------------------------------
     | start: get all managers as dropdown array function 
     |--------------------------------------------------------
     |

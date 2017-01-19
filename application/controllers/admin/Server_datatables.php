@@ -91,7 +91,7 @@ class server_datatables extends CI_Controller {
         //echo '<pre>'; print_r($this->input->post()); die();
         
         // database column for searching
-        $db_column = array('r.requisition_id', 'r.requisition_num', 'r.date_req', 'r.date_req_until', 'r.approving_authority', 'r.status');
+        $db_column = array('r.requisition_id', 'r.requisition_num', 'r.date_req', 'r.date_req_until', 'r.approving_authority', 'r.is_approved', 'r.status');
         
         // load requisition model
         $this->load->model('admin/requisition_model');
@@ -178,7 +178,7 @@ class server_datatables extends CI_Controller {
         $dataCount = $this->requisition_model->get_requisition($db_where_column, $db_where_value, $db_where_column_or, $db_where_value_or);
         // end: get all requisitions or search requisition
         
-        $dt_column = array('requisition_num', 'date_req', 'date_req_until', 'project_name', 'location_name', 'donor_name', 'approving_authority_name');
+        $dt_column = array('requisition_num', 'date_req', 'date_req_until', 'project_name', 'location_name', 'approving_authority_name', 'is_approved');
         
         $data = array();
         $i = 0;
@@ -203,19 +203,19 @@ class server_datatables extends CI_Controller {
                 
                 foreach($dt_column as $get_dt_column) {
                     
-                    /*if($get_dt_column == 'product_title'){
-                        $data[$i][] = '<a href="'.base_url().'admin/product/view_product_detail/'.$value['product_id'].'">'.$value[$get_dt_column].'</a>';
+                    if($get_dt_column == 'is_approved'){
+                        $data[$i][] = $value[$get_dt_column] ? 'Approved' : 'Not Approved';
                     }
-                    else if($get_dt_column == 'product_quantity'){
+                    /*else if($get_dt_column == 'product_quantity'){
                         $data[$i][] = ($value[$get_dt_column] <= 0) ? 'Out of Stock' : $value[$get_dt_column];
                     }
                     else if($get_dt_column == 'product_org_price'){
                         
                         $data[$i][] = number_format($value[$get_dt_column],2);
-                    }
-                    else {*/
+                    }*/
+                    else {
                         $data[$i][] = $value[$get_dt_column];
-                    //}
+                    }
                     
                 }
 

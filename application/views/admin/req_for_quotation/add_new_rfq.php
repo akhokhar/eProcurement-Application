@@ -127,6 +127,21 @@
                                                           echo form_input($input_data);
                                                           ?>
                                                     </div>
+                                                    <div class="form-group">
+                                                        <label for="total_price">Total Price</label>
+                                                         <?php
+                                                          $input_data = array(
+                                                                    'type'          => 'number',
+                                                                    'name'          => 'total_price',
+                                                                    'id'            => 'total_price',
+																	'disabled'	  => true,
+                                                                    'value'         => $requisition['total_price'],
+                                                                    'class'         => 'form-control'
+                                                          );
+                                                          echo form_input($input_data);
+                                                          ?>
+                                                    
+                                                    </div>
                                                 </div>
                                                 <div class="col-md-6">
                                                     <div class="form-group">
@@ -163,7 +178,7 @@
                                                                     'required'	  => 'required',
                                                                     'data-required-error' => 'Select 3 Vendors'
                                                           );
-														  echo form_dropdown('project', $projects, '', $dropdown_data);
+														  echo form_dropdown('vendors', $vendors, '', $dropdown_data);
                                                           ?>
                                                     </div>
                                                 </div>
@@ -175,7 +190,7 @@
                                                         Next <i class="fa fa-arrow-circle-right"></i>
                                                     </a>-->
                                                     <div class="col-md-2 pull-right">
-                                                        <button type="submit" class="btn btn-primary pull-right" id="newRequisitionButton" disabled>Create Requisition</button>
+                                                        <button type="submit" class="btn btn-primary pull-right" id="newRfqButton" disabled>Create RFQ</button>
                                                     </div>
                                                 </div>
                                               </div>
