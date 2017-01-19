@@ -159,7 +159,7 @@
                                                     'Manager 2'	 => 'Manager 2',
                                                     'Manager 3'	 => 'Manager 3'
                                           );
-                                          echo form_dropdown('approvingAuthority', $approvingAuthorities, '', $dropdown_data);
+                                          echo form_dropdown('approvingAuthority', $managers, '', $dropdown_data);
                                           ?>
                                     </div>
                                 </div>

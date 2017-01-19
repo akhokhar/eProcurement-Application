@@ -69,20 +69,27 @@
 								$attributes = array('role' => 'form', 'data-toggle' => 'validator', 'name' => 'changeApproveStatus', 'id' => 'changeApproveStatus');
 								echo form_open('', $attributes);
 							?>
-                            <label for="approve_reject">Approve / Reject</label>
-                            <?php
-                              $dropdown_data = array(
-                                        'id'            	  => 'approve_reject',
-                                        'class'         	   => 'form-control',
-                                        'required'	  		=> 'required',
-                                        'data-required-error' => 'Select'
-                              );
-							  $approve_reject = array(
-							  			1	=>	'Approve',
-										0	=>	'Reject'
-									);
-                              echo form_dropdown('approve_reject', $approve_reject, '', $dropdown_data);
+							
+							<?php if($user_group == "Master Admin" || $user_group == "Manager"){?>
+							
+								<label for="approve_reject">Approve / Reject</label>
+								<?php
+								  $dropdown_data = array(
+											'id'            	  => 'approve_reject',
+											'class'         	   => 'form-control',
+											'required'	  		=> 'required',
+											'data-required-error' => 'Select'
+								  );
+								  $approve_reject = array(
+											1	=>	'Approve',
+											0	=>	'Reject'
+										);
+								  echo form_dropdown('approve_reject', $approve_reject, '', $dropdown_data);
+								  
+								}
                               ?>
+
+							  <input type="hidden" name="requisition_id" value="<?php echo $requisition_id;?>" />
                               <button type="submit" class="btn btn-primary pull-right" id="changeApproveStatusButton">Change Status</button>
                             <?php echo form_close(); ?>
                          </div>

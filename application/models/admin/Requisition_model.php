@@ -16,16 +16,17 @@ class Requisition_model extends CI_Model {
         $user_id    = $this->flexi_auth->get_user_id();
         
         $data = array(
-                'date_req'            	  => date("Y-m-d H:i:s", strtotime($requisition['requisitionDate'])),
+                'date_req'            	  	=> date("Y-m-d H:i:s", strtotime($requisition['requisitionDate'])),
                 'date_req_until'            => date("Y-m-d H:i:s", strtotime($requisition['requiredUntilDate'])),
                 'project_id'			  	=> $requisition['project'],
                 'budget_head_id'          	=> $requisition['budgetHead'],
-                'location_id'       		   => $requisition['location'],
-                'donor_id'            	  => $requisition['donor'],
-                'approving_authority'       => $user_id,
-				'is_approved'			   => 0,
-				'is_tendered'			   => 0,
-				'date_created'			  => date("Y-m-d H:i:s", time()),
+                'location_id'       		=> $requisition['location'],
+                'donor_id'            	  	=> $requisition['donor'],
+                'approving_authority'       => $requisition['approvingAuthority'],
+                'created_by'       			=> $user_id,
+				'is_approved'			   	=> 0,
+				'is_tendered'			   	=> 0,
+				'date_created'			  	=> date("Y-m-d H:i:s", time()),
 				'status'					=> 1,
         ); 
         
@@ -114,7 +115,7 @@ class Requisition_model extends CI_Model {
             $this->db->select($db_select_column);
         else
             //$this->db->select('*, r.*');
-            $this->db->select('r.requisition_id, r.requisition_num, r.date_req, r.date_req_until, p.project_name, b.budget_head, l.location_name, d.donor_name, r.approving_authority');
+            $this->db->select('r.requisition_id, r.requisition_num, r.date_req, r.date_req_until, p.project_name, b.budget_head, l.location_name, d.donor_name, r.approving_authority, CONCAT(up.upro_first_name, " ", up.upro_last_name) AS approving_authority_name, r.approved_by, r.created_by');
 
         if($db_where_column_or) {
             foreach($db_where_column_or as $key => $column) {
@@ -147,6 +148,8 @@ class Requisition_model extends CI_Model {
         $this->db->join('location l', 'r.location_id = l.location_id', 'LEFT');
         $this->db->join('donor d', 'r.donor_id = d.donor_id', 'LEFT');
         $this->db->join('budget_head b', 'r.budget_head_id = b.budget_head_id', 'LEFT');
+		$this->db->join('user_accounts ua', 'r.approving_authority = ua.uacc_id', 'LEFT');
+        $this->db->join('user_profiles up', 'up.upro_uacc_fk = ua.uacc_id', 'left');
 		$result = $this->db->get('requisition r');
         
         if($result->num_rows() > 0) {
@@ -326,5 +329,39 @@ class Requisition_model extends CI_Model {
         
     }
     /*---- end: get_status function ----*/
+	
+	
+	function approve_and_email_requisition($requisition_id, $approve) {
+		
+        $user_id    = $this->flexi_auth->get_user_id();
+        
+        
+        $data = array(
+                'is_approved'            	=> $approve,
+				'approved_by'				=> $user_id,
+        );  
+        
+        $this->db->trans_begin();
+        
+        $this->db->where('requisition_id', $requisition_id);
+        $this->db->set($data);
+        $this->db->update('requisition');
+        
+        //$product_id = $this->db->insert_id();
+
+        if($requisition_id){
+            //Requisition Item Work will go here.
+        }
+        
+        $this->db->trans_complete();
+        
+        if($this->db->trans_status() === FALSE) {
+            $this->db->trans_rollback();
+            return FALSE;
+        } else {
+            return TRUE;
+        }
+        
+    }
 
 }

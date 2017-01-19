@@ -122,6 +122,7 @@ class Requisition extends CI_Controller {
 		$this->data['projects'] = $this->general_model->list_projects();
 		$this->data['locations'] = $this->general_model->list_locations();
 		$this->data['donors'] = $this->general_model->list_donors();
+		$this->data['managers'] = $this->general_model->list_managers();
         
         $this->load->view('admin/includes/header', $this->data);
         $this->load->view('admin/requisition/requisitions', $this->data);
@@ -244,7 +245,7 @@ class Requisition extends CI_Controller {
 			$this->data['budgetHeads'] = $this->general_model->list_budget_head();
 			$this->data['locations'] = $this->general_model->list_locations();
 			$this->data['donors'] = $this->general_model->list_donors();
-			
+			$this->data['managers'] = $this->general_model->list_managers();
 			
 			$this->data['page_title'] = 'Add New Requisition';
 			
@@ -333,6 +334,58 @@ class Requisition extends CI_Controller {
 	}
 	
 	function view($requisition_id) {
+		
+		// Approve Requisition Check if posted.
+		// Send email after approving.
+		if($this->input->post()) {
+            
+			// load validation helper
+            $this->load->library('form_validation');
+            $this->form_validation->set_rules('approve_reject', 'Approve/Reject', 'required');
+            
+            if ($this->form_validation->run() || true) {
+				$requisition_id = $this->input->post('requisition_id');
+				$approve = $this->input->post('approve_reject');
+				
+				if($this->requisition_model->approve_and_email_requisition($requisition_id, $approve)) {
+					$requisition = $this->requisition_model->get_requisition(array('requisition_id'), array($requisition_id));
+					
+					/*Setup email for manager starts*/
+					$managerId = $requisition[0]['approving_authority'];
+					$managerData = $this->general_model->get_user_detail($managerId);
+					
+					$subjectManager = "You have a new Requisition request.";
+					
+					$bodyManager  	= "Dear ".$managerData['upro_first_name']." ".$managerData['upro_last_name']."\r\n";
+					$bodyManager 	.= "Your have a new Requisition Request \R\n";
+					$bodyManager 	.= "Requisition Number is ".$requisition_id;
+					
+					$toManager = $managerData['uacc_email'];
+					$toManagerName = $managerData['upro_first_name']." ".$managerData['upro_last_name'];
+					
+					$this->send_email($toManager, $toManagerName, $subjectManager, $bodyManager);
+					/*Setup email for manager ends*/
+					
+					/*Setup email for purchaser starts*/
+					$purchaserId = $requisition[0]['created_by'];
+					$purchaserData = $this->general_model->get_user_detail($purchaserId);
+					
+					$subjectPurchaser = "Your Requisition has been approved!";
+					
+					$bodyPurchaser  = "Dear ".$purchaserData['upro_first_name']." ".$purchaserData['upro_last_name']."\r\n";
+					$bodyPurchaser .= "Your Requisition has been created \R\n";
+					$bodyPurchaser .= "Requisition Number is ".$requisition_id;
+					
+					$toPurchaser = $purchaserData['uacc_email'];
+					$toPurchaserName = $purchaserData['upro_first_name']." ".$purchaserData['upro_last_name'];
+					
+					$this->send_email($toPurchaser, $toPurchaserName, $subjectPurchaser, $bodyPurchaser);
+					/*Setup email for purchaser end*/
+					redirect('admin/requisition/view_all');
+				}
+			}
+		}
+		
 		if (!isset($requisition_id) || empty($requisition_id)) {
 			redirect('admin/requisition/view_all');
 		}
@@ -370,9 +423,30 @@ class Requisition extends CI_Controller {
 		$requisition[0]['total_price'] = $total_price;
 			
 		$this->data['requisition'] = $requisition[0];
+		$this->data['requisition_id'] = $requisition_id;
+		
+		$user_id    = $this->flexi_auth->get_user_id();
+		$this->data['user_details'] = $this->general_model->get_user_detail($user_id);
+		$this->data['user_group'] = $this->data['user_details']['ugrp_name'];
 		
         $this->load->view('admin/includes/header', $this->data);
         $this->load->view('admin/requisition/view_requisition', $this->data);
 	}
 	
+	function send_email($to, $toName, $subject, $message) 
+	{
+		$this->load->library('email');
+		
+		$this->email->clear(TRUE);
+		$this->email->from('fm.memon777@gmail', 'Farman Memon'); 
+		$this->email->to($to, $toName);
+		$this->email->subject($subject);
+		$this->email->message($message);  
+
+		$this->email->send();
+
+		return TRUE;
+
+	}
+
 }
