@@ -64,16 +64,16 @@
                     <!-- end: Success and error message -->
                     <div class="page-header row">
                         <h1 class="col-sm-6"><?php echo $page_title; ?></h1>
-                        <div class="col-sm-6">
+                        <div class="col-sm-6">							
+							<?php if ($user_group == "Master Admin" || $user_group == "Manager"){ ?>
+
                             <?php
 								$attributes = array('role' => 'form', 'data-toggle' => 'validator', 'name' => 'changeApproveStatus', 'id' => 'changeApproveStatus');
 								echo form_open('', $attributes);
 							?>
 							
-							<?php if($user_group == "Master Admin" || $user_group == "Manager"){?>
-							
 								<label for="approve_reject">Approve / Reject</label>
-								<?php
+							<?php
 								  $dropdown_data = array(
 											'id'            	  => 'approve_reject',
 											'class'         	   => 'form-control',
@@ -85,13 +85,16 @@
 											0	=>	'Reject'
 										);
 								  echo form_dropdown('approve_reject', $approve_reject, '', $dropdown_data);
-								  
-								}
                               ?>
 
 							  <input type="hidden" name="requisition_id" value="<?php echo $requisition_id;?>" />
                               <button type="submit" class="btn btn-primary pull-right" id="changeApproveStatusButton">Change Status</button>
                             <?php echo form_close(); ?>
+                            <?php } ?>
+                            
+                            <?php if ($requisition['is_approved'] && in_array($user_group, array("Master Admin", "Manager", "Logistics"))){ ?>
+                              <a href="<?php echo base_url(); ?>admin/rfq/add/<?php echo $requisition_id;?>" class="btn btn-primary pull-right">Request for Quotation</a> 
+                            <?php } ?>
                          </div>
                     </div>
                     <!-- end: PAGE TITLE & BREADCRUMB -->
@@ -141,6 +144,10 @@
                             <tr>
                               <td>Approving Authority</td>
                               <td><?php echo $requisition['approving_authority']; ?></td>
+                            </tr>
+                            <tr>
+                              <td>Status</td>
+                              <td><?php echo $requisition['is_approved'] ? 'Approved': 'Not Approved'; ?></td>
                             </tr>
                             <tr>
                               <td><strong>Total of Items</strong></td>
