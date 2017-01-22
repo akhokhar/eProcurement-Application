@@ -101,7 +101,7 @@ class Quotation_model extends CI_Model {
         if($db_select_column)
             $this->db->select($db_select_column);
         else
-            $this->db->select('r.rfq_id, r.rfq_num, r.requisition_id, r.rfq_date, r.due_date, r.created_by, r.status, rv.vendor_id, rv.unit_rate, v.vendor_name');
+            $this->db->select('r.rfq_id, r.rfq_num, r.requisition_id, r.rfq_date, r.due_date, r.created_by, r.status, rv.vendor_id, rv.unit_rate, v.vendor_name, rq.description');
 
         if($db_where_column_or) {
             foreach($db_where_column_or as $key => $column) {
@@ -133,6 +133,7 @@ class Quotation_model extends CI_Model {
         //$this->db->where('r.status', 1);
         $this->db->join('rfq_vendor rv', 'r.rfq_id = rv.rfq_id', 'LEFT');
         $this->db->join('vendor v', 'rv.vendor_id = v.vendor_id', 'LEFT');
+        $this->db->join('requisition rq', 'r.requisition_id = rq.requisition_id', 'LEFT');
 		$result = $this->db->get('rfq r');
 		
         $data = array();
@@ -146,89 +147,7 @@ class Quotation_model extends CI_Model {
     }
     /*---- end: get_requisition function ----*/
     
-    
-    function delete_requisition($requisition_id) {
-        
-        $user_id    = $this->flexi_auth->get_user_id();
-        
-        $data = array(
-                'product_delete'        => 1,
-                'product_deleted_by'    => $user_id
-        );
-        
-        $this->db->trans_begin();
-        
-        $this->db->where('requisition_id', $requisition_id);
-        $this->db->set($data);
-        $this->db->update('requisition');
-        
-        $this->db->trans_complete();
-        
-        if($this->db->trans_status() === FALSE) {
-            $this->db->trans_rollback();
-            return FALSE;
-        } else {
-            $b = $this->db->trans_commit();
-            return TRUE;
-        }
-        
-    }
-    
-    
-    function edit_requisition($requisition_id) {
-        
-        $requisition   = $this->input->post();
-        $user_id    = $this->flexi_auth->get_user_id();
-        //$inserted_cat_id = $this->get_prod_category_id($requisition_id);
-        
-        // calculate discount value
-        if(isset($product['product_disc_type']) && $product['product_disc_type'] == '2') {
-            $discount_percent_value = ($product['product_discount']/100)*$product['product_price'];
-            $discount_value = $product['product_price']-$discount_percent_value;
-        }
-        else {
-            $discount_value = $product['product_price']-$product['product_discount'];
-        }
-        
-        //echo $discount_value; die();
-        
-        $data = array(
-                'date_req'            		=> date("Y-m-d H:i:s", strtotime($requisition['requisitionDate'])),
-                'date_req_until'            => date("Y-m-d H:i:s", strtotime($requisition['requiredUntilDate'])),
-                'project_id'			  	=> $requisition['project'],
-                'budget_head_id'          	=> $requisition['budgetHead'],
-                'location_id'       		=> $requisition['location'],
-                'donor_id'            		=> $requisition['donor'],
-                'approved_rejected_by'      => $user_id,
-				'date_modified'				=> date("Y-m-d H:i:s", time()),
-				'status'					=> 1,
-        );  
-        
-        $this->db->trans_begin();
-        
-        $this->db->where('requisition_id', $requisition_id);
-        $this->db->set($data);
-        $this->db->update('requisition');
-        
-        //$product_id = $this->db->insert_id();
-
-        if($requisition_id){
-            //Requisition Item Work will go here.
-        }
-        
-        $this->db->trans_complete();
-        
-        if($this->db->trans_status() === FALSE) {
-            $this->db->trans_rollback();
-            return FALSE;
-        } else {
-            return TRUE;
-        }
-        
-    }
-    
-    
-    /*
+	/*
     |------------------------------------------------
     | start: get_status function
     |------------------------------------------------

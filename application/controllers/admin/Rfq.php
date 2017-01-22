@@ -249,4 +249,36 @@ class Rfq extends CI_Controller {
         $this->load->view('admin/req_for_quotation/view_rfq', $this->data);
 	}
 	
+	function generate_rfq_pdf($rfq_id){
+		
+		$this->load->model('Requisition_model');
+		
+		$quotationData = $this->Quotation_model->get_rfq(array('rfq_id'), array($rfq_id));
+		$quotation = $quotationData[0];
+		
+		$requisitionData = $this->Requisition_model->get_requisition(array('r.requisition_id'), array($quotation['requisition_id']));
+		$requisition = $requisitionData[0];
+		
+		$requisitionItems = $this->Requisition_model->get_requisition_items($quotation['requisition_id']);
+		
+		$data['quotation'] = $quotation;
+		$data['requisition'] = $requisition;
+		$data['requisitionItems'] = $requisitionItems;
+		
+		$html = $this->load->view('admin/req_for_quotation/quotation', $data, true);
+		
+		//this the the PDF filename that user will get to download
+		$pdfFilePath = "quotation.pdf";
+
+		//load mPDF library
+		$this->load->library('m_pdf');
+		//actually, you can pass mPDF parameter on this load() function
+		$pdf = $this->m_pdf->load($html);
+		//generate the PDF!
+		$pdf->WriteHTML($html);
+		//offer it to user via browser download! (The PDF won't be saved on your server HDD)
+		$pdf->Output($pdfFilePath, "D");
+
+	}
+	
 }

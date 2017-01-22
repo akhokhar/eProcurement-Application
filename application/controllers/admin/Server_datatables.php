@@ -345,7 +345,7 @@ class server_datatables extends CI_Controller {
         $dataCount = $this->Quotation_model->get_rfq($db_where_column, $db_where_value, $db_where_column_or, $db_where_value_or);
         // end: get all requisitions or search requisition
         
-        $dt_column = array('rfq_num', 'requisition_id', 'rfq_date', 'due_date', 'vendor_name');
+        $dt_column = array('rfq_num', 'description', 'rfq_date', 'due_date', 'vendor_name');
         
         $data = array();
         $i = 0;
