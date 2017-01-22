@@ -16,17 +16,19 @@ class Requisition_model extends CI_Model {
         $user_id    = $this->flexi_auth->get_user_id();
         
         $data = array(
-                'date_req'            	  	=> date("Y-m-d H:i:s", strtotime($requisition['requisitionDate'])),
+                'requisition_num'            	  	=> $requisition['req_num'],
+                'description'            	=> $requisition['purchasing_detail'],
+                'date_req'            	  => date("Y-m-d H:i:s", strtotime($requisition['requisitionDate'])),
                 'date_req_until'            => date("Y-m-d H:i:s", strtotime($requisition['requiredUntilDate'])),
                 'project_id'			  	=> $requisition['project'],
                 'budget_head_id'          	=> $requisition['budgetHead'],
-                'location_id'       		=> $requisition['location'],
+                'location_id'       			=> $requisition['location'],
                 'donor_id'            	  	=> $requisition['donor'],
                 'approving_authority'       => $requisition['approvingAuthority'],
                 'created_by'       			=> $user_id,
 				'is_approved'			   	=> 0,
 				'is_tendered'			   	=> 0,
-				'date_created'			  	=> date("Y-m-d H:i:s", time()),
+				'date_created'			  => date("Y-m-d H:i:s", time()),
 				'status'					=> 1,
         ); 
         
@@ -115,7 +117,7 @@ class Requisition_model extends CI_Model {
             $this->db->select($db_select_column);
         else
             //$this->db->select('*, r.*');
-            $this->db->select('r.requisition_id, r.requisition_num, r.date_req, r.date_req_until, p.project_name, b.budget_head, l.location_name, d.donor_name, r.approving_authority, CONCAT(up.upro_first_name, " ", up.upro_last_name) AS approving_authority_name, r.approved_by, r.created_by, r.is_approved');
+            $this->db->select('r.requisition_id, r.requisition_num, r.description, r.date_req, r.date_req_until, p.project_name, b.budget_head, l.location_name, d.donor_name, r.approving_authority, CONCAT(up.upro_first_name, " ", up.upro_last_name) AS approving_authority_name, r.approved_by, r.created_by, r.is_approved');
 
         if($db_where_column_or) {
             foreach($db_where_column_or as $key => $column) {

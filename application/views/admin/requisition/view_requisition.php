@@ -118,6 +118,10 @@
                               <td><?php echo $requisition['requisition_num']; ?></td>
                             </tr>
                             <tr>
+                              <td>Purchasing Detail</td>
+                              <td><?php echo $requisition['description']; ?></td>
+                            </tr>
+                            <tr>
                               <td>Date Requested</td>
                               <td><?php echo date('d-m-Y', strtotime($requisition['date_req'])); ?></td>
                             </tr>

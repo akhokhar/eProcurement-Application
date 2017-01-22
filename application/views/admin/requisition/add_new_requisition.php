@@ -240,6 +240,14 @@
                                                           ?>
                                                     </div>
                                                 </div>
+                                                <div class="col-md-12">
+                                                    <div class="form-group">
+                                                        <label for="purchasing_detail">
+                                                        	Purchasing Detail <span class="symbol required"></span>
+                                                        </label>
+                                                        <textarea id="purchasing_detail" name="purchasing_detail" required="required" class="form-control" placeholder="Brief Note of Purchasing"></textarea>
+                                                    </div>
+                                                </div>
                                               </div>
                                               <hr />
                                               <div class="row">
