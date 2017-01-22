@@ -171,6 +171,7 @@ class Requisition extends CI_Controller {
 					
 					$requisition[$fieldName] = $fieldValue;
 				}
+				$requisition['req_num'] = '1-10-17';
 				if($requisition_id = $this->requisition_model->add_requisition($requisition)) {
 					// If Requisition added successfully, then add items
 					// Item work goes here....
