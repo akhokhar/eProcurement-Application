@@ -416,10 +416,14 @@ class Requisition extends CI_Controller {
 		if(!isset($requisition) || empty($requisition)) {
 			redirect('admin/requisition/view_all');
 		}
-		foreach ($requisition[0]['items'] as $key => $item) {
-			$total_item_price = $item['unit_price'] * $item['quantity'];
-			$requisition[0]['items'][$key]['total_item_price'] = $total_item_price;
-			$total_price += $item['unit_price'] * $item['quantity'];
+		
+		$total_price = 0;
+		if (isset($requisition[0]['items']) && !empty($requisition[0]['items'])) {
+			foreach ($requisition[0]['items'] as $key => $item) {
+				$total_item_price = $item['unit_price'] * $item['quantity'];
+				$requisition[0]['items'][$key]['total_item_price'] = $total_item_price;
+				$total_price += $item['unit_price'] * $item['quantity'];
+			}
 		}
 		$requisition[0]['total_price'] = $total_price;
 			

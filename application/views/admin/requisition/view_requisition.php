@@ -65,7 +65,7 @@
                     <div class="page-header row">
                         <h1 class="col-sm-6"><?php echo $page_title; ?></h1>
                         <div class="col-sm-6">							
-							<?php if ($user_group == "Master Admin" || $user_group == "Manager"){ ?>
+							<?php if (($user_group == "Master Admin" || $user_group == "Manager") && $requisition['is_approved'] == 0){ ?>
 
                             <?php
 								$attributes = array('role' => 'form', 'data-toggle' => 'validator', 'name' => 'changeApproveStatus', 'id' => 'changeApproveStatus');
@@ -82,7 +82,7 @@
 								  );
 								  $approve_reject = array(
 											1	=>	'Approve',
-											0	=>	'Reject'
+											2	=>	'Reject'
 										);
 								  echo form_dropdown('approve_reject', $approve_reject, '', $dropdown_data);
                               ?>
@@ -92,7 +92,7 @@
                             <?php echo form_close(); ?>
                             <?php } ?>
                             
-                            <?php if ($requisition['is_approved'] && in_array($user_group, array("Master Admin", "Manager", "Logistics"))){ ?>
+                            <?php if ($requisition['is_approved'] == 1 && in_array($user_group, array("Master Admin", "Manager", "Logistics"))){ ?>
                               <a href="<?php echo base_url(); ?>admin/rfq/add/<?php echo $requisition_id;?>" class="btn btn-primary pull-right">Request for Quotation</a> 
                             <?php } ?>
                          </div>
@@ -151,7 +151,17 @@
                             </tr>
                             <tr>
                               <td>Status</td>
-                              <td><?php echo $requisition['is_approved'] ? 'Approved': 'Not Approved'; ?></td>
+                              <td><?php 
+							  	if ($requisition['is_approved'] == 1) {
+									echo 'Approved';
+								}
+								else if ($requisition['is_approved'] == 2) {
+									echo 'Rejected';
+								}
+								else {
+									echo 'Not Approved';
+								}
+								?></td>
                             </tr>
                             <tr>
                               <td><strong>Total of Items</strong></td>
@@ -173,7 +183,7 @@
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <i class="fa fa-external-link-square"></i>
-                            Catalog
+                            Requisition Items
                         </div>
                         <div class="panel-body">
                             <?php
