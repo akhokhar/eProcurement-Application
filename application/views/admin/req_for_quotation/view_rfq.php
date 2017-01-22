@@ -65,26 +65,7 @@
                     <div class="page-header row">
                         <h1 class="col-sm-6"><?php echo $page_title; ?></h1>
                         <div class="col-sm-6">
-                            <?php
-								$attributes = array('role' => 'form', 'data-toggle' => 'validator', 'name' => 'changeApproveStatus', 'id' => 'changeApproveStatus');
-								echo form_open('', $attributes);
-							?>
-                            <label for="approve_reject">Approve / Reject</label>
-                            <?php
-                              $dropdown_data = array(
-                                        'id'            	  => 'approve_reject',
-                                        'class'         	   => 'form-control',
-                                        'required'	  		=> 'required',
-                                        'data-required-error' => 'Select'
-                              );
-							  $approve_reject = array(
-							  			1	=>	'Approve',
-										0	=>	'Reject'
-									);
-                              echo form_dropdown('approve_reject', $approve_reject, '', $dropdown_data);
-                              ?>
-                              <button type="submit" class="btn btn-primary pull-right" id="changeApproveStatusButton">Change Status</button>
-                            <?php echo form_close(); ?>
+							  <button type="button" class="btn btn-primary pull-right" id="changeApproveStatusButton">Download Quotation</button>
                          </div>
                     </div>
                     <!-- end: PAGE TITLE & BREADCRUMB -->
@@ -99,46 +80,31 @@
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <i class="fa fa-external-link-square"></i>
-                            Requisition Details
+                            Quotation Details
                         </div>
                         <div class="panel-body">
                           <table class="table table-bordered table-hover">
                             <tr>
-                              <td width="40%">Requisition #</td>
-                              <td><?php echo $requisition['requisition_num']; ?></td>
+                              <td width="40%">Rfq #</td>
+                              <td><?php echo $quotation['rfq_num']; ?></td>
                             </tr>
                             <tr>
-                              <td>Date Requested</td>
-                              <td><?php echo date('d-m-Y', strtotime($requisition['date_req'])); ?></td>
+                              <td>Rfq Date</td>
+                              <td><?php echo date('d-m-Y', strtotime($quotation['rfq_date'])); ?></td>
                             </tr>
                             <tr>
-                              <td>Date Required Until</td>
-                              <td><?php echo date('d-m-Y', strtotime($requisition['date_req_until'])); ?></td>
+                              <td>Due Date</td>
+                              <td><?php echo date('d-m-Y', strtotime($quotation['due_date'])); ?></td>
                             </tr>
                             <tr>
-                              <td>Project</td>
-                              <td><?php echo $requisition['project_name']; ?></td>
+                              <td>Unit Rate</td>
+                              <td><?php echo $quotation['unit_rate']; ?></td>
                             </tr>
                             <tr>
-                              <td>Budget Head</td>
-                              <td><?php echo $requisition['budget_head']; ?></td>
+                              <td>Vendor</td>
+                              <td><?php echo $quotation['vendor_name']; ?></td>
                             </tr>
-                            <tr>
-                              <td>Location</td>
-                              <td><?php echo $requisition['location_name']; ?></td>
-                            </tr>
-                            <tr>
-                              <td>Donor</td>
-                              <td><?php echo $requisition['donor_name']; ?></td>
-                            </tr>
-                            <tr>
-                              <td>Approving Authority</td>
-                              <td><?php echo $requisition['approving_authority']; ?></td>
-                            </tr>
-                            <tr>
-                              <td><strong>Total of Items</strong></td>
-                              <td><strong><?php echo $requisition['total_price']; ?></strong></td>
-                            </tr>
+                            
                           </table>
                         </div>
                     </div>
@@ -148,35 +114,6 @@
             <!-- end: PAGE CONTENT-->
             
             
-            <!-- start: PAGE CONTENT -->
-            <div class="row">
-                <div class="col-md-12">
-                    <!-- start: BASIC TABLE PANEL -->
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <i class="fa fa-external-link-square"></i>
-                            Catalog
-                        </div>
-                        <div class="panel-body">
-                            <?php
-                            $attributes = array('class' => 'form-horizontal', 'role' => 'cat_form', 'id' => 'cat_form');
-                            echo form_open(current_url(), $attributes);
-                            ?>
-                            <table class="table table-striped table-bordered table-hover" id="itemsDataTable">
-                                
-                            </table>
-                            <?php if($checkbox_disabled!=""){ ?>
-                            <div class="form-group col-md-2 pull-left">
-                            <input type="submit" id="delete" name="delete" value="Delete Records" class="btn btn-info btn-block"/>
-                            </div>
-                            <?php } ?>
-                            <?php form_close(); ?>
-                        </div>
-                    </div>
-                    <!-- end: BASIC TABLE PANEL -->
-                </div>
-            </div>
-            <!-- end: PAGE CONTENT-->
         </div>
     </div>
     <!-- end: PAGE -->

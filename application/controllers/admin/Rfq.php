@@ -69,6 +69,7 @@ class Rfq extends CI_Controller {
         $check_slash = str_replace("//","/",$check_slash);
 
 		$this->load->model('admin/requisition_model');
+		$this->load->model('admin/Quotation_model');
 		$this->load->model('admin/general_model');
 		
         $this->uri_privileged = $this->menu_model->get_privilege_name($check_slash);
@@ -108,23 +109,19 @@ class Rfq extends CI_Controller {
         $this->data['message'] = $this->session->flashdata('message');
         
         // unshift crumb
-        $this->breadcrumbs->unshift('Requisitions', base_url().'admin/requisition');
+        $this->breadcrumbs->unshift('Quotations', base_url().'admin/rfq');
         
         
-        $btn_array["Add"]["action"] = "admin/requisition/add/";
+        $btn_array["Add"]["action"] = "admin/rfq/add/";
         //$btn_array["checkbox_disabled"]["action"] = "admin/product/delete_checked_checkbox/";
         $add_category = $this->menu_model->get_privilege_name($btn_array);
         
-        $this->data['page_title'] = 'List Requisitions';
+        $this->data['page_title'] = 'List Quotations';
 		
-		$this->requisition_model->get_requisition();
-		
-		$this->data['projects'] = $this->general_model->list_projects();
-		$this->data['locations'] = $this->general_model->list_locations();
-		$this->data['donors'] = $this->general_model->list_donors();
+		$this->data['vendors'] = $this->general_model->list_vendors(false);
         
         $this->load->view('admin/includes/header', $this->data);
-        $this->load->view('admin/requisition/requisitions', $this->data);
+        $this->load->view('admin/req_for_quotation/rfqs', $this->data);
         
     }
     /*---- end: index function ----*/
@@ -147,6 +144,23 @@ class Rfq extends CI_Controller {
                 redirect('admin/requisition');		
         }
         
+		if($this->input->post()) {
+            //echo '<pre>'; print_r($this->input->post()); die();
+			// load validation helper
+            $this->load->library('form_validation');
+            
+            $this->form_validation->set_rules('rfqDate', 'Quotation Date', 'required');
+            $this->form_validation->set_rules('rfqDueDate', 'Quotation Due Date', 'required');
+            $this->form_validation->set_rules('vendors', 'Project', 'required');
+            
+            if ($this->form_validation->run()) {
+				$rfqNum = '1-10-17';
+				if($rfq_id = $this->Quotation_model->add_rfq($requisition_id, $rfqNum))
+					$this->session->set_flashdata('message', '<p class="status_msg">Requisition updated successfully.</p>');
+					redirect('admin/rfq/view_rfq_detail/'.$rfq_id);
+				}
+			}
+		//}
 		
 		if(isset($requisition_id) && !empty($requisition_id)) {
            
@@ -171,54 +185,7 @@ class Rfq extends CI_Controller {
 				$requisition[0]['total_price'] = $total_price;
 					
 				$this->data['requisition'] = $requisition[0];
-					/*foreach($this->input->post('items') as $items){
-						
-						//Set Parameters for adding items to requisition
-						$itemName = '';
-						$itemDesc = '';
-						$costCenter = '';
-						$unit = '';
-						$quantity = '';
-						$unitPrice = '';
-						$totalPrice = '';
-						
-						foreach($items as $item){
-						
-							$fieldName = $item['name'];
-							$fieldValue = $item['value'];
-							
-							if($fieldName == "itemName"){
-								$itemName = $fieldValue;
-							}
-							if($fieldName == "itemDescription"){
-								$itemDesc = $fieldValue;
-							}
-							if($fieldName == "costCenter"){
-								$costCenter = $fieldValue;
-							}
-							if($fieldName == "unit"){
-								$unit = $fieldValue;
-							}
-							if($fieldName == "quantity"){
-								$quantity = $fieldValue;
-							}
-							if($fieldName == "unitPrice"){
-								$unitPrice = $fieldValue;
-							}
-							if($fieldName == "totalPrice"){
-								$totalPrice = $fieldValue;
-							}
-							
-						}
-						
-						// Calling method to add requisition item.
-						$this->requisition_model->add_requisition_item($requisition_id, $itemName, $itemDesc, $costCenter, $unit, $quantity, $unitPrice);
-						
-					}*/
 					
-					//$return['msg_success'] = 'Requisition Added Successfully.';
-               
-			
 			// start: add breadcrumbs
 			$this->breadcrumbs->push('Add RFQ', base_url().'admin/rfq/add');
 			
@@ -238,92 +205,21 @@ class Rfq extends CI_Controller {
     /*---- end: add function ----*/
 	
 	
-	/*
-    |------------------------------------------------
-    | start: edit_product function
-    |------------------------------------------------
-    |
-    | This function update requisition
-    |
-   */
-    function edit($requisition_id) {
-        
-        // Check user has privileges to edit requisition, else display a message to notify the user they do not have valid privileges.
-        if (! $this->flexi_auth->is_privileged($this->uri_privileged))
-        {
-                $this->session->set_flashdata('message', '<p class="error_msg">You do not have access privileges to edit requisition.</p>');
-                redirect('admin/requisition');
-        }
-        
-        // active menu
-        $this->data['sub_menu'] = $this->data['uri_1'].'/requisition/';
-        
-        // start: add breadcrumbs
-        $this->breadcrumbs->push('Edit Requisition', base_url().'admin/requisition/edit');
-        
-        // unshift crumb
-        $this->breadcrumbs->unshift('Catalog', base_url().'admin/requisition');
-        
-        if($this->input->post()) {
-            
-            //echo '<pre>'; print_r($this->input->post()); die();
-            
-            // load validation helper
-            $this->load->library('form_validation');
-            
-            $this->form_validation->set_rules('requisitionDate', 'Requisition Date', 'required');
-            $this->form_validation->set_rules('requiredUntilDate', 'Required Until Date', 'required');
-            $this->form_validation->set_rules('project', 'Project', 'required');
-            $this->form_validation->set_rules('budgetHead', 'Budget Head', 'required');
-            $this->form_validation->set_rules('location', 'Location', 'required');
-            $this->form_validation->set_rules('donor', 'Donor', 'required');
-            $this->form_validation->set_rules('approvingAuthority', 'Approving Authority', 'required');
-            
-            if ($this->form_validation->run()) {
-                
-                if($this->requisition_model->edit_requisition($requisition_id)) {
-                    //echo '<pre>'; print_r($this->input->post()); die();
-                    $this->session->set_flashdata('message', '<p class="status_msg">Requisition updated successfully.</p>');
-                    redirect('admin/requisition/view_requisition_detail/'.$requisition_id);
-                }
-                
-            }
-            
-        }
-        
-        // ************************************
-        // start: get requisition by id
-        // ************************************
-        $db_where_column    = array('requisition_id');
-        $db_where_value     = array($requisition_id);
-        
-        $this->data['requisition'] = $this->requisition_model->get_requisition($db_where_column, $db_where_value);
-        $this->data['requisition'] = $this->data['requisition'][0];
-        
-		
-        $this->data['currentPage'] = $this;
-
-        $this->data['page_title'] = 'Update Requisition';
-        
-        $this->load->view('admin/includes/header', $this->data);
-        $this->load->view('admin/requisition/edit_requisition', $this->data);
-        
-    }
-    /*---- end: edit_requisition function ----*/
+	
     
 	function view_all() {
 		$this->index();
 	}
 	
-	function view($requisition_id) {
-		if (!isset($requisition_id) || empty($requisition_id)) {
-			redirect('admin/requisition/view_all');
+	function view($rfq_id) {
+		if (!isset($rfq_id) || empty($rfq_id)) {
+			redirect('admin/rfq');
 		}
 		
-        // Check user has privileges to view product, else display a message to notify the user they do not have valid privileges.
+		// Check user has privileges to view product, else display a message to notify the user they do not have valid privileges.
         if (! $this->flexi_auth->is_privileged($this->uri_privileged))
         {
-                $this->session->set_flashdata('message', '<p class="error_msg">You do not have access privileges to view requisitions.</p>');
+                $this->session->set_flashdata('message', '<p class="error_msg">You do not have access privileges to view rfq.</p>');
                 if($this->flexi_auth->is_admin())
                     redirect('auth_admin');
                 else
@@ -334,28 +230,23 @@ class Rfq extends CI_Controller {
         $this->data['message'] = $this->session->flashdata('message');
         
         // unshift crumb
-        $this->breadcrumbs->unshift('Requisition Details', base_url().'admin/requisition/view');
+        $this->breadcrumbs->unshift('Quotation Details', base_url().'admin/rfq/view');
         
         //$btn_array["checkbox_disabled"]["action"] = "admin/product/delete_checked_checkbox/";
         $add_category = $this->menu_model->get_privilege_name($btn_array);
         
-        $this->data['page_title'] = 'Requisition Details';
+        $this->data['page_title'] = 'Quotation Details';
 		
-		$requisition = $this->requisition_model->get_requisition(array('requisition_id'), array($requisition_id));
-		if(!isset($requisition) || empty($requisition)) {
-			redirect('admin/requisition/view_all');
+		$quotation = $this->Quotation_model->get_rfq(array('rfq_id'), array($rfq_id));
+		
+		if(!isset($quotation) || empty($quotation)) {
+			redirect('admin/rfq/');
 		}
-		foreach ($requisition[0]['items'] as $key => $item) {
-			$total_item_price = $item['unit_price'] * $item['quantity'];
-			$requisition[0]['items'][$key]['total_item_price'] = $total_item_price;
-			$total_price += $item['unit_price'] * $item['quantity'];
-		}
-		$requisition[0]['total_price'] = $total_price;
 			
-		$this->data['requisition'] = $requisition[0];
+		$this->data['quotation'] = $quotation[0];
 		
         $this->load->view('admin/includes/header', $this->data);
-        $this->load->view('admin/requisition/view_requisition', $this->data);
+        $this->load->view('admin/req_for_quotation/view_rfq', $this->data);
 	}
 	
 }
