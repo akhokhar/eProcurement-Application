@@ -204,7 +204,16 @@ class server_datatables extends CI_Controller {
                 foreach($dt_column as $get_dt_column) {
                     
                     if($get_dt_column == 'is_approved'){
-                        $data[$i][] = $value[$get_dt_column] ? 'Approved' : 'Not Approved';
+						if ($value[$get_dt_column] == 1) {
+							$data[$i][] = 'Approved';
+						}
+						else if ($value[$get_dt_column] == 2) {
+							$data[$i][] = 'Rejected';
+						}
+						else {
+							$data[$i][] = 'Not Approved';
+						}
+						
                     }
                     /*else if($get_dt_column == 'product_quantity'){
                         $data[$i][] = ($value[$get_dt_column] <= 0) ? 'Out of Stock' : $value[$get_dt_column];
