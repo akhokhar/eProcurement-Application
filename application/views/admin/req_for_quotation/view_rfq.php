@@ -65,7 +65,9 @@
                     <div class="page-header row">
                         <h1 class="col-sm-6"><?php echo $page_title; ?></h1>
                         <div class="col-sm-6">
+							<a href="<?php echo base_url()?>admin/rfq/generate_rfq_pdf/<?php echo $quotation['rfq_id'];?>">
 							  <button type="button" class="btn btn-primary pull-right" id="changeApproveStatusButton">Download Quotation</button>
+							</a>
                          </div>
                     </div>
                     <!-- end: PAGE TITLE & BREADCRUMB -->
@@ -103,6 +105,14 @@
                             <tr>
                               <td>Vendor</td>
                               <td><?php echo $quotation['vendor_name']; ?></td>
+                            </tr>
+							<tr>
+                              <td>Requisition Id</td>
+                              <td><?php echo $quotation['requisition_id']; ?></td>
+                            </tr>
+							<tr>
+                              <td>Description</td>
+                              <td><?php echo $quotation['description']; ?></td>
                             </tr>
                             
                           </table>

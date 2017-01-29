@@ -96,11 +96,9 @@
 												<input type="checkbox" class="flat-grey">
 											</label>
 										</div>--></th>
-                                        <th class="center">Quotation #</th>
-                                        <th class="center">Requisition</th>
-                                        <th class="center">Quotation Date</th>
-                                        <th class="center">Quotation Due Date</th>
-                                        <th class="hidden-xs">Vendor</th>
+                                        <th class="center">Rfq #</th>
+                                        <th class="center">Rfq Date</th>
+                                        <th class="center">Rfq Due Date</th>
                                         <th class="center">Action</th>
                                     </tr>
                                 </thead>
@@ -205,8 +203,6 @@
                 null,
                 null,
                 null,
-                null,
-                null,
                 null
             ],
             "pageLength": 20,
@@ -216,9 +212,9 @@
                 $(".group1").colorbox();
             }
         }).on( 'draw', function () {
-            //$('tr td:nth-child(1), tr td:nth-child(3), tr td:nth-child(5)').each(function (){
-            //      $(this).addClass('center')
-            //})
+            $('tr td:nth-child(1), tr td:nth-child(5)').each(function (){
+                  $(this).addClass('center');
+            })
             
             $('input[type="checkbox"].flat-grey, input[type="radio"].flat-grey').iCheck({
                 checkboxClass: 'icheckbox_flat-grey',

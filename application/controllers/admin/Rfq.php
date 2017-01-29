@@ -1,6 +1,8 @@
 <?php
 if (!defined('BASEPATH'))
     exit('No direct script access allowed');
+	
+require_once APPPATH."/third_party/PHPExcel.php";
 
 class Rfq extends CI_Controller {
     
@@ -115,6 +117,8 @@ class Rfq extends CI_Controller {
         $btn_array["Add"]["action"] = "admin/rfq/add/";
         //$btn_array["checkbox_disabled"]["action"] = "admin/product/delete_checked_checkbox/";
         $add_category = $this->menu_model->get_privilege_name($btn_array);
+		
+		$quotation = $this->Quotation_model->get_rfq();
         
         $this->data['page_title'] = 'List Quotations';
 		
@@ -157,7 +161,7 @@ class Rfq extends CI_Controller {
 				$rfqNum = '1-10-17';
 				if($rfq_id = $this->Quotation_model->add_rfq($requisition_id, $rfqNum))
 					$this->session->set_flashdata('message', '<p class="status_msg">Requisition updated successfully.</p>');
-					redirect('admin/rfq/view_rfq_detail/'.$rfq_id);
+					redirect('admin/rfq/view/'.$rfq_id);
 				}
 			}
 		//}
@@ -247,6 +251,176 @@ class Rfq extends CI_Controller {
 		
         $this->load->view('admin/includes/header', $this->data);
         $this->load->view('admin/req_for_quotation/view_rfq', $this->data);
+	}
+	
+	function generate_rfq_pdf($rfq_id){
+		
+		$this->load->model('Requisition_model');
+		
+		$quotationData = $this->Quotation_model->get_rfq(array('rfq_id'), array($rfq_id));
+		$quotation = $quotationData[0];
+		
+		$requisitionData = $this->Requisition_model->get_requisition(array('r.requisition_id'), array($quotation['requisition_id']));
+		$requisition = $requisitionData[0];
+		
+		$requisitionItems = $this->Requisition_model->get_requisition_items($quotation['requisition_id']);
+		
+		$data['quotation'] = $quotation;
+		$data['requisition'] = $requisition;
+		$data['requisitionItems'] = $requisitionItems;
+		
+		$html = $this->load->view('admin/req_for_quotation/quotation', $data, true);
+		
+		//this the the PDF filename that user will get to download
+		$pdfFilePath = "quotation.pdf";
+
+		//load mPDF library
+		$this->load->library('m_pdf');
+		//actually, you can pass mPDF parameter on this load() function
+		$pdf = $this->m_pdf->load($html);
+		//generate the PDF!
+		$pdf->WriteHTML($html);
+		//offer it to user via browser download! (The PDF won't be saved on your server HDD)
+		$pdf->Output($pdfFilePath, "D");
+
+	}
+	
+	function add_comparative($rfq_id){
+		
+		if($this->input->post()) {
+			
+			foreach($_POST['item'] as $count => $item){
+				foreach($_POST['unit'][$count] as $vendor => $rate){
+					$this->Quotation_model->add_comparative($rfq_id, $vendor, $item, $rate);
+				}
+			}
+			redirect('admin/rfq');
+		}
+		
+		$this->load->model('Requisition_model');
+		// Set Flash Message
+        $this->data['message'] = $this->session->flashdata('message');
+        
+        // unshift crumb
+        $this->breadcrumbs->unshift('Quotations', base_url().'admin/rfq');
+        
+        
+        $btn_array["Add"]["action"] = "";
+        //$btn_array["checkbox_disabled"]["action"] = "admin/product/delete_checked_checkbox/";
+        $add_category = $this->menu_model->get_privilege_name($btn_array);
+		
+		$quotation = $this->Quotation_model->get_rfq(array('r.rfq_id'), array($rfq_id));
+		$quotation = $quotation[0];
+		$this->data['quotation'] = $quotation;
+		
+		$requisition = $this->Requisition_model->get_requisition(array('r.requisition_id'), $quotation['requisition_id']);
+		$this->data['requisition'] = $requisition[0];
+		
+		$this->data['requisitionItems'] = $this->Requisition_model->get_requisition_items($quotation['requisition_id']);
+		
+		$this->data['rfqVendors'] = $this->Quotation_model->get_rfq(array('r.requisition_id'), array($quotation['requisition_id']));
+		
+		$this->data['page_title'] = 'Add Comparative';
+		
+		$this->data['vendors'] = $this->general_model->list_vendors(false);
+        
+        $this->load->view('admin/includes/header', $this->data);
+        $this->load->view('admin/req_for_quotation/add_new_comparative', $this->data);
+	}
+	
+	public function generate_comparison($rfq_id){
+		
+		$this->load->model('Requisition_model');
+		
+		$quotationData = $this->Quotation_model->get_rfq(array('rfq_id'), array($rfq_id));
+		$quotation = $quotationData[0];
+		
+		$requisitionData = $this->Requisition_model->get_requisition(array('r.requisition_id'), array($quotation['requisition_id']));
+		$requisition = $requisitionData[0];
+		
+		$requisitionItems = $this->Requisition_model->get_requisition_items($quotation['requisition_id']);
+		
+		// Create Object of PHP Excel
+		$objPHPExcel = new PHPExcel();
+		$objPHPExcel->setActiveSheetIndex(0);
+		
+		$styleArray = array(
+		'font'  => array(
+			'bold'  => true,
+			'size'  => 16,
+			'name'  => 'Calibri'
+		));
+		$styleArray2 = array(
+		'font'  => array(
+			'bold'  => true,
+			'size'  => 14,
+			'name'  => 'Calibri'
+		));
+		$styleArray3 = array(
+		'font'  => array(
+			'size'  => 14,
+			'name'  => 'Calibri'
+		));
+		$styleArray4 = array(
+			'font'  => array(
+				'size'  => 11,
+				'name'  => 'Calibri'
+			),
+			'borders' => array(
+			  'allborders' => array(
+				  'style' => PHPExcel_Style_Border::BORDER_THIN,
+				  )
+			 ),
+		);
+		
+		// 1st two lines
+		$objPHPExcel->getActiveSheet()->SetCellValue('A1', 'Research and Development Foundation');
+		$objPHPExcel->getActiveSheet()->getStyle('A1')->applyFromArray($styleArray);
+		$objPHPExcel->getActiveSheet()->SetCellValue('A2', 'Supplier Quotations Evaluation');
+		$objPHPExcel->getActiveSheet()->getStyle('A2')->applyFromArray($styleArray2);
+		
+		// Project Details
+		$objPHPExcel->getActiveSheet()->SetCellValue('A3', 'Project Detail');
+		$objPHPExcel->getActiveSheet()->getStyle('A3')->applyFromArray($styleArray3);
+		$objPHPExcel->getActiveSheet()->mergeCells('C3:H3');
+		$objPHPExcel->getActiveSheet()->SetCellValue('C3', $requisition['description']);
+		$objPHPExcel->getActiveSheet()->mergeCells('I3:J3');
+		$objPHPExcel->getActiveSheet()->SetCellValue('I3', 'Date of Joining');
+		$joiningDate = date("d/m/Y", strtotime($requisition['date_req']));
+		$objPHPExcel->getActiveSheet()->SetCellValue('K3', $joiningDate );
+		
+		$objPHPExcel->getActiveSheet()->SetCellValue('A4', 'Requisition No');
+		$objPHPExcel->getActiveSheet()->getStyle('A4')->applyFromArray($styleArray3);
+		$objPHPExcel->getActiveSheet()->SetCellValue('C4', $requisition['requisition_num']);
+		$objPHPExcel->getActiveSheet()->SetCellValue('D4', 'PR Date');
+		$joiningDate = date("d/m/Y", strtotime($requisition['date_req']));
+		$objPHPExcel->getActiveSheet()->SetCellValue('E4', $joiningDate );
+		
+		$objPHPExcel->getActiveSheet()->SetCellValue('F4', 'RFQ Ref#:');
+		//$objPHPExcel->getActiveSheet()->getStyle('F4','G4','I4','K4')->applyFromArray($styleArray4);
+		$objPHPExcel->getActiveSheet()->SetCellValue('G4', $quotation['rfq_num']);
+		//$objPHPExcel->getActiveSheet()->getStyle('G4')->applyFromArray($styleArray4);
+		$objPHPExcel->getActiveSheet()->SetCellValue('I4', 'RFQ Date');
+		//$objPHPExcel->getActiveSheet()->getStyle('I4')->applyFromArray($styleArray4);
+		$rfqDate = date("d/m/Y", strtotime($quotation['rfq_date']));
+		$objPHPExcel->getActiveSheet()->SetCellValue('K4', $rfqDate);
+		//$objPHPExcel->getActiveSheet()->getStyle('K4')->applyFromArray($styleArray4);
+		$objPHPExcel->getActiveSheet()->getStyle('F4','G4','I4','K4')->applyFromArray($styleArray4);
+		
+		$objPHPExcel->getActiveSheet()->SetCellValue('A5', 'Purchasing Detail');
+		$objPHPExcel->getActiveSheet()->getStyle('A5')->applyFromArray($styleArray3);
+		$objPHPExcel->getActiveSheet()->mergeCells('C5:K5');
+		$objPHPExcel->getActiveSheet()->SetCellValue('C5', $requisition['description']);
+		$objPHPExcel->getActiveSheet()->getStyle('C5')->applyFromArray($styleArray4);
+		
+		$objWriter = new PHPExcel_Writer_Excel2007($objPHPExcel);
+		
+		// We'll be outputting an excel file
+		header('Content-type: application/vnd.ms-excel');
+		// It will be called file.xls
+		header('Content-Disposition: attachment; filename="comparative.xlsx"');
+		$objWriter->save('php://output');
+
 	}
 	
 }
