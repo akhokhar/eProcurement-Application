@@ -335,6 +335,10 @@ class Rfq extends CI_Controller {
 		$quotationData = $this->Quotation_model->get_rfq(array('rfq_id'), array($rfq_id));
 		$quotation = $quotationData[0];
 		
+		
+		$rfqVendorItemDetails = $this->Quotation_model->get_rfq_vender_items($rfq_id);
+		$this->data['rfqVendorItemDetails'] = $rfqVendorItemDetails;
+		
 		$requisitionData = $this->Requisition_model->get_requisition(array('r.requisition_id'), array($quotation['requisition_id']));
 		$requisition = $requisitionData[0];
 		
@@ -371,6 +375,18 @@ class Rfq extends CI_Controller {
 				  'style' => PHPExcel_Style_Border::BORDER_THIN,
 				  )
 			 ),
+		);
+		
+		$styleArray5 = array(
+			'font'  => array(
+				'bold'  => true,
+				'size'  => 11,
+				'name'  => 'Calibri'
+			),
+			'fill' => array(
+				'type' 	=> PHPExcel_Style_Fill::FILL_SOLID,
+				'color' => array('rgb' => 'FF0000')
+			)
 		);
 		
 		// 1st two lines
@@ -412,6 +428,86 @@ class Rfq extends CI_Controller {
 		$objPHPExcel->getActiveSheet()->mergeCells('C5:K5');
 		$objPHPExcel->getActiveSheet()->SetCellValue('C5', $requisition['description']);
 		$objPHPExcel->getActiveSheet()->getStyle('C5')->applyFromArray($styleArray4);
+		
+		// Items Heading
+		$objPHPExcel->getActiveSheet()->SetCellValue('A7', 'S.No');
+		$objPHPExcel->getActiveSheet()->SetCellValue('B7', 'Item Name');
+		$objPHPExcel->getActiveSheet()->SetCellValue('C7', 'Item Description');
+		$objPHPExcel->getActiveSheet()->SetCellValue('D7', 'Unit');
+		$objPHPExcel->getActiveSheet()->SetCellValue('E7', 'Quantity Required');
+		$objPHPExcel->getActiveSheet()->getStyle('A7:E7')->applyFromArray($styleArray5);
+		
+		$vendors = $this->Quotation_model->get_rfq_vender_items($requisitionItems[0]['requisition_item_id']);
+		//65-90 A-Z
+		//69E
+		$vCount = 1;
+		$unitColNo = 70;
+		$amountColNO = $unitColNo+1;
+		foreach($vendors as $vendor){
+				if($vCount == 1){
+					$unitcolumn = chr($unitColNo);
+				} else{
+					$unitColNo = $amountColNO+1;
+					$unitcolumn = chr($unitColNo);
+				}
+				$amountColNO = $unitColNo+1;
+				$amountColumn = chr($amountColNO);
+			
+			$ucCol = $unitcolumn."7";
+			$amCol = $amountColumn."7";
+			//echo $ucCol." ".$amCol." ";
+			
+			$objPHPExcel->getActiveSheet()->mergeCells("$ucCol:$amCol");
+			$objPHPExcel->getActiveSheet()->SetCellValue($ucCol, $vendor['vendor_name']);
+			$objPHPExcel->getActiveSheet()->getStyle($ucCol)->applyFromArray($styleArray5);
+			//$objPHPExcel->getActiveSheet()->getStyle($ucCol)->applyFromArray($styleArray5);
+			//$objPHPExcel->getActiveSheet()->SetCellValue($amCol, 'Amount');
+			//$objPHPExcel->getActiveSheet()->getStyle($amCol)->applyFromArray($styleArray5);
+			
+			$vCount++;
+		}
+		
+		
+		// Set Items Data against each vendor
+		$srNo = 1;
+		$startingRow = 8;
+		foreach($requisitionItems as $rfqItem){
+			$objPHPExcel->getActiveSheet()->SetCellValue("A$startingRow", $srNo);
+			$objPHPExcel->getActiveSheet()->SetCellValue("B$startingRow", $rfqItem['item_name']);
+			$objPHPExcel->getActiveSheet()->SetCellValue("C$startingRow", $rfqItem['item_desc']);
+			$objPHPExcel->getActiveSheet()->SetCellValue("D$startingRow", $rfqItem['unit']);
+			$objPHPExcel->getActiveSheet()->SetCellValue("E$startingRow", $rfqItem['quantity']);
+			$vendors = $this->Quotation_model->get_rfq_vender_items($rfqItem['requisition_item_id']);
+			//65-90 A-Z
+			//69E
+			$vCount = 1;
+			$unitColNo = 70;
+			$amountColNO = $unitColNo+1;
+			foreach($vendors as $vendor){
+					if($vCount == 1){
+						$unitcolumn = chr($unitColNo);
+					} else{
+						$unitColNo = $amountColNO+1;
+						$unitcolumn = chr($unitColNo);
+					}
+					$amountColNO = $unitColNo+1;
+					$amountColumn = chr($amountColNO);
+				
+				$amount = ($rfqItem['quantity'] * $vendor['unit_rate']);
+				$objPHPExcel->getActiveSheet()->SetCellValue("$unitcolumn$startingRow", $vendor['unit_rate']);
+				$objPHPExcel->getActiveSheet()->SetCellValue("$amountColumn$startingRow", $amount);
+				
+				$vCount++;
+			}
+			$srNo++;
+			$startingRow++;
+		}
+		
+		//foreach($rfqVendorItemDetails as $rfqItem){
+		//	print_r($rfqItem);
+		//}exit;
+		
+		//$objPHPExcel->getActiveSheet()->SetCellValue('E7', 'Quantity Required');
 		
 		$objWriter = new PHPExcel_Writer_Excel2007($objPHPExcel);
 		

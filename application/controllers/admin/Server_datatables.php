@@ -391,7 +391,7 @@ class server_datatables extends CI_Controller {
 				$rfq_id = $value['rfq_id'];
 				
 				$action_btn .= '
-				<a href="add_comparative/'.$rfq_id.'" class="" data-placement="top" data-original-title="Add Comparison" > Add Comparative </a>';
+				<a href="rfq/add_comparative/'.$rfq_id.'" class="" data-placement="top" data-original-title="Add Comparison" > Add Comparative </a>';
 				
                 $action_btn .= '
 				<a href="rfq/generate_comparison/'.$rfq_id.'" class="" data-placement="top" data-original-title="Generate Comparison" > | <i class="glyphicon glyphicon-save"></i> </a>';

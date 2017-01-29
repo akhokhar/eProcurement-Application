@@ -209,6 +209,27 @@ class Quotation_model extends CI_Model {
             return FALSE;
 		}
     }
+	
+	function get_rfq_vender_items($item_id) {
+        
+        $this->db->select('rvi.*, v.vendor_name');
+        
+		//$this->db->join('requisition_item ri', 'ri.requisition_item_id = rvi.requisition_item_id', 'LEFT');
+        $this->db->join('vendor v', 'rvi.vendor_id = v.vendor_id', 'LEFT');
+        $this->db->join('rfq r', 'r.rfq_id = rvi.rfq_id', 'LEFT');
+		
+		$this->db->where('rvi.requisition_item_id', $item_id);
+        $result = $this->db->get('rfq_vender_item_details rvi');
+		
+        $data = array();
+        if($result->num_rows() > 0) {
+            $data = $result->result_array();
+            return $data;
+        }
+        else{
+            return FALSE;
+		}
+    }
     
 	/*
     |------------------------------------------------
