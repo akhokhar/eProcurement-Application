@@ -555,3 +555,15 @@ $config['video_formats'] = "mp4,ogv,webm";
 */
 $config['youtube_video_format'] = "video/youtube"; 
 $config['youtube_http'] = "https://www.youtube.com/embed/";
+
+/*
+|--------------------------------------------------------------------------
+| Business Status Flags
+| 0/null = nothing, 1 = active, 2 = inactive, 3 = sent, 4 = received
+|--------------------------------------------------------------------------
+|
+*/
+$config['activeFlag'] = 1; 
+$config['inactiveFlag'] = 2; 
+$config['sentFlag'] = 3; 
+$config['receivedFlag'] = 4;

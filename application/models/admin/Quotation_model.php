@@ -146,6 +146,69 @@ class Quotation_model extends CI_Model {
 		}
     }
     /*---- end: get_requisition function ----*/
+	
+	function get_all_rfqs($db_where_column = null, $db_where_value = null, $db_where_column_or = null, $db_where_value_or = null, $db_limit = null, $db_order = null, $db_select_column = null) {
+        
+        if($db_select_column)
+            $this->db->select($db_select_column);
+        else
+            $this->db->select('r.*');
+
+        if($db_where_column_or) {
+            foreach($db_where_column_or as $key => $column) {
+                if (!empty($db_where_value_or[$key])) {
+                    $this->db->or_where($column, $db_where_value_or[$key]);
+                }
+            }
+        }
+        
+        if($db_where_column) {
+            foreach ($db_where_column as $key => $column) {
+                if ($db_where_value[$key]!="") {
+					if($column == "rfq_id"){ $column = "r.rfq_id"; }
+                    $this->db->where($column, $db_where_value[$key]);
+                }
+            }
+        }
+        
+        if ($db_limit) {
+            $this->db->limit($db_limit['limit'], $db_limit['pageStart']);
+        }
+        
+        if($db_order) {
+            foreach($db_order as $get_order) {
+                $this->db->order_by($get_order['title'], $get_order['order_by']);
+            } 
+        }
+        
+        //$this->db->where('r.status', 1);
+        $result = $this->db->get('rfq r');
+		
+        $data = array();
+        if($result->num_rows() > 0) {
+            $data = $result->result_array();
+            return $data;
+        }
+        else{
+            return FALSE;
+		}
+    }
+	
+	function get_rfq_vendors($rfq_id) {
+        
+        $this->db->select('rv.*');
+        $this->db->where('rv.rfq_id', $rfq_id);
+        $result = $this->db->get('rfq_vendor rv');
+		
+        $data = array();
+        if($result->num_rows() > 0) {
+            $data = $result->result_array();
+            return $data;
+        }
+        else{
+            return FALSE;
+		}
+    }
     
 	/*
     |------------------------------------------------
@@ -195,6 +258,33 @@ class Quotation_model extends CI_Model {
             $this->db->trans_rollback();
             return FALSE;
         } else {
+            return TRUE;
+        }
+        
+    }
+	
+	function add_comparative($rfq_id, $vendor, $item, $rate) {
+        
+        $data = array(
+				'rfq_id'			  		=> $rfq_id,
+				'vendor_id'					=> $vendor,
+                'requisition_item_id'       => $item,
+                'unit_rate'            		=> $rate,
+        ); 
+        
+        $this->db->trans_begin();
+        
+        $this->db->set($data);
+        $this->db->insert('rfq_vender_item_details');
+        
+        $this->db->trans_complete();
+        
+        if($this->db->trans_status() === FALSE) {
+            $this->db->trans_rollback();
+            return FALSE;
+        } else {
+            $b = $this->db->trans_commit();
+            
             return TRUE;
         }
         

@@ -258,7 +258,7 @@ class server_datatables extends CI_Controller {
 	
 	function get_rfqs(){
 		// database column for searching
-        $db_column = array('', 'r.rfq_id', 'r.requisition_id', 'r.rfq_date', 'r.due_date', 'r.vendor_id');
+        $db_column = array('', 'r.rfq_id', 'r.rfq_num', 'r.rfq_date', 'r.due_date');
 
         // load product model
         $this->load->model('admin/Quotation_model');
@@ -340,12 +340,12 @@ class server_datatables extends CI_Controller {
         }
         // end: search data by like
         
-        $dataRecord = $this->Quotation_model->get_rfq($db_where_column, $db_where_value, $db_where_column_or, $db_where_value_or, $db_limit, $db_order);
+        $dataRecord = $this->Quotation_model->get_all_rfqs($db_where_column, $db_where_value, $db_where_column_or, $db_where_value_or, $db_limit, $db_order);
         
-        $dataCount = $this->Quotation_model->get_rfq($db_where_column, $db_where_value, $db_where_column_or, $db_where_value_or);
+        $dataCount = $this->Quotation_model->get_all_rfqs($db_where_column, $db_where_value, $db_where_column_or, $db_where_value_or);
         // end: get all requisitions or search requisition
         
-        $dt_column = array('rfq_num', 'description', 'rfq_date', 'due_date', 'vendor_name');
+        $dt_column = array('rfq_num', 'rfq_date', 'due_date');
         
         $data = array();
         $i = 0;
@@ -387,8 +387,15 @@ class server_datatables extends CI_Controller {
                 
                 $action_btn .= '<div class="visible-md visible-lg hidden-sm hidden-xs">';
 
-                $action_btn .= $this->create_action_buttons($btn_arr_responce,$value['rfq_id']);
-                
+                //$action_btn .= $this->create_action_buttons($btn_arr_responce,$value['rfq_id']);
+				$rfq_id = $value['rfq_id'];
+				
+				$action_btn .= '
+				<a href="add_comparative/'.$rfq_id.'" class="" data-placement="top" data-original-title="Add Comparison" > Add Comparative </a>';
+				
+                $action_btn .= '
+				<a href="rfq/generate_comparison/'.$rfq_id.'" class="" data-placement="top" data-original-title="Generate Comparison" > | <i class="glyphicon glyphicon-save"></i> </a>';
+
                 $action_btn .= '</div>';
                 
                 $data[$i][] = $action_btn;
