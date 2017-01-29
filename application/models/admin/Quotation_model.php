@@ -10,10 +10,11 @@ class Quotation_model extends CI_Model {
     | This function add new rfq
     |
     */
-    function add_rfq($requisition_id, $rfqNum) {
+    function add_rfq($requisition_id) {
         
         $rfq   = $this->input->post();
         $user_id    = $this->flexi_auth->get_user_id();
+		$rfqNum = '1-10-17';
         
         $data = array(
 				'rfq_num'			  		=> $rfqNum,
@@ -30,8 +31,9 @@ class Quotation_model extends CI_Model {
         $this->db->insert('rfq');
         
         $rfq_id = $this->db->insert_id();
-		$this->add_rfq_vendor($rfq_id, $rfq['vendors']);
-		
+		foreach($rfq['vendors'] as $vendor) {
+			$this->add_rfq_vendor($rfq_id, $vendor);
+		}
         $this->db->trans_complete();
         
         if($this->db->trans_status() === FALSE) {
@@ -61,10 +63,10 @@ class Quotation_model extends CI_Model {
         
         $data = array(
                 'rfq_id'				=> $rfq_id,
-                'vendor_id'            	=> $vendor_id,
-                'unit_rate'				=> (isset($unit_rate))?$unit_rate:NULL,
+                'vendor_id'             => $vendor_id,
+                'unit_rate'			 => (isset($unit_rate))?$unit_rate:NULL,
                 'status'          		=> $this->config->item('activeFlag')
-        ); 
+        );
         
         $this->db->trans_begin();
         
@@ -101,7 +103,7 @@ class Quotation_model extends CI_Model {
         if($db_select_column)
             $this->db->select($db_select_column);
         else
-            $this->db->select('r.rfq_id, r.rfq_num, r.requisition_id, r.rfq_date, r.due_date, r.created_by, r.status, rv.vendor_id, rv.unit_rate, v.vendor_name, rq.description');
+            $this->db->select('r.rfq_id, r.rfq_num, r.requisition_id, r.rfq_date, r.due_date, r.created_by, r.status, GROUP_CONCAT(rv.vendor_id) as vendor_id, rv.unit_rate, v.vendor_name, rq.description');
 
         if($db_where_column_or) {
             foreach($db_where_column_or as $key => $column) {
@@ -193,6 +195,29 @@ class Quotation_model extends CI_Model {
             return FALSE;
 		}
     }
+	
+	function change_rfq_status($rfq_id, $status) {
+		$this->db->trans_begin();
+        
+        $this->db->where('rfq_id', $rfq_id);
+        $this->db->set(array('status' => $status));
+        $this->db->update('rfq');
+        
+        //$product_id = $this->db->insert_id();
+
+        if($requisition_id){
+            //Requisition Item Work will go here.
+        }
+        
+        $this->db->trans_complete();
+        
+        if($this->db->trans_status() === FALSE) {
+            $this->db->trans_rollback();
+            return FALSE;
+        } else {
+            return TRUE;
+        }
+	}
 	
 	function get_rfq_vendors($rfq_id) {
         

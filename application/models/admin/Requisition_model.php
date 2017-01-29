@@ -232,6 +232,29 @@ class Requisition_model extends CI_Model {
     }
 	/*---- end: get requisition items ----*/
     
+	function change_requisition_status($requisition_id, $status) {
+		$this->db->trans_begin();
+        
+        $this->db->where('requisition_id', $requisition_id);
+        $this->db->set(array('status' => $status));
+        $this->db->update('requisition');
+        
+        //$product_id = $this->db->insert_id();
+
+        if($requisition_id){
+            //Requisition Item Work will go here.
+        }
+        
+        $this->db->trans_complete();
+        
+        if($this->db->trans_status() === FALSE) {
+            $this->db->trans_rollback();
+            return FALSE;
+        } else {
+            return TRUE;
+        }
+	}
+	
     function delete_requisition($requisition_id) {
         
         $user_id    = $this->flexi_auth->get_user_id();

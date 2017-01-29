@@ -117,11 +117,20 @@ class General_model extends CI_Model {
     | This function vendors
     |
     */
-    function list_vendors($get_all) {
+    function list_vendors($get_all, $where_col = array(), $where_val = array()) {
         $this->db->select ( 'vendor_id, vendor_name, vendor_address, location_id' );
 
         $this->db->from ( 'vendor' );
 		$this->db->where ('status', 1);
+		
+		if($where_col) {
+            foreach ($where_col as $key => $column) {
+                if ($where_val[$key]!="") {
+                    $this->db->where($column, $where_val[$key]);
+                }
+            }
+        }
+		
         $this->db->order_by("vendor_name","ASC");
 
         $query=$this->db->get();

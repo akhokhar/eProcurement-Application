@@ -258,7 +258,7 @@ class server_datatables extends CI_Controller {
 	
 	function get_rfqs(){
 		// database column for searching
-        $db_column = array('', 'r.rfq_id', 'r.rfq_num', 'r.rfq_date', 'r.due_date');
+        $db_column = array('r.rfq_id', 'r.rfq_num', 'r.rfq_date', 'r.due_date');
 
         // load product model
         $this->load->model('admin/Quotation_model');
@@ -266,10 +266,10 @@ class server_datatables extends CI_Controller {
 		// *****************************************
         // start: get all requitision or search requisition
         // *****************************************
-        $db_where_column    = array('r.status');
-        $db_where_value     = array(1);
-        $db_where_column_or = array();
-        $db_where_value_or  = array();
+        $db_where_column    = array();
+        $db_where_value     = array();
+        $db_where_column_or = array('r.status', 'r.status', 'r.status');
+        $db_where_value_or  = array(1, 3, 4);
         $db_limit           = array();
         $db_order           = array();
         
@@ -359,14 +359,14 @@ class server_datatables extends CI_Controller {
             $btn_arr_responce = $this->create_action_array($view,$edit,$remove);
             foreach($dataRecord as $key => $value) {
                 
-                $btn_array_checked_checkbox = "admin/product/delete_checked_checkbox/";
+                /*$btn_array_checked_checkbox = "admin/product/delete_checked_checkbox/";
                 $checkbox = "";
                 if(!$this->flexi_auth->is_privileged($this->menu_model->get_privilege_name($btn_array_checked_checkbox))){
                     $checkbox="disabled";
                 }
                 $data[$i][] = '<div class="checkbox-table"><label>
                                     <input type="checkbox" '.$checkbox.' name="rfq['.$value['rfq_id'].']" class="flat-grey deleteThis">
-                                </label></div>';
+                                </label></div>';*/
                 
                 foreach($dt_column as $get_dt_column) {
                     
@@ -391,10 +391,170 @@ class server_datatables extends CI_Controller {
 				$rfq_id = $value['rfq_id'];
 				
 				$action_btn .= '
-				<a href="rfq/add_comparative/'.$rfq_id.'" class="" data-placement="top" data-original-title="Add Comparison" > Add Comparative </a>';
+				<a href="'.base_url().'admin/rfq/view/'.$rfq_id.'" class="" data-placement="top" data-original-title="View Detail" > <i class="glyphicon glyphicon-eye-open"></i> </a>';
+				
+				
+                $action_btn .= '</div>';
+                
+                $data[$i][] = $action_btn;
+                // end: delete and edit button
+                
+                $i++;
+            }
+        }
+        
+        $this->data['datatable']['draw']            = $this->input->post('draw');
+        $this->data['datatable']['recordsTotal']    = count($dataCount);
+        $this->data['datatable']['recordsFiltered'] = count($dataCount);
+        $this->data['datatable']['data']            = $data;
+        
+        //echo '<pre>'; print_r($this->data['datatable']); die();
+        
+        echo json_encode($this->data['datatable']);
+	}
+	
+	function get_comparatives(){
+		// database column for searching
+        $db_column = array('r.rfq_id', 'r.rfq_num', 'r.rfq_date', 'r.due_date');
+
+        // load product model
+        $this->load->model('admin/Quotation_model');
+		
+		// *****************************************
+        // start: get all requitision or search requisition
+        // *****************************************
+        $db_where_column    = array();
+        $db_where_value     = array();
+        $db_where_column_or = array('r.status', 'r.status', 'r.status');
+        $db_where_value_or  = array(1, 3, 4);
+        $db_limit           = array();
+        $db_order           = array();
+        
+        /***** start: record length and start *****/
+        if($this->input->post('length') != '-1') {
+            $db_limit['limit'] = $this->input->post('length');
+            $db_limit['pageStart'] = $this->input->post('start');
+        }
+        // end: get data order by
+        
+        /***** start: get data order by *****/
+        $order = $this->input->post('order');
+        
+        if($order) {
+            foreach($order as $key => $get_order) {
+                
+                $db_order[$key]['title']    = $db_column[$get_order['column']-1];
+                $db_order[$key]['order_by'] = $get_order['dir'];
+                
+            }            
+        }
+        // end: get data order by
+        
+        /***** start: top search data by equal to *****/
+        if($this->input->post('top_search_like')) {
+            foreach($this->input->post('top_search_like') as $key => $search_val) {
+
+                if(preg_match('/prod/', $key)) {
+
+                    $search_key = substr($key, 5);
+                    
+                    if(!empty($search_val)) {
+                        $db_where_column[]  = $search_key . ' LIKE';
+                        $db_where_value[]   = '%' . $search_val . '%';
+                    }
+
+                }
+
+            }
+        }
+        
+        if($this->input->post('top_search')) {
+            foreach($this->input->post('top_search') as $key => $search_val) {
+
+                if(preg_match('/prod/', $key)) {
+
+                    $search_key = substr($key, 5);
+                    
+                    if($search_val!="") {
+                        $db_where_column[]  = $search_key;
+                        $db_where_value[]   = $search_val;
+                    }
+
+                }
+
+            }
+        }
+        // end: top search data by equal to
+        
+        /***** start: search data by like *****/
+        $search = $this->input->post('search');
+        
+        if($search['value'] != '') {
+            foreach($db_column as $value) {
+                $db_where_column_or[]   = $value . ' LIKE';
+                $db_where_value_or[]    = '%' . $search['value'] . '%';
+            }
+        }
+        // end: search data by like
+        
+        $dataRecord = $this->Quotation_model->get_all_rfqs($db_where_column, $db_where_value, $db_where_column_or, $db_where_value_or, $db_limit, $db_order);
+        
+        $dataCount = $this->Quotation_model->get_all_rfqs($db_where_column, $db_where_value, $db_where_column_or, $db_where_value_or);
+        // end: get all requisitions or search requisition
+        
+        $dt_column = array('rfq_num', 'rfq_date', 'due_date');
+        
+        $data = array();
+        $i = 0;
+        
+        if($dataRecord) {
+            
+            $view = "admin/rfq/view/";
+            $edit = "";//"admin/requisition/edit/";
+            $remove = "";//"admin/requisition/delete_requisition/";
+
+            $btn_arr_responce = $this->create_action_array($view,$edit,$remove);
+            foreach($dataRecord as $key => $value) {
+                
+                /*$btn_array_checked_checkbox = "admin/product/delete_checked_checkbox/";
+                $checkbox = "";
+                if(!$this->flexi_auth->is_privileged($this->menu_model->get_privilege_name($btn_array_checked_checkbox))){
+                    $checkbox="disabled";
+                }
+                $data[$i][] = '<div class="checkbox-table"><label>
+                                    <input type="checkbox" '.$checkbox.' name="rfq['.$value['rfq_id'].']" class="flat-grey deleteThis">
+                                </label></div>';*/
+                
+                foreach($dt_column as $get_dt_column) {
+                    
+                    if($get_dt_column == 'rfq_date'){
+                        $data[$i][] = date("d/M/Y", strtotime($value[$get_dt_column]));
+                    }
+                    else if($get_dt_column == 'due_date'){
+                        $data[$i][] = date("d/M/Y", strtotime($value[$get_dt_column]));
+                    }
+                    else {
+                        $data[$i][] = $value[$get_dt_column];
+                    }
+                    
+                }
+
+                /***** start: delete and edit button *****/
+                $action_btn = '';
+                
+                $action_btn .= '<div class="visible-md visible-lg hidden-sm hidden-xs">';
+
+                //$action_btn .= $this->create_action_buttons($btn_arr_responce,$value['rfq_id']);
+				$rfq_id = $value['rfq_id'];
+				
+				//$action_btn .= '
+				//<a href="'.base_url().'admin/rfq/view/'.$rfq_id.'" class="" data-placement="top" data-original-title="View Detail" > <i class="glyphicon glyphicon-eye-open"></i> </a>';
+				
+				//$action_btn .= '
+				//<a href="'.base_url().'admin/rfq/add_comparative/'.$rfq_id.'" class="" data-placement="top" data-original-title="Add Comparison" > | Add Comparative </a>';
 				
                 $action_btn .= '
-				<a href="rfq/generate_comparison/'.$rfq_id.'" class="" data-placement="top" data-original-title="Generate Comparison" > | <i class="glyphicon glyphicon-save"></i> </a>';
+				<a href="'.base_url().'admin/comparative_quotation/generate_comparative/'.$rfq_id.'" class="" data-placement="top" data-original-title="Generate Comparison" > <i class="glyphicon glyphicon-save"></i> </a>';
 
                 $action_btn .= '</div>';
                 
@@ -1429,8 +1589,14 @@ class server_datatables extends CI_Controller {
 			else if ($keys == 'Edit') {
 				$icon_classes = 'glyphicon glyphicon-edit';
 			}
+			else if ($keys == 'Download') {
+				$icon_classes = 'glyphicon glyphicon-save';
+			}
+			else {
+				$link_text = $keys;
+			}
             if ($this->flexi_auth->is_privileged($record['title']))
-               $action_btn .= '<a href="' . base_url() . $record['action'] . $id . '" class="' . $record['aClass'] . '" data-placement="top" data-original-title="' . $keys . '"><i class="' . $record['iClass'] . ' ' . $icon_classes . '"></i></a> &nbsp;&nbsp;&nbsp;';
+               $action_btn .= '<a href="' . base_url() . $record['action'] . $id . '" class="' . $record['aClass'] . '" data-placement="top" data-original-title="' . $keys . '"><i class="' . $record['iClass'] . ' ' . $icon_classes . '"></i>' . $link_text . '</a> &nbsp;&nbsp;&nbsp;';
         }
 			
         return $action_btn;

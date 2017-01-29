@@ -1,3 +1,4 @@
+
 <!-- start: MAIN CONTAINER -->
 <div class="main-container">
     <div class="navbar-content">
@@ -63,12 +64,8 @@
                     <?php } ?>
                     <!-- end: Success and error message -->
                     <div class="page-header row">
-                        <h1 class="col-sm-6"><?php echo $page_title; ?></h1>
-                        <div class="col-sm-6">
-							<a href="<?php echo base_url()?>admin/rfq/generate_rfq_pdf/<?php echo $quotation['rfq_id'];?>">
-							  <button type="button" class="btn btn-primary pull-right">Download Quotation</button>
-							</a>
-                         </div>
+                        <h1 class="col-sm-6">View all Quotations</h1>
+                        
                     </div>
                     <!-- end: PAGE TITLE & BREADCRUMB -->
                 </div>
@@ -77,71 +74,40 @@
             
             <!-- start: PAGE CONTENT -->
             <div class="row">
-                <div class="col-sm-12">
-                    <!-- start: TEXT FIELDS PANEL -->
+                <div class="col-md-12">
+                    <!-- start: BASIC TABLE PANEL -->
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <i class="fa fa-external-link-square"></i>
-                            Quotation Details
+                            Quotation(s)
+                            
                         </div>
                         <div class="panel-body">
-                          <table class="table table-bordered table-hover">
-                            <tr>
-                              <td width="40%">Rfq #</td>
-                              <td><?php echo $quotation['rfq_num']; ?></td>
-                            </tr>
-                            <tr>
-                              <td>Rfq Date</td>
-                              <td><?php echo date('d-m-Y', strtotime($quotation['rfq_date'])); ?></td>
-                            </tr>
-                            <tr>
-                              <td>Due Date</td>
-                              <td><?php echo date('d-m-Y', strtotime($quotation['due_date'])); ?></td>
-                            </tr>
-                            <tr>
-                              <td>Unit Rate</td>
-                              <td><?php echo $quotation['unit_rate']; ?></td>
-                            </tr>
-                            <tr>
-                              <td>Vendor</td>
-                              <td>
-							  <?php foreach ($vendors as $vends) { ?>
-                              	<?php foreach ($vends as $id => $vendor) { ?>
-								  <?php if ($id == 0) { continue; }?>
-                                  <?php echo $vendor; ?><br />
-                                <?php } ?>
-                              <?php } ?>
-                              </td>
-                            </tr>
-							<tr>
-                              <td>Description</td>
-                              <td><?php echo $quotation['description']; ?></td>
-                            </tr>
+                            <?php
+                            $attributes = array('class' => 'form-horizontal', 'role' => 'rfq_form', 'id' => 'rfq_form');
+                            echo form_open(current_url(), $attributes);
+                            ?>
+                            <table class="table table-striped table-bordered table-hover" id="rfq_table">
+                                <thead>
+                                    <tr>
+                                        <th class="center">Rfq #</th>
+                                        <th class="center">Rfq Date</th>
+                                        <th class="center">Rfq Due Date</th>
+                                        <th class="center">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    
+                                </tbody>
+                            </table>
                             
-                          </table>
-                          <?php if ($quotation['status'] == $this->config->item('activeFlag')) { ?>             
-                            <a href="<?php echo base_url()?>admin/rfq/change_rfq_status/<?php echo $quotation['rfq_id'];?>/<?php echo $this->config->item('sentFlag');?>">
-                              <button type="button" class="btn btn-success pull-right">Sending Quotations? Click here</button>
-                            </a>
-						  <?php }
-						  else if ($quotation['status'] == $this->config->item('sentFlag')) { ?>             
-                            <a href="<?php echo base_url()?>admin/rfq/change_rfq_status/<?php echo $quotation['rfq_id'];?>/<?php echo $this->config->item('receivedFlag');?>">
-                              <button type="button" class="btn btn-success pull-right">Quotations Received? Click here</button>
-                            </a>
-						  <?php }
-						  else if ($quotation['status'] == $this->config->item('receivedFlag')) { ?>             
-                            <a href="<?php echo base_url()?>admin/comparative_quotation/add/<?php echo $quotation['rfq_id'];?>/<?php echo $this->config->item('receivedFlag');?>">
-                              <button type="button" class="btn btn-success pull-right">Add to Comparative</button>
-                            </a>
-						  <?php } ?>
+                            <?php form_close(); ?>
                         </div>
                     </div>
-                    <!-- end: TEXT FIELDS PANEL -->
+                    <!-- end: BASIC TABLE PANEL -->
                 </div>
             </div>
             <!-- end: PAGE CONTENT-->
-            
-            
         </div>
     </div>
     <!-- end: PAGE -->
@@ -188,75 +154,67 @@
         FormValidator.init();
         //PagesGallery.init();
         //TableData.init();
-        
-        
-        jQuery("#delete").prop('disabled', true);
-        var deleteClicks = 0;
-        
-        jQuery('body').on('ifChecked', function(event){
-                deleteClicks++;
-                if(deleteClicks > 1){
-                jQuery("#delete").prop('disabled', false);
-                }else{
-                jQuery("#delete").prop('disabled', true);
-           }
-        });
-        
-        jQuery('body').on('ifUnchecked', function(event){ 
-                deleteClicks--;
-                if(deleteClicks > 1){
-                jQuery("#delete").prop('disabled', false);
-                }else{
-                jQuery("#delete").prop('disabled', true);
-           }
-        });
-    
+       
     });
-	
-    var items = <?php echo json_encode($requisition['items']); ?>;
-	var items_array = [];
-	var indx;
-	var showItemCol = ['s.no', 'item_name', 'item_desc', 'cost_center', 'unit', 'quantity', 'unit_price', 'total_item_price'];
-	for (i = 0; i < items.length; i++) {
-		var item_array = [];
-		item_array[0] = i+1;
-		$.map(items[i], function(value, index) {
-			indx = showItemCol.indexOf(index)
-			if (indx < 0) {
-				return;
-			}
-			item_array[indx] = value;
-			return true;
-		});
-		items_array[i] = item_array;
-	}console.log(items_array);
-	
+    
+    
     $(function () {
-        $('#itemsDataTable').DataTable({
-            "data": items_array,
-            "order": [[ 0, "asc" ]],
+        $('#rfq_table').DataTable({
+            "processing": true,
+            "serverSide": true,
+            "searching": false,
+            "ajax": {
+                "url": "<?php echo base_url(); ?>admin/server_datatables/get_comparatives",
+                "type": "POST",
+                "data": function ( d ) {
+                    var top_search_like = {
+                        prod_product_title: $('#product_title').val(),                        
+                        prod_product_model: $('#product_model').val()
+                    };
+                    
+                    var top_search = {
+                        prod_product_cat_id: $('#product_cat_id').val(),
+                        prod_product_org_price: $('#product_org_price').val(),
+                        prod_product_status: $('#product_status').val(),
+                        prod_product_featured: $('#product_featured').val(),
+                        prod_product_tag_image: $('#product_tag_image').val()
+                    };
+                    
+                    d.top_search_like = top_search_like;
+                    d.top_search = top_search;
+                }
+            },
+            "order": [[ 1, "desc" ]],
             "columnDefs": [
                 { "orderable": false, "targets": 0 },
-                //{ "orderable": false, "targets": 1 },
+                { "orderable": false, "targets": 1 },
                 { "orderable": false, "targets": 2 },
-                { "orderable": false, "targets": 7 }
+                //{ "orderable": false, "targets": 3 },
+                //{ "orderable": false, "targets": 4 },
             ],
             "columns": [
-				{ title: "S.No." },
-				{ title: "Item Name" },
-				{ title: "Item Description" },
-				{ title: "Cost Center" },
-				{ title: "Unit" },
-				{ title: "Quantity", "width": "11%" },
-				{ title: "Estimated Unit Value (Rs)"},
-				{ title: "Estimated Total Unit Value (Rs)" }
-        	],
+                null,
+                null,
+                null,
+                null
+            ],
             "pageLength": 20,
-            "lengthMenu": [[10, 20, 50, -1], [10, 20, 50, "All"]],
+            //"lengthMenu": [[10, 20, 50, -1], [10, 20, 50, "All"]],
             "initComplete": function(settings, json) {
                 //alert( 'DataTables has finished its initialisation.' );
                 $(".group1").colorbox();
             }
+        }).on( 'draw', function () {
+            $('tr td:nth-child(1), tr td:nth-child(5)').each(function (){
+                  $(this).addClass('center');
+            })
+            
+            $('input[type="checkbox"].flat-grey, input[type="radio"].flat-grey').iCheck({
+                checkboxClass: 'icheckbox_flat-grey',
+                radioClass: 'iradio_flat-grey',
+                increaseArea: '10%' // optional
+            });
+            if($(".tooltips").length) {$('.tooltips').tooltip();}
         });
     });
 </script>

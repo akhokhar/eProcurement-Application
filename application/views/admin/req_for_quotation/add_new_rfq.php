@@ -63,7 +63,7 @@
                     </ol>
                     <!-- end: Success and error message -->
                     <div class="page-header row">
-                        <h1 class="col-sm-6">Add New Requisition <small></small></h1>
+                        <h1 class="col-sm-6"><?php echo $page_title; ?> <small></small></h1>
                     </div>
                     
                     <!-- end: PAGE TITLE & BREADCRUMB -->
@@ -176,9 +176,10 @@
                                                                     'id'            => 'vendors',
                                                                     'class'         => 'form-control select2',
                                                                     'required'	  => 'required',
+																	'multiple'	  => 'multiple',
                                                                     'data-required-error' => 'Select 3 Vendors'
                                                           );
-														  echo form_dropdown('vendors', $vendors, '', $dropdown_data);
+														  echo form_dropdown('vendors[]', $vendors, '', $dropdown_data);
                                                           ?>
                                                     </div>
                                                 </div>

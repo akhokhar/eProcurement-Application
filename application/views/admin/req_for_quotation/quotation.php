@@ -2,7 +2,7 @@
 <tr>
 	<td>
 		<h4>Dear Sir,<br>
-		REQUEST FOR PRISE QUOTATION</h4>
+		REQUEST FOR PRICE QUOTATION</h4>
 	</td>
 </tr>
 <tr>
