@@ -52,7 +52,7 @@
                     </ol>
                     <!-- end: Success and error message -->
                     <div class="page-header row">
-                        <h1 class="col-sm-6">Add New Comparative <small></small></h1>
+                        <h1 class="col-sm-6"><?php echo $page_title; ?> <small></small></h1>
                     </div>
                     
                     <!-- end: PAGE TITLE & BREADCRUMB -->
@@ -79,44 +79,71 @@
                                         echo form_open_multipart('', $attributes);
                                         ?>
                                             <div class="panel-body">
-												<div class="row">
-													<div class="col-md-4">Items</div>                                                    
-													  <?php foreach ($vendors as $vends) { ?>
-                                                        <?php foreach ($vends as $id => $vendor) { ?>
-                                                          <?php if ($id == 0) { continue; }?>
-                                                      		<div class="col-md-2">
-                                                          <?php echo $vendor['vendor_name']; ?>
-                                                      		</div>
-                                                        <?php } ?>
-                                                      <?php } ?>
+                                                
+                                                <div class="row">
+													<div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label for="poDate">
+                                                                Purchase Order Date <span class="symbol required"></span>
+                                                            </label>
+                                                            <div class="input-group date">
+                                                              <div class="input-group-addon">
+                                                                <i class="fa fa-calendar"></i>
+                                                              </div>
+                                                              <?php
+                                                              $input_data = array(
+                                                                        'type'          		=> 'text',
+                                                                        'name'         		=> 'poDate',
+                                                                        'id'            	  => 'poDate',
+                                                                        'required'	  		=> 'required',
+                                                                        'data-required-error' => 'Purchase Order Date cannot be empty',
+                                                                        'value'         	   => set_value('poDate'),
+                                                                        'class'         	   => 'form-control pull-right datepicker',
+                                                                        'placeholder'   		 => 'DD/MM/YYYY'
+                                                              );
+                                                              echo form_input($input_data);
+                                                              ?>
+                                                            </div>
+                                                        </div>
+                                                      </div>
+                                                
+													<div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label for="donors">
+                                                                Vendor <span class="symbol required"></span>
+                                                            </label>                                        
+                                                              <?php
+                                                              $rfq_vendors = array();
+                                                              foreach ($vendors as $vends) { ?>
+                                                                <?php foreach ($vends as $id => $vendor) { ?>
+                                                                  <?php if ($id == 0) { continue; }?>
+                                                                  <?php $rfq_vendors[$id] = $vendor; ?>
+                                                                <?php } ?>
+                                                              <?php } ?>
+                                                            <?php
+                                                              $dropdown_data = array(
+                                                                        'id'            	  => 'vendor',
+                                                                        'class'         	   => 'form-control select2',
+                                                                        'required'	  		=> 'required',
+                                                                        'data-required-error' => 'Select a Vendor'
+                                                              );
+                                                              echo form_dropdown('donor', $rfq_vendors, '', $dropdown_data);
+                                                              ?>
+                                                         </div>     
+													</div>
+												</div>
+                                                
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <div class="form-group">
+                                                            <label for="delivery_address">
+                                                                Enter Delivery Address <span class="symbol required"></span>
+                                                            </label>
+                                                            <textarea id="delivery_address" name="delivery_address" required="required" class="form-control" placeholder="Description"></textarea>
+                                                        </div>
+                                                    </div>
 												</div>
 											
-											<hr><?php $count = 1;?>
-											<?php foreach($requisitionItems as $item){?>
-												<div class="row">
-													<div class="col-md-4">
-													<?php echo $item['item_name'];?>
-													<input type="hidden" name="item[<?php echo $count;?>]" value="<?php echo $item['requisition_item_id']?>">
-													</div>
-													<?php foreach ($vendors as $vends) { ?>
-                                                            <?php foreach ($vends as $id => $vendor) { ?>
-                                                            	<?php if ($id == 0) { continue; }?>
-                                                                <div class="col-md-2">
-                                                                    <div class="form-group">
-																 <?php $vendorId = $vendor['vendor_id'];
-																  $input_data = array(
-																			'type'          => 'number',
-																			'name'          => "unit[$count][$vendorId]",
-																			'class'         => 'form-control',
-																  );
-																  echo form_input($input_data);
-																  ?>
-                                                                    </div>
-                                                                </div>
-                                                            <?php } ?>
-													<?php } ?>
-												</div>
-											  <?php $count++;}?>
                                               <hr />
                                               <div class="row">
                                                 <div class="col-md-2 pull-right">
@@ -124,7 +151,7 @@
                                                         Next <i class="fa fa-arrow-circle-right"></i>
                                                     </a>-->
                                                     <div class="col-md-2 pull-right">
-                                                        <button type="submit" class="btn btn-primary pull-right" id="newRequisitionButton">Create Comparative</button>
+                                                        <button type="submit" class="btn btn-primary pull-right" id="newRequisitionButton">Create Purchase Order</button>
                                                     </div>
                                                 </div>
                                               </div>

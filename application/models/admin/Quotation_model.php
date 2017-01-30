@@ -64,7 +64,6 @@ class Quotation_model extends CI_Model {
         $data = array(
                 'rfq_id'				=> $rfq_id,
                 'vendor_id'             => $vendor_id,
-                'unit_rate'			 => (isset($unit_rate))?$unit_rate:NULL,
                 'status'          		=> $this->config->item('activeFlag')
         );
         
@@ -103,7 +102,7 @@ class Quotation_model extends CI_Model {
         if($db_select_column)
             $this->db->select($db_select_column);
         else
-            $this->db->select('r.rfq_id, r.rfq_num, r.requisition_id, r.rfq_date, r.due_date, r.created_by, r.status, GROUP_CONCAT(rv.vendor_id) as vendor_id, rv.unit_rate, v.vendor_name, rq.description');
+            $this->db->select('r.rfq_id, r.rfq_num, r.requisition_id, r.rfq_date, r.due_date, r.created_by, r.status, GROUP_CONCAT(rv.vendor_id) as vendor_id, v.vendor_name, rq.description');
 
         if($db_where_column_or) {
             foreach($db_where_column_or as $key => $column) {

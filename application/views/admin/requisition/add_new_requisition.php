@@ -126,7 +126,7 @@
                                                           echo form_input($input_data);
                                                           ?>
                                                         </div>
-                                                    </div>        
+                                                    </div>
                                                     <div class="form-group">
                                                       <label for="refNumber">Ref#</label>
                                                          <?php
