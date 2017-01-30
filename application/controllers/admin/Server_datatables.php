@@ -549,11 +549,11 @@ class server_datatables extends CI_Controller {
 				//$action_btn .= '
 				//<a href="'.base_url().'admin/rfq/view/'.$rfq_id.'" class="" data-placement="top" data-original-title="View Detail" > <i class="glyphicon glyphicon-eye-open"></i> </a>';
 				
-				//$action_btn .= '
-				//<a href="'.base_url().'admin/rfq/add_comparative/'.$rfq_id.'" class="" data-placement="top" data-original-title="Add Comparison" > | Add Comparative </a>';
+				$action_btn .= '
+				<a href="'.base_url().'admin/purchase_order/add/'.$rfq_id.'" class="" data-placement="top" data-original-title="Create Purchase Order" > Create Purchase Order </a>';
 				
                 $action_btn .= '
-				<a href="'.base_url().'admin/comparative_quotation/generate_comparative/'.$rfq_id.'" class="" data-placement="top" data-original-title="Generate Comparison" > <i class="glyphicon glyphicon-save"></i> </a>';
+				<a href="'.base_url().'admin/comparative_quotation/generate_comparative/'.$rfq_id.'" class="" data-placement="top" data-original-title="Generate Comparison" > | <i class="glyphicon glyphicon-save"></i> </a>';
 
                 $action_btn .= '</div>';
                 
