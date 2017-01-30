@@ -145,7 +145,7 @@ class Requisition_model extends CI_Model {
             } 
         }
         
-        $this->db->where('r.status', 1);
+        //$this->db->where('r.status', 1);
         $this->db->join('project p', 'r.project_id = p.project_id', 'LEFT');
         $this->db->join('location l', 'r.location_id = l.location_id', 'LEFT');
         $this->db->join('donor d', 'r.donor_id = d.donor_id', 'LEFT');

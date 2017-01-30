@@ -109,7 +109,7 @@
                                                 
 													<div class="col-md-6">
                                                         <div class="form-group">
-                                                            <label for="donors">
+                                                            <label for="vendor">
                                                                 Vendor <span class="symbol required"></span>
                                                             </label>                                        
                                                               <?php
@@ -127,7 +127,7 @@
                                                                         'required'	  		=> 'required',
                                                                         'data-required-error' => 'Select a Vendor'
                                                               );
-                                                              echo form_dropdown('donor', $rfq_vendors, '', $dropdown_data);
+                                                              echo form_dropdown('vendor', $rfq_vendors, '', $dropdown_data);
                                                               ?>
                                                          </div>     
 													</div>
@@ -143,6 +143,8 @@
                                                         </div>
                                                     </div>
 												</div>
+												
+												<input type="hidden" name="requisition_id" value="<?php echo $quotation['requisition_id'];?>" />
 											
                                               <hr />
                                               <div class="row">
@@ -230,41 +232,18 @@
 <script src="<?php echo $includes_dir; ?>admin/plugins/jQuery-Tags-Input/jquery.tagsinput.js"></script>
 <!-- end: JAVASCRIPTS REQUIRED FOR THIS PAGE ONLY -->
 
-<style>
-    #product_meta_tag_tag, #product_meta_description_tag, #product_meta_key_tag, #product_product_tag_tag {
-        width: auto !important;
-    }
-    .custom-header {
-        background-color: #f5f5f5;
-        font-weight: bold;
-        padding: 5px;
-        text-align: center;
-    }
-    .has-error-tab  {
-        background: #a94442;
-    }
-    .has-error-tab a {
-        color: #ffffff !important;
-    }
-    .has-error-tab:hover a {
-        color: #555 !important;
-    }
-    .active.has-error-tab a {
-        color: #333333 !important;
-    }
-    .productTagImage {
-        display: none;
-        width: 65%;
-    }
-    .upload_tab {
-        border: 1px solid #dddddd !important;
-        float: none !important;
-        margin-top: 0 !important;
-    }
-    .upload_tab li.active > a:hover {
-        color: #333333 !important;
-    }
-    .fileuploader {
-        margin-top: 25px;
-    }
-</style>
+<script type="text/javascript">
+
+
+$(function () {
+	//Date picker
+	$('.datepicker').datepicker({
+		autoclose: true
+	});
+	
+	//select 2
+	$('.select2').select2({
+		width: '100%'
+	});
+});
+</script>

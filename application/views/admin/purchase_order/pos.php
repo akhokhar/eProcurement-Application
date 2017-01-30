@@ -64,7 +64,7 @@
                     <?php } ?>
                     <!-- end: Success and error message -->
                     <div class="page-header row">
-                        <h1 class="col-sm-6">View all Quotations</h1>
+                        <h1 class="col-sm-6">View all Purchase Orders</h1>
                         
                     </div>
                     <!-- end: PAGE TITLE & BREADCRUMB -->
@@ -79,20 +79,21 @@
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <i class="fa fa-external-link-square"></i>
-                            Quotation(s)
+                            Purchase Order(s)
                             
                         </div>
                         <div class="panel-body">
                             <?php
-                            $attributes = array('class' => 'form-horizontal', 'role' => 'rfq_form', 'id' => 'rfq_form');
+                            $attributes = array('class' => 'form-horizontal', 'role' => 'purchase_form', 'id' => 'purchase_form');
                             echo form_open(current_url(), $attributes);
                             ?>
-                            <table class="table table-striped table-bordered table-hover" id="rfq_table">
+                            <table class="table table-striped table-bordered table-hover" id="order_table">
                                 <thead>
                                     <tr>
-                                        <th class="center">Rfq #</th>
-                                        <th class="center">Rfq Date</th>
-                                        <th class="center">Rfq Due Date</th>
+                                        <th class="center">Purchase Date</th>
+                                        <th class="center">Description</th>
+                                        <th class="center">Vendor</th>
+                                        <th class="center">Delivery Address</th>
                                         <th class="center">Action</th>
                                     </tr>
                                 </thead>
@@ -159,12 +160,12 @@
     
     
     $(function () {
-        $('#rfq_table').DataTable({
+        $('#order_table').DataTable({
             "processing": true,
             "serverSide": true,
             "searching": false,
             "ajax": {
-                "url": "<?php echo base_url(); ?>admin/server_datatables/get_comparatives",
+                "url": "<?php echo base_url(); ?>admin/server_datatables/get_purchase_orders",
                 "type": "POST",
                 "data": function ( d ) {
                     var top_search_like = {
@@ -186,13 +187,12 @@
             },
             "order": [[ 1, "desc" ]],
             "columnDefs": [
-                { "orderable": false, "targets": 0 },
-                { "orderable": false, "targets": 1 },
-                { "orderable": false, "targets": 2 },
+                //{ "orderable": false, "targets": 2 },
                 //{ "orderable": false, "targets": 3 },
                 //{ "orderable": false, "targets": 4 },
             ],
             "columns": [
+                null,
                 null,
                 null,
                 null,
@@ -205,7 +205,7 @@
                 $(".group1").colorbox();
             }
         }).on( 'draw', function () {
-            $('tr td:nth-child(1), tr td:nth-child(5)').each(function (){
+            $('tr td:nth-child(1), tr td:nth-child(2)').each(function (){
                   $(this).addClass('center');
             })
             
