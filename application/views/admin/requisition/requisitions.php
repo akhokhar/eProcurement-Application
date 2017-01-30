@@ -256,6 +256,7 @@
                                                 </label>
                                             </div>--></th>
                                         <th class="center">Requisition#</th>
+										<th class="center">Description</th>
                                         <th class="center">Date Requested</th>
                                         <th class="center">Needed Till</th>
                                         <th class="center">Project</th>
@@ -390,6 +391,7 @@
                 null,
                 null,
                 null,
+                null,
 				null,
                 null,
                 null,
@@ -404,7 +406,7 @@
                 $(".group1").colorbox();
             }
         }).on( 'draw', function () {
-            $('tr td:nth-child(1), tr td:nth-child(3), tr td:nth-child(7)').each(function (){
+            $('tr td:nth-child(1), tr td:nth-child(3), tr td:nth-child(8)').each(function (){
                   $(this).addClass('center')
             })
             
