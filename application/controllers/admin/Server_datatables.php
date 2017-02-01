@@ -178,7 +178,7 @@ class server_datatables extends CI_Controller {
         $dataCount = $this->requisition_model->get_requisition($db_where_column, $db_where_value, $db_where_column_or, $db_where_value_or);
         // end: get all requisitions or search requisition
         
-        $dt_column = array('requisition_num', 'date_req', 'date_req_until', 'project_name', 'location_name', 'approving_authority_name', 'is_approved');
+        $dt_column = array('requisition_num', 'description', 'date_req', 'date_req_until', 'project_name', 'location_name', 'approving_authority_name', 'is_approved');
         
         $data = array();
         $i = 0;
@@ -215,13 +215,12 @@ class server_datatables extends CI_Controller {
 						}
 						
                     }
-                    /*else if($get_dt_column == 'product_quantity'){
-                        $data[$i][] = ($value[$get_dt_column] <= 0) ? 'Out of Stock' : $value[$get_dt_column];
+                    else if($get_dt_column == 'date_req'){
+                        $data[$i][] = date("d/M/Y", strtotime($value[$get_dt_column]));
                     }
-                    else if($get_dt_column == 'product_org_price'){
-                        
-                        $data[$i][] = number_format($value[$get_dt_column],2);
-                    }*/
+					else if($get_dt_column == 'date_req_until'){
+                        $data[$i][] = date("d/M/Y", strtotime($value[$get_dt_column]));
+                    }
                     else {
                         $data[$i][] = $value[$get_dt_column];
                     }
