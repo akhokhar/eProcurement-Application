@@ -1,36 +1,37 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Purchase_model extends CI_Model {
+class Grn_model extends CI_Model {
     
     /*
     |------------------------------------------------
-    | start: add_purchase_order function
+    | start: add_grn function
     |------------------------------------------------
     |
-    | This function add new Purchase Order
+    | This function add new Goods/Services Receiving
     |
     */
-    function add_purchase_order($rfq_id) {
+    function add_grn($order_id) {
         
-        $order   = $this->input->post();
+        $grn   = $this->input->post();
         $user_id    = $this->flexi_auth->get_user_id();
-		$orderNum = '1-10-17';
+		$grnNum = '1-10-17';
         
         $data = array(
-				'po_num'			  		=> $orderNum,
-				'po_date'					=> date("Y-m-d H:i:s", strtotime($order['poDate'])),
-                'rfq_id'            	  	=> $rfq_id,
-                'vendor_id'            		=> $order['vendor'],
-                'requisition_id'       		=> $order['requisition_id'],
-				'delivery_address'			=> $order['delivery_address'],
+				'vendor_id'			  		=> $grn['vendor'],
+				'purchase_order_id'			=> $order_id,
+				'delivery_challan_no'		=> $grn['challan'],
+				'received_qty'				=> $grn['received_qty'],
+				'accepted_qty'				=> $grn['accepted_qty'],
+				'grn_date'					=> date("Y-m-d H:i:s", strtotime($grn['grnDate'])),
+                'grn_num'            	  	=> $grnNum,
 				'added_by'					=> $user_id,
 				'status'					=> $this->config->item('activeFlag'),
         ); 
-		
+
 		$this->db->trans_begin();
         
         $this->db->set($data);
-        $this->db->insert('purchase_order');
+        $this->db->insert('grn');
         
         $order_id = $this->db->insert_id();
 		
@@ -51,19 +52,19 @@ class Purchase_model extends CI_Model {
 	
 	/*
     |------------------------------------------------
-    | start: get_orders function
+    | start: get_grn function
     |------------------------------------------------
     |
     | This function get all orders or
-    | get get_orders by id and other cloumn
+    | get get_grn by id and other cloumn
     |
     */
-    function get_orders($db_where_column = null, $db_where_value = null, $db_where_column_or = null, $db_where_value_or = null, $db_limit = null, $db_order = null, $db_select_column = null) {
+    function get_grn($db_where_column = null, $db_where_value = null, $db_where_column_or = null, $db_where_value_or = null, $db_limit = null, $db_order = null, $db_select_column = null) {
         
         if($db_select_column)
             $this->db->select($db_select_column);
         else
-            $this->db->select('po.po_id, po.po_num, po.po_date, po.delivery_address, r.requisition_num, rfq.rfq_num, v.vendor_id, v.vendor_name, r.description');
+            $this->db->select('grn.grn_id, grn.grn_num, grn.purchase_order_id, grn.received_qty, grn.accepted_qty, grn.grn_date, grn.delivery_challan_no, r.requisition_id, r.requisition_num, rfq.rfq_num, grn.vendor_id, v.vendor_name, r.description');
 
         if($db_where_column_or) {
             foreach($db_where_column_or as $key => $column) {
@@ -91,11 +92,12 @@ class Purchase_model extends CI_Model {
             } 
         }
         
-        $this->db->where('po.status', 1);
-        $this->db->join('vendor v', 'po.vendor_id = v.vendor_id', 'LEFT');
-        $this->db->join('requisition r', 'po.requisition_id = r.requisition_id', 'LEFT');
+        $this->db->where('grn.status', 1);
+        $this->db->join('vendor v', 'grn.vendor_id = v.vendor_id', 'LEFT');
+        $this->db->join('purchase_order po', 'grn.purchase_order_id = po.po_id', 'LEFT');
         $this->db->join('rfq', 'po.rfq_id = rfq.rfq_id', 'LEFT');
-		$result = $this->db->get('purchase_order po');
+        $this->db->join('requisition r', 'po.requisition_id = r.requisition_id', 'LEFT');
+		$result = $this->db->get('grn');
 		
         $data = array();
         if($result->num_rows() > 0) {
@@ -106,6 +108,6 @@ class Purchase_model extends CI_Model {
             return NULL;
 		}
     }
-    /*---- end: get_orders function ----*/
+    /*---- end: get_grn function ----*/
 	
 }
