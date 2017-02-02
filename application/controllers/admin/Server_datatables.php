@@ -1877,6 +1877,70 @@ class server_datatables extends CI_Controller {
         echo json_encode($this->data['datatable']);
 	}
 	
+	
+	function get_vendors(){
+		
+		
+        // load vendor model
+        $this->load->model('admin/Vendor_model');
+		
+        $dataRecord = $this->Vendor_model->get_vendor();
+        
+        $dataCount = $this->Vendor_model->get_vendor();
+        // end: get all Vendors
+        
+        $dt_column = array('vendor_name', 'vendor_address', 'vendor_date', 'location_name');
+        
+        $data = array();
+        $i = 0;
+        
+        if($dataRecord) {
+            
+            $view = "";
+            $edit = "";//"admin/requisition/edit/";
+            $remove = "admin/vendor/delete_vendor/";
+
+            $btn_arr_responce = $this->create_action_array($view,$edit,$remove);
+            foreach($dataRecord as $key => $value) {
+                
+                foreach($dt_column as $get_dt_column) {
+                    
+                    if($get_dt_column == 'vendor_date'){
+                        $data[$i][] = date("d/M/Y", strtotime($value[$get_dt_column]));
+                    }
+                    else {
+                        $data[$i][] = $value[$get_dt_column];
+                    }
+                    
+                }
+
+                /***** start: delete and edit button *****/
+                $action_btn = '';
+                
+                $action_btn .= '<div class="visible-md visible-lg hidden-sm hidden-xs">';
+
+                $action_btn .= $this->create_action_buttons($btn_arr_responce,$value['vendor_id']);
+				$vendor_id = $value['vendor_id'];
+				
+                $action_btn .= '</div>';
+                
+                $data[$i][] = $action_btn;
+                // end: delete and edit button
+                
+                $i++;
+            }
+        }
+        
+        $this->data['datatable']['draw']            = $this->input->post('draw');
+        $this->data['datatable']['recordsTotal']    = count($dataCount);
+        $this->data['datatable']['recordsFiltered'] = count($dataCount);
+        $this->data['datatable']['data']            = $data;
+        
+        //echo '<pre>'; print_r($this->data['datatable']); die();
+        
+        echo json_encode($this->data['datatable']);
+	}
+	
     
     function create_action_array($view_url,$edit_url,$delete_url){
         
