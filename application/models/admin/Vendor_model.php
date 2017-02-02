@@ -1,36 +1,32 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Purchase_model extends CI_Model {
+class Vendor_model extends CI_Model {
     
     /*
     |------------------------------------------------
-    | start: add_purchase_order function
+    | start: add_grn function
     |------------------------------------------------
     |
-    | This function add new Purchase Order
+    | This function add new Goods/Services Receiving
     |
     */
-    function add_purchase_order($rfq_id) {
+    function add_vendor() {
         
-        $order   = $this->input->post();
+        $vendor   = $this->input->post();
         $user_id    = $this->flexi_auth->get_user_id();
-		$orderNum = '1-10-17';
-        
-        $data = array(
-				'po_num'			  		=> $orderNum,
-				'po_date'					=> date("Y-m-d H:i:s", strtotime($order['poDate'])),
-                'rfq_id'            	  	=> $rfq_id,
-                'vendor_id'            		=> $order['vendor'],
-                'requisition_id'       		=> $order['requisition_id'],
-				'delivery_address'			=> $order['delivery_address'],
-				'added_by'					=> $user_id,
+		
+		$data = array(
+				'vendor_name'			  	=> $vendor['vendor_name'],
+				'vendor_address'			=> $vendor['vendor_address'],
+				'location_id'				=> $vendor['location'],
+				'vendor_date'				=> date("Y-m-d H:i:s", time()),
 				'status'					=> $this->config->item('activeFlag'),
         ); 
 		
 		$this->db->trans_begin();
         
         $this->db->set($data);
-        $this->db->insert('purchase_order');
+        $this->db->insert('vendor');
         
         $order_id = $this->db->insert_id();
 		
@@ -51,20 +47,19 @@ class Purchase_model extends CI_Model {
 	
 	/*
     |------------------------------------------------
-    | start: get_orders function
+    | start: get_grn function
     |------------------------------------------------
     |
     | This function get all orders or
-    | get get_orders by id and other cloumn
+    | get get_grn by id and other cloumn
     |
     */
-    function get_orders($db_where_column = null, $db_where_value = null, $db_where_column_or = null, $db_where_value_or = null, $db_limit = null, $db_order = null, $db_select_column = null) {
+    function get_vendor($db_where_column = null, $db_where_value = null, $db_where_column_or = null, $db_where_value_or = null, $db_limit = null, $db_order = null, $db_select_column = null) {
         
         if($db_select_column)
             $this->db->select($db_select_column);
         else
-
-            $this->db->select('po.po_id, po.po_num, po.po_date, po.delivery_address, r.requisition_num, rfq.rfq_num, v.vendor_id, v.vendor_name, r.description');
+            $this->db->select('v.vendor_id, v.vendor_name, v.vendor_address, v.location_id, v.vendor_date, l.location_name');
 
         if($db_where_column_or) {
             foreach($db_where_column_or as $key => $column) {
@@ -86,17 +81,10 @@ class Purchase_model extends CI_Model {
             $this->db->limit($db_limit['limit'], $db_limit['pageStart']);
         }
         
-        if($db_order) {
-            foreach($db_order as $get_order) {
-                $this->db->order_by($get_order['title'], $get_order['order_by']);
-            } 
-        }
-        
-        $this->db->where('po.status', 1);
-        $this->db->join('vendor v', 'po.vendor_id = v.vendor_id', 'LEFT');
-        $this->db->join('requisition r', 'po.requisition_id = r.requisition_id', 'LEFT');
-        $this->db->join('rfq', 'po.rfq_id = rfq.rfq_id', 'LEFT');
-		$result = $this->db->get('purchase_order po');
+		$this->db->where('v.status', 1);
+		$this->db->order_by("vendor_name", "ASC");
+        $this->db->join('location l', 'v.location_id = l.location_id', 'LEFT');
+        $result = $this->db->get('vendor v');
 		
         $data = array();
         if($result->num_rows() > 0) {
@@ -107,6 +95,32 @@ class Purchase_model extends CI_Model {
             return NULL;
 		}
     }
-    /*---- end: get_orders function ----*/
+    /*---- end: get_vendor function ----*/
+	
+	
+	function delete_vendor($vendor_id) {
+		
+        $data = array( 'status'  => 0);  
+        
+        $this->db->trans_begin();
+        
+        $this->db->where('vendor_id', $vendor_id);
+        $this->db->set($data);
+        $this->db->update('vendor');
+        
+        if($this->db->affected_rows() != 1){
+            //Requisition Item Work will go here.
+        }
+        
+        $this->db->trans_complete();
+        
+        if($this->db->trans_status() === FALSE) {
+            $this->db->trans_rollback();
+            return FALSE;
+        } else {
+            return TRUE;
+        }
+        
+    }
 	
 }
