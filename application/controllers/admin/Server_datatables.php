@@ -1697,9 +1697,11 @@ class server_datatables extends CI_Controller {
 				$po_id = $value['po_id'];
 				
 				$action_btn .= '
+
 				<a href="'.base_url().'admin/grn/add/'.$po_id.'" class="" data-placement="top" data-original-title="Add Goods Receiving" > Add Grn </a>';
 				
 				$action_btn .= '
+
 				<a href="'.base_url().'admin/purchase_order/generate_order_pdf/'.$po_id.'" class="" data-placement="top" data-original-title="Generate Order" > | <i class="glyphicon glyphicon-save"></i> </a>';
 				
 				
@@ -1721,7 +1723,6 @@ class server_datatables extends CI_Controller {
         
         echo json_encode($this->data['datatable']);
 	}
-	
 	
 	function get_grns(){
 		// database column for searching

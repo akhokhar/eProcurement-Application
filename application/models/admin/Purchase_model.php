@@ -63,6 +63,7 @@ class Purchase_model extends CI_Model {
         if($db_select_column)
             $this->db->select($db_select_column);
         else
+
             $this->db->select('po.po_id, po.po_num, po.po_date, po.delivery_address, r.requisition_num, rfq.rfq_num, v.vendor_id, v.vendor_name, r.description');
 
         if($db_where_column_or) {
