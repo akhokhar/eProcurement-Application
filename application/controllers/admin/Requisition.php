@@ -130,7 +130,28 @@ class Requisition extends CI_Controller {
     }
     /*---- end: index function ----*/
     
-    
+    function get_requisition_num_detail() {
+		$req_date = $this->input->get('req_date');
+		$echo = $this->input->get('echo');
+		$req_date_year = date('Y', strtotime($req_date));
+		$req_date_month = date('m', strtotime($req_date));
+		$numSeperator = $this->config->item('numSeperator');
+		$requisition_num = $this->requisition_model->get_requisition_num_detail($req_date_year, $req_date_month);
+		if (!!$requisition_num) {
+			$requisition_num = explode($numSeperator, $requisition_num);
+			$requisition_num[count($requisition_num)-1] = $requisition_num[count($requisition_num)-1]+1;
+			$requisition_num = implode($numSeperator, $requisition_num);
+		}
+		else {
+			$requisition_num = date('Y-m-').'01';
+		}
+		if (!!$echo) {
+			echo $requisition_num;
+		}
+		else {
+			return $requisition_num;
+		}
+	}
     /*
     |------------------------------------------------
     | start: add function
@@ -148,6 +169,8 @@ class Requisition extends CI_Controller {
                 redirect('admin/requisition');		
         }
         
+		$requisition_num = $this->get_requisition_num_detail();
+		$this->data['req_num'] = $requisition_num;
 		
 		if($this->input->post()) {
             //echo '<pre>'; print_r($this->input->post()); die();
@@ -161,7 +184,7 @@ class Requisition extends CI_Controller {
             $this->form_validation->set_rules('location', 'Location', 'required');
             $this->form_validation->set_rules('donor', 'Donor', 'required');
             $this->form_validation->set_rules('approvingAuthority', 'Approving Authority', 'required');*/
-            
+			
             if ($this->form_validation->run() || true) {
                 
 				$requisition = array();
@@ -171,7 +194,7 @@ class Requisition extends CI_Controller {
 					
 					$requisition[$fieldName] = $fieldValue;
 				}
-				$requisition['req_num'] = '1-10-17';
+				$requisition['req_num'] = $requisition_num;
 				if($requisition_id = $this->requisition_model->add_requisition($requisition)) {
 					// If Requisition added successfully, then add items
 					// Item work goes here....
@@ -454,4 +477,30 @@ class Requisition extends CI_Controller {
 
 	}
 
+
+	function generate_requisition_pdf($requisition_id){
+		
+		$this->load->model('Requisition_model');
+		
+		$requisitionData = $this->Requisition_model->get_requisition(array('r.requisition_id'), array($requisition_id));
+		$requisition = $requisitionData[0];
+		
+		$data['requisition'] = $requisition;
+		$data['requisitionItems'] = $requisitionItems;
+		
+		$html = $this->load->view('admin/requisition/requisition_report', $data, true);
+		
+		//this the the PDF filename that user will get to download
+		$pdfFilePath = "requisition.pdf";
+
+		//load mPDF library
+		$this->load->library('m_pdf');
+		//actually, you can pass mPDF parameter on this load() function
+		$pdf = $this->m_pdf->load($html);
+		//generate the PDF!
+		$pdf->WriteHTML($html);
+		//offer it to user via browser download! (The PDF won't be saved on your server HDD)
+		$pdf->Output($pdfFilePath, "D");
+
+	}
 }

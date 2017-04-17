@@ -64,7 +64,7 @@
                     <?php } ?>
                     <!-- end: Success and error message -->
                     <div class="page-header row">
-                        <h1 class="col-sm-6">View all Quotations</h1>
+                        <h1 class="col-sm-6"><?php echo $page_title; ?></h1>
                         
                     </div>
                     <!-- end: PAGE TITLE & BREADCRUMB -->
@@ -79,7 +79,7 @@
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <i class="fa fa-external-link-square"></i>
-                            Quotation(s)
+                            Payment Request(s)
                             
                         </div>
                         <div class="panel-body">
@@ -90,9 +90,12 @@
                             <table class="table table-striped table-bordered table-hover" id="rfq_table">
                                 <thead>
                                     <tr>
-                                        <th class="center">Rfq #</th>
-                                        <th class="center">Rfq Date</th>
-                                        <th class="center">Rfq Due Date</th>
+                                        <th class="center">S.no.</th>
+                                        <th class="center">Requisition#</th>
+                                        <th class="center">Description</th>
+                                        <th class="center">Payment Request Date</th>
+                                        <th class="center">Payment Mode</th>
+                                        <th class="center">Payment Purpose</th>
                                         <th class="center">Action</th>
                                     </tr>
                                 </thead>
@@ -164,7 +167,7 @@
             "serverSide": true,
             "searching": false,
             "ajax": {
-                "url": "<?php echo base_url(); ?>admin/server_datatables/get_comparatives",
+                "url": "<?php echo base_url(); ?>admin/server_datatables/get_payment_request",
                 "type": "POST",
                 "data": function ( d ) {
                     var top_search_like = {
@@ -193,6 +196,9 @@
                 //{ "orderable": false, "targets": 4 },
             ],
             "columns": [
+                null,
+                null,
+                null,
                 null,
                 null,
                 null,

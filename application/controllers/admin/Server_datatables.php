@@ -99,10 +99,10 @@ class server_datatables extends CI_Controller {
         // *****************************************
         // start: get all requitision or search requisition
         // *****************************************
-        $db_where_column    = array('r.status');
-        $db_where_value     = array(1);
-        $db_where_column_or = array();
-        $db_where_value_or  = array();
+        $db_where_column    = array();
+        $db_where_value     = array();
+        $db_where_column_or = array('r.status', 'r.status', 'r.status', 'r.status');
+        $db_where_value_or  = array(1, 2, 3 ,4);
         $db_limit           = array();
         $db_order           = array();
         
@@ -194,13 +194,13 @@ class server_datatables extends CI_Controller {
                 
                 $btn_array_checked_checkbox = "admin/product/delete_checked_checkbox/";
                 $checkbox = "";
-                if(!$this->flexi_auth->is_privileged($this->menu_model->get_privilege_name($btn_array_checked_checkbox))){
+                /*if(!$this->flexi_auth->is_privileged($this->menu_model->get_privilege_name($btn_array_checked_checkbox))){
                     $checkbox="disabled";
                 }
                 $data[$i][] = '<div class="checkbox-table"><label>
                                     <input type="checkbox" '.$checkbox.' name="requisition['.$value['requisition_id'].']" class="flat-grey deleteThis">
-                                </label></div>';
-                
+                                </label></div>';*/
+                $data[$i][] = $i+1;
                 foreach($dt_column as $get_dt_column) {
                     
                     if($get_dt_column == 'is_approved'){
@@ -257,7 +257,7 @@ class server_datatables extends CI_Controller {
 	
 	function get_rfqs(){
 		// database column for searching
-        $db_column = array('r.rfq_id', 'r.rfq_num', 'r.rfq_date', 'r.due_date');
+        $db_column = array('r.rfq_id', 'r.rfq_num', 'r.rfq_date', 'r.due_date', 'r.status');
 
         // load product model
         $this->load->model('admin/Quotation_model');
@@ -267,8 +267,8 @@ class server_datatables extends CI_Controller {
         // *****************************************
         $db_where_column    = array();
         $db_where_value     = array();
-        $db_where_column_or = array('r.status', 'r.status', 'r.status');
-        $db_where_value_or  = array(1, 3, 4);
+        $db_where_column_or = array('r.status', 'r.status', 'r.status', 'r.status');
+        $db_where_value_or  = array(1, 3, 4, 5);
         $db_limit           = array();
         $db_order           = array();
         
@@ -344,7 +344,7 @@ class server_datatables extends CI_Controller {
         $dataCount = $this->Quotation_model->get_all_rfqs($db_where_column, $db_where_value, $db_where_column_or, $db_where_value_or);
         // end: get all requisitions or search requisition
         
-        $dt_column = array('rfq_num', 'rfq_date', 'due_date');
+        $dt_column = array('rfq_num', 'rfq_date', 'due_date', 'status');
         
         $data = array();
         $i = 0;
@@ -366,10 +366,32 @@ class server_datatables extends CI_Controller {
                 $data[$i][] = '<div class="checkbox-table"><label>
                                     <input type="checkbox" '.$checkbox.' name="rfq['.$value['rfq_id'].']" class="flat-grey deleteThis">
                                 </label></div>';*/
-                
+                $data[$i][] = $i+1;
+				
                 foreach($dt_column as $get_dt_column) {
-                    
-                    if($get_dt_column == 'rfq_date'){
+					
+                    if($get_dt_column == 'status'){
+						if ($value[$get_dt_column] == $this->config->item('activeFlag')) {
+							$data[$i][] = 'Approved';
+						}
+						else if ($value[$get_dt_column] == $this->config->item('inactiveFlag')) {
+							$data[$i][] = 'Rejected';
+						}
+						else if ($value[$get_dt_column] == $this->config->item('sentFlag')) {
+							$data[$i][] = 'Sent to Vendors';
+						}
+						else if ($value[$get_dt_column] == $this->config->item('receivedFlag')) {
+							$data[$i][] = 'Received from Vendors';
+						}
+						else if ($value[$get_dt_column] == $this->config->item('addedComparative')) {
+							$data[$i][] = 'Comparative Added';
+						}
+						else {
+							$data[$i][] = '-';
+						}
+						
+                    }
+                    else if($get_dt_column == 'rfq_date'){
                         $data[$i][] = date("d/M/Y", strtotime($value[$get_dt_column]));
                     }
                     else if($get_dt_column == 'due_date'){
@@ -414,18 +436,19 @@ class server_datatables extends CI_Controller {
 	
 	function get_comparatives(){
 		// database column for searching
-        $db_column = array('r.rfq_id', 'r.rfq_num', 'r.rfq_date', 'r.due_date');
+        $db_column = array('r.rfq_id', 'r.rfq_num', 'r.rfq_date', 'r.due_date', 'r.status', 'v.vendor_name');
 
         // load product model
         $this->load->model('admin/Quotation_model');
+        $this->load->model('admin/Purchase_model');
 		
 		// *****************************************
         // start: get all requitision or search requisition
         // *****************************************
         $db_where_column    = array();
         $db_where_value     = array();
-        $db_where_column_or = array('r.status', 'r.status', 'r.status');
-        $db_where_value_or  = array(1, 3, 4);
+        $db_where_column_or = array('r.status');
+        $db_where_value_or  = array(5);
         $db_limit           = array();
         $db_order           = array();
         
@@ -496,12 +519,13 @@ class server_datatables extends CI_Controller {
         }
         // end: search data by like
         
-        $dataRecord = $this->Quotation_model->get_all_rfqs($db_where_column, $db_where_value, $db_where_column_or, $db_where_value_or, $db_limit, $db_order);
+		
+        $dataRecord = $this->Quotation_model->get_all_comparatives($db_where_column, $db_where_value, $db_where_column_or, $db_where_value_or, $db_limit, $db_order);
         
-        $dataCount = $this->Quotation_model->get_all_rfqs($db_where_column, $db_where_value, $db_where_column_or, $db_where_value_or);
-        // end: get all requisitions or search requisition
+        $dataCount = $this->Quotation_model->get_all_comparatives($db_where_column, $db_where_value, $db_where_column_or, $db_where_value_or);
+		// end: get all requisitions or search requisition
         
-        $dt_column = array('rfq_num', 'rfq_date', 'due_date');
+        $dt_column = array('rfq_num', 'rfq_date', 'due_date', 'vendor_name');
         
         $data = array();
         $i = 0;
@@ -515,7 +539,12 @@ class server_datatables extends CI_Controller {
             $btn_arr_responce = $this->create_action_array($view,$edit,$remove);
             foreach($dataRecord as $key => $value) {
                 
-                /*$btn_array_checked_checkbox = "admin/product/delete_checked_checkbox/";
+				
+				$db_where_column_or_po = array('rfq.rfq_id');
+				$db_where_value_or_po = array($value['rfq_id']);
+				$poCount = $this->Purchase_model->get_orders($db_where_column_po, $db_where_value_po, $db_where_column_or_po, $db_where_value_or_po);
+				
+				/*$btn_array_checked_checkbox = "admin/product/delete_checked_checkbox/";
                 $checkbox = "";
                 if(!$this->flexi_auth->is_privileged($this->menu_model->get_privilege_name($btn_array_checked_checkbox))){
                     $checkbox="disabled";
@@ -523,7 +552,7 @@ class server_datatables extends CI_Controller {
                 $data[$i][] = '<div class="checkbox-table"><label>
                                     <input type="checkbox" '.$checkbox.' name="rfq['.$value['rfq_id'].']" class="flat-grey deleteThis">
                                 </label></div>';*/
-                
+                $data[$i][] = $i+1;
                 foreach($dt_column as $get_dt_column) {
                     
                     if($get_dt_column == 'rfq_date'){
@@ -538,7 +567,7 @@ class server_datatables extends CI_Controller {
                     
                 }
 
-                /***** start: delete and edit button *****/
+				/***** start: delete and edit button *****/
                 $action_btn = '';
                 
                 $action_btn .= '<div class="visible-md visible-lg hidden-sm hidden-xs">';
@@ -549,11 +578,12 @@ class server_datatables extends CI_Controller {
 				//$action_btn .= '
 				//<a href="'.base_url().'admin/rfq/view/'.$rfq_id.'" class="" data-placement="top" data-original-title="View Detail" > <i class="glyphicon glyphicon-eye-open"></i> </a>';
 				
+				if (count($poCount) === 0) {
 				$action_btn .= '
-				<a href="'.base_url().'admin/purchase_order/add/'.$rfq_id.'" class="" data-placement="top" data-original-title="Create Purchase Order" > Create Purchase Order </a>';
-				
+				<a href="'.base_url().'admin/purchase_order/add/'.$rfq_id.'" class="" data-placement="top" data-original-title="Create Purchase Order" > Create Purchase Order </a> | ';
+				}
                 $action_btn .= '
-				<a href="'.base_url().'admin/comparative_quotation/generate_comparative/'.$rfq_id.'" class="" data-placement="top" data-original-title="Generate Comparison" > | <i class="glyphicon glyphicon-save"></i> </a>';
+				<a href="'.base_url().'admin/comparative_quotation/generate_comparative/'.$rfq_id.'" class="" data-placement="top" data-original-title="Generate Comparison" > <i class="glyphicon glyphicon-save"></i> </a>';
 
                 $action_btn .= '</div>';
                 
@@ -725,6 +755,138 @@ class server_datatables extends CI_Controller {
     }
 
     /*---- end: get_product_for_order function ----*/
+	
+	
+    /*
+    |------------------------------------------------
+    | start: get_payment_request function
+    |------------------------------------------------
+    |
+    | This function get product and search product
+    | via ajax
+    |
+   */
+  function get_payment_request() {
+        // database column for searching
+        $db_column = array('pr.*', 'r.requisition_num', 'r.description');
+
+        // load product model
+        $this->load->model('admin/payment_model');
+
+        // *****************************************
+        // start: get all product or search product
+        // *****************************************
+        $db_where_column = array();
+        $db_where_value = array();
+        $db_where_column_or = array();
+        $db_where_value_or = array();
+        $db_limit = array();
+        $db_order = array();
+
+        /*         * *** start: record length and start **** */
+        if ($this->input->post('length') != '-1') {
+            $db_limit['limit'] = $this->input->post('length');
+            $db_limit['pageStart'] = $this->input->post('start');
+        }
+        // end: get data order by
+
+        /*         * *** start: get data order by **** */
+        $order = $this->input->post('order');
+
+        if ($order) {
+            foreach ($order as $key => $get_order) {
+
+                $db_order[$key]['title'] = $db_column[$get_order['column']];
+                $db_order[$key]['order_by'] = $get_order['dir'];
+            }
+        }
+        // end: get data order by
+
+        /*         * *** start: top search data by equal to **** */
+
+        if ($this->input->post('top_search')) {
+            foreach ($this->input->post('top_search') as $key => $search_val) {
+
+                if (preg_match('/prod/', $key)) {
+
+                    $search_key = substr($key, 5);
+
+                    if (!empty($search_val)) {
+                        $db_where_column[] = $search_key;
+                        $db_where_value[] = $search_val;
+                    }
+                }
+            }
+        }
+        // end: top search data by equal to
+
+        /*         * *** start: search data by like **** */
+        $search = $this->input->post('search');
+
+        if ($search['value'] != '') {
+            foreach ($db_column as $value) {
+                $db_where_column_or[] = $value . ' LIKE';
+                $db_where_value_or[] = '%' . $search['value'] . '%';
+            }
+        }
+        // end: search data by like
+
+        $dataRecord = $this->payment_model->get_prs($db_where_column, $db_where_value, $db_where_column_or, $db_where_value_or, $db_limit, $db_order);
+
+        $dataCount = $this->payment_model->get_prs($db_where_column, $db_where_value, $db_where_column_or, $db_where_value_or);
+        // end: get all product or search product
+        $dt_column = array('requisition_num', 'description', 'pr_date', 'payment_mode', 'payment_purpose');
+
+        $data = array();
+        $i = 0;
+
+        if ($dataRecord) {
+
+			$data[$i][] = $i+1;
+            //$btn_arr_responce = $this->create_action_array($view,$edit,$remove); 
+            foreach ($dataRecord as $key => $value) {
+				
+                foreach ($dt_column as $get_dt_column) {
+
+                    if($get_dt_column == 'pr_date'){
+                        $data[$i][] = date("d/M/Y", strtotime($value[$get_dt_column]));
+                    } else {
+                        $data[$i][] = $value[$get_dt_column];
+                    }
+                }
+
+                /*                 * *** start: delete and edit button **** */
+                $action_btn .= '<div class="visible-md visible-lg hidden-sm hidden-xs">';
+
+                //$action_btn .= $this->create_action_buttons($btn_arr_responce,$value['rfq_id']);
+				$pr_id = $value['pr_id'];
+				
+				//$action_btn .= '
+				//<a href="'.base_url().'admin/rfq/view/'.$rfq_id.'" class="" data-placement="top" data-original-title="View Detail" > <i class="glyphicon glyphicon-eye-open"></i> </a>';
+				
+                $action_btn .= '
+				<a href="'.base_url().'admin/payment_request/generate_pr_pdf/'.$pr_id.'" class="" data-placement="top" data-original-title="Generate Payment Request" > <i class="glyphicon glyphicon-save"></i> </a>';
+
+                $action_btn .= '</div>';
+
+                $data[$i][] = $action_btn;
+                // end: delete and edit button
+
+                $i++;
+            }
+        }
+
+        $this->data['datatable']['draw'] = $this->input->post('draw');
+        $this->data['datatable']['recordsTotal'] = count($dataCount);
+        $this->data['datatable']['recordsFiltered'] = count($dataCount);
+        $this->data['datatable']['data'] = $data;
+
+        //echo '<pre>'; print_r($this->data['datatable']); die();
+
+        echo json_encode($this->data['datatable']);
+    }
+
+    /*---- end: get_payment_request function ----*/
     
     /* =============================================================== */
     
@@ -1567,7 +1729,7 @@ class server_datatables extends CI_Controller {
 	
 	function get_purchase_orders(){
 		// database column for searching
-        $db_column = array('po.vendor_id', 'po.po_date', 'po.po_num', 'po.delivery_address');
+        $db_column = array('po.vendor_id', 'po.po_date', 'po.po_num', 'po.delivery_address', 'po.status');
 
         // load purchase model
         $this->load->model('admin/Purchase_model');
@@ -1577,7 +1739,7 @@ class server_datatables extends CI_Controller {
         // *****************************************
         $db_where_column    = array();
         $db_where_value     = array();
-        $db_where_column_or = array('r.status', 'r.status', 'r.status');
+        $db_where_column_or = array('po.status', 'po.status', 'po.status');
         $db_where_value_or  = array(1, 3, 4);
         $db_limit           = array();
         $db_order           = array();
@@ -1676,7 +1838,7 @@ class server_datatables extends CI_Controller {
                 $data[$i][] = '<div class="checkbox-table"><label>
                                     <input type="checkbox" '.$checkbox.' name="rfq['.$value['rfq_id'].']" class="flat-grey deleteThis">
                                 </label></div>';*/
-                
+                $data[$i][] = $i+1;
                 foreach($dt_column as $get_dt_column) {
                     
                     if($get_dt_column == 'po_date'){
@@ -1696,13 +1858,13 @@ class server_datatables extends CI_Controller {
                 //$action_btn .= $this->create_action_buttons($btn_arr_responce,$value['rfq_id']);
 				$po_id = $value['po_id'];
 				
-				$action_btn .= '
-
-				<a href="'.base_url().'admin/grn/add/'.$po_id.'" class="" data-placement="top" data-original-title="Add Goods Receiving" > Add Grn </a>';
+				if ($value['status'] == $this->config->item('activeFlag')) {
+					$action_btn .= '<a href="'.base_url().'admin/grn/add/'.$po_id.'" class="" data-placement="top" data-original-title="Add Goods Receiving" > Add Grn </a> | ';
+				}
 				
 				$action_btn .= '
 
-				<a href="'.base_url().'admin/purchase_order/generate_order_pdf/'.$po_id.'" class="" data-placement="top" data-original-title="Generate Order" > | <i class="glyphicon glyphicon-save"></i> </a>';
+				<a href="'.base_url().'admin/purchase_order/generate_order_pdf/'.$po_id.'" class="" data-placement="top" data-original-title="Generate Order" > <i class="glyphicon glyphicon-save"></i> </a>';
 				
 				
                 $action_btn .= '</div>';
@@ -1813,7 +1975,7 @@ class server_datatables extends CI_Controller {
         $dataCount = $this->Grn_model->get_grn($db_where_column, $db_where_value, $db_where_column_or, $db_where_value_or);
         // end: get all Grns or search Grns
         
-        $dt_column = array('grn_date', 'grn_num', 'delivery_challan_no', 'description', 'vendor_name', 'received_qty', 'accepted_qty');
+        $dt_column = array('grn_date', 'grn_num', 'delivery_challan_no', 'description', 'vendor_name');
         
         $data = array();
         $i = 0;
@@ -1835,7 +1997,7 @@ class server_datatables extends CI_Controller {
                 $data[$i][] = '<div class="checkbox-table"><label>
                                     <input type="checkbox" '.$checkbox.' name="rfq['.$value['rfq_id'].']" class="flat-grey deleteThis">
                                 </label></div>';*/
-                
+                $data[$i][] = $i+1;
                 foreach($dt_column as $get_dt_column) {
                     
                     if($get_dt_column == 'grn_date'){
@@ -1855,6 +2017,10 @@ class server_datatables extends CI_Controller {
                 //$action_btn .= $this->create_action_buttons($btn_arr_responce,$value['rfq_id']);
 				$grn_id = $value['grn_id'];
 				
+				if ($value['status'] == $this->config->item('activeFlag')) {
+					$action_btn .= '
+					<a href="'.base_url().'admin/Payment_request/add/'.$grn_id.'" class="" data-placement="top" data-original-title="" > Create Payment Request </a> | ';
+				}
 				$action_btn .= '
 				<a href="'.base_url().'admin/grn/generate_grn_pdf/'.$grn_id.'" class="" data-placement="top" data-original-title="Generate Grn Report" > <i class="glyphicon glyphicon-save"></i> </a>';
 				

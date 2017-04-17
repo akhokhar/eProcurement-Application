@@ -68,23 +68,69 @@
                         <div class="panel panel-default">
                             <div class="panel-heading">
                                 <i class="fa fa-reorder"></i>
-                                <?php echo $requisition['description'];?>
+                                Payment Request for: <b><?php echo $requisition['description'];?></b>
                             </div>
                             <div class="panel-body">
                                 <div class="tabbable panel-tabs">
                                     <div class="tab-content">
                                         <div id="panel_tab_general" class="tab-pane active">
 										<?php
-                                        $attributes = array('class' => '', 'method' => 'post', 'role' => 'form', 'id' => 'generalRequisitionForm');
+                                        $attributes = array('class' => '', 'method' => 'post', 'role' => 'form', 'id' => 'prForm');
                                         echo form_open_multipart('', $attributes);
                                         ?>
                                             <div class="panel-body">
                                                 
+												<?php $totalAmount = 0;
+												$amount = 0;
+												if(isset($requisition['items']) && count($requisition['items']) > 0){
+												foreach($requisition['items'] as $item){ ?>
+												<?php $grnItem = $grnItems[$item['requisition_item_id']]; ?>
+												<?php 
+													$amount = ($grnItem['qty_accepted'] * $item['rfq_rate']);
+													$totalAmount += $amount;
+												?>
+												<?php } ?>
+                                                <?php } ?>
+                                                <div class="row">
+                                                	<div class="col-md-12">
+                                                    	<table class="table table-bordered">
+                                                        	<tr>
+                                                            	<td>Payee Name</td>
+                                                                <td><?php echo strtoupper($grn['vendor_name']); ?></td>
+                                                            </tr>
+                                                            <tr>
+                                                            	<td>Amount in Figures</td>
+                                                                <td><?php echo $totalAmount;?></td>
+                                                            </tr>
+                                                            <tr>
+                                                            	<td>Amount in Words</td>
+                                                                <td><?php echo amount_to_words($totalAmount);?></td>
+                                                            </tr>
+                                                            <tr>
+                                                            	<td>Donor</td>
+                                                                <td><?php echo $requisition['donor_name'];?></td>
+                                                            </tr>
+                                                            <tr>
+                                                            	<td>Budget</td>
+                                                                <td><?php echo $requisition['budget_head'];?></td>
+                                                            </tr>
+                                                            <tr>
+                                                            	<td>Project</td>
+                                                                <td><?php echo $requisition['project_name'];?></td>
+                                                            </tr>
+                                                            <tr>
+                                                            	<td>Location</td>
+                                                                <td><?php echo $requisition['location_name'];?></td>
+                                                            </tr>
+                                                        </table> 
+                                                    </div>
+                                                </div>
                                                 <div class="row">
 													<div class="col-md-6">
                                                         <div class="form-group">
-                                                            <label for="poDate">
-                                                                Purchase Order Date <span class="symbol required"></span>
+                                                        	<input type="hidden" name="requisition_id" value="<?php echo $requisition['requisition_id']; ?>" />
+                                                            <label for="requisitionDate">
+                                                                Requisition Date <span class="symbol required"></span>
                                                             </label>
                                                             <div class="input-group date">
                                                               <div class="input-group-addon">
@@ -93,11 +139,11 @@
                                                               <?php
                                                               $input_data = array(
                                                                         'type'          		=> 'text',
-                                                                        'name'         		=> 'poDate',
-                                                                        'id'            	  => 'poDate',
+                                                                        'name'         		=> 'prDate',
+                                                                        'id'            	  => 'prDate',
                                                                         'required'	  		=> 'required',
-                                                                        'data-required-error' => 'Purchase Order Date cannot be empty',
-                                                                        'value'         	   => set_value('poDate'),
+                                                                        'data-required-error' => 'Payment Request Date cannot be empty',
+                                                                        'value'         	   => set_value('prDate'),
                                                                         'class'         	   => 'form-control pull-right datepicker',
                                                                         'placeholder'   		 => 'DD/MM/YYYY'
                                                               );
@@ -105,53 +151,35 @@
                                                               ?>
                                                             </div>
                                                         </div>
-                                                      </div>
-                                                
+                                                    </div>
 													<div class="col-md-6">
                                                         <div class="form-group">
-                                                            <label for="donors">
-                                                                Vendor <span class="symbol required"></span>
-                                                            </label>                                        
-                                                              <?php
-                                                              $rfq_vendors = array();
-                                                              foreach ($vendors as $vends) { ?>
-                                                                <?php foreach ($vends as $id => $vendor) { ?>
-                                                                  <?php if ($id == 0) { continue; }?>
-                                                                  <?php $rfq_vendors[$id] = $vendor; ?>
-                                                                <?php } ?>
-                                                              <?php } ?>
-                                                            <?php
-                                                              $dropdown_data = array(
-                                                                        'id'            	  => 'vendor',
-                                                                        'class'         	   => 'form-control select2',
-                                                                        'required'	  		=> 'required',
-                                                                        'data-required-error' => 'Select a Vendor'
-                                                              );
-                                                              echo form_dropdown('donor', $rfq_vendors, '', $dropdown_data);
-                                                              ?>
-                                                         </div>     
-													</div>
+                                                            <label for="payment_mode">
+                                                                Mode of Payment <span class="symbol required"></span>
+                                                            </label><br />
+                                                            <input type="radio" name="paymentMode" value="Cash" /> Cash &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                                            <input type="radio" name="paymentMode" value="Cheque" /> Cheque
+                                                        </div>
+                                                   </div>
 												</div>
-                                                
-                                                <div class="row">
+												<div class="row">
                                                     <div class="col-md-12">
                                                         <div class="form-group">
-                                                            <label for="delivery_address">
-                                                                Enter Delivery Address <span class="symbol required"></span>
+                                                            <label for="challan">
+                                                                Purpose of Payment <span class="symbol required"></span>
                                                             </label>
-                                                            <textarea id="delivery_address" name="delivery_address" required="required" class="form-control" placeholder="Description"></textarea>
+                                                            <textarea name="paymentPurpose" class="form-control"></textarea>
                                                         </div>
                                                     </div>
 												</div>
-											
-                                              <hr />
+												
                                               <div class="row">
                                                 <div class="col-md-2 pull-right">
                                                     <!--<a href="#panel_tab_items" data-toggle="tab" class="btn btn-teal ladda-button next_tab">
                                                         Next <i class="fa fa-arrow-circle-right"></i>
                                                     </a>-->
                                                     <div class="col-md-2 pull-right">
-                                                        <button type="submit" class="btn btn-primary pull-right" id="newRequisitionButton">Create Purchase Order</button>
+                                                        <button type="submit" class="btn btn-primary pull-right" id="newRequisitionButton">Add Payment Request</button>
                                                     </div>
                                                 </div>
                                               </div>
@@ -230,41 +258,18 @@
 <script src="<?php echo $includes_dir; ?>admin/plugins/jQuery-Tags-Input/jquery.tagsinput.js"></script>
 <!-- end: JAVASCRIPTS REQUIRED FOR THIS PAGE ONLY -->
 
-<style>
-    #product_meta_tag_tag, #product_meta_description_tag, #product_meta_key_tag, #product_product_tag_tag {
-        width: auto !important;
-    }
-    .custom-header {
-        background-color: #f5f5f5;
-        font-weight: bold;
-        padding: 5px;
-        text-align: center;
-    }
-    .has-error-tab  {
-        background: #a94442;
-    }
-    .has-error-tab a {
-        color: #ffffff !important;
-    }
-    .has-error-tab:hover a {
-        color: #555 !important;
-    }
-    .active.has-error-tab a {
-        color: #333333 !important;
-    }
-    .productTagImage {
-        display: none;
-        width: 65%;
-    }
-    .upload_tab {
-        border: 1px solid #dddddd !important;
-        float: none !important;
-        margin-top: 0 !important;
-    }
-    .upload_tab li.active > a:hover {
-        color: #333333 !important;
-    }
-    .fileuploader {
-        margin-top: 25px;
-    }
-</style>
+<script type="text/javascript">
+
+
+$(function () {
+	//Date picker
+	$('.datepicker').datepicker({
+		autoclose: true
+	});
+	
+	//select 2
+	$('.select2').select2({
+		width: '100%'
+	});
+});
+</script>

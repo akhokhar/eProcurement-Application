@@ -41,7 +41,6 @@ class Purchase_model extends CI_Model {
             return FALSE;
         } else {
             $b = $this->db->trans_commit();
-            
             return $order_id;
         }
         
@@ -64,7 +63,7 @@ class Purchase_model extends CI_Model {
             $this->db->select($db_select_column);
         else
 
-            $this->db->select('po.po_id, po.po_num, po.po_date, po.delivery_address, r.requisition_num, rfq.rfq_num, v.vendor_id, v.vendor_name, r.description');
+            $this->db->select('po.po_id, po.po_num, po.po_date, po.delivery_address, r.requisition_id, r.requisition_num, rfq.rfq_num, v.vendor_id, v.vendor_name, r.description, po.status');
 
         if($db_where_column_or) {
             foreach($db_where_column_or as $key => $column) {
@@ -92,9 +91,9 @@ class Purchase_model extends CI_Model {
             } 
         }
         
-        $this->db->where('po.status', 1);
-        $this->db->join('vendor v', 'po.vendor_id = v.vendor_id', 'LEFT');
-        $this->db->join('requisition r', 'po.requisition_id = r.requisition_id', 'LEFT');
+        //$this->db->where('po.status', 1);
+        $this->db->join('vendor v', 'po.vendor_id = v.vendor_id', 'INNER');
+        $this->db->join('requisition r', 'po.requisition_id = r.requisition_id', 'INNER');
         $this->db->join('rfq', 'po.rfq_id = rfq.rfq_id', 'LEFT');
 		$result = $this->db->get('purchase_order po');
 		
@@ -108,5 +107,29 @@ class Purchase_model extends CI_Model {
 		}
     }
     /*---- end: get_orders function ----*/
+	
+	
+	function change_po_status($rfq_id, $status) {
+		$this->db->trans_begin();
+        
+        $this->db->where('po_id', $rfq_id);
+        $this->db->set(array('status' => $status));
+        $this->db->update('purchase_order');
+        
+        //$product_id = $this->db->insert_id();
+
+        if($requisition_id){
+            //Requisition Item Work will go here.
+        }
+        
+        $this->db->trans_complete();
+        
+        if($this->db->trans_status() === FALSE) {
+            $this->db->trans_rollback();
+            return FALSE;
+        } else {
+            return TRUE;
+        }
+	}
 	
 }

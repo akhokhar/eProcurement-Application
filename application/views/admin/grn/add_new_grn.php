@@ -75,7 +75,7 @@
                                     <div class="tab-content">
                                         <div id="panel_tab_general" class="tab-pane active">
 										<?php
-                                        $attributes = array('class' => '', 'method' => 'post', 'role' => 'form', 'id' => 'generalRequisitionForm');
+                                        $attributes = array('class' => '', 'method' => 'post', 'role' => 'form', 'id' => 'grnForm');
                                         echo form_open_multipart('', $attributes);
                                         ?>
                                             <div class="panel-body">
@@ -136,46 +136,6 @@
 													</div>
 												</div>
                                                 
-                                                <div class="row">
-                                                    <div class="col-md-6">
-                                                        <div class="form-group">
-                                                            <label for="received_qty">
-                                                                Received Quantity <span class="symbol required"></span>
-                                                            </label>
-                                                            <?php
-															$input_data = array(
-																	'type'          	=> 'text',
-																	'name'         		=> 'received_qty',
-																	'id'            	=> 'received_qty',
-																	'value'         	=> set_value('received_qty'),
-																	'class'         	=> 'form-control pull-right',
-																	'required'			=> 'required',
-                                                              );
-                                                              echo form_input($input_data);
-															?>
-                                                        </div>
-                                                    </div>
-													
-													<div class="col-md-6">
-                                                        <div class="form-group">
-                                                            <label for="accepted_qty">
-                                                                Accepted Quantity <span class="symbol required"></span>
-                                                            </label>
-                                                            <?php
-															$input_data = array(
-																	'type'          	=> 'text',
-																	'name'         		=> 'accepted_qty',
-																	'id'            	=> 'accepted_qty',
-																	'value'         	=> set_value('accepted_qty'),
-																	'class'         	=> 'form-control pull-right',
-																	'required'			=> 'required',
-                                                              );
-                                                              echo form_input($input_data);
-															?>
-                                                        </div>
-                                                    </div>
-												</div>
-												
 												<div class="row">
                                                     <div class="col-md-6">
                                                         <div class="form-group">
@@ -197,7 +157,56 @@
                                                     </div>
 													
 												</div>
-												
+												<br />
+                                                <div class="row">
+                                                	<div class="col-md-12">
+                                                    
+                                                    	<table class="table table-bordered">
+                                                        	<tr>
+                                                            	<th>S.no.</th>
+                                                                <th>Item Name</th>
+                                                                <th>Quantity Received</th>
+                                                                <th>Quantity Accepted</th>
+                                                                <th>Remarks</th>
+                                                            </tr>
+                                                        <?php $count = 1;?>
+                                                        <?php foreach($requisition['items'] as $item) { ?>
+                                                        <?php $requisition_item_id = $item['requisition_item_id']; ?>
+                                                        	<tr>
+                                                            	<td><?php echo $count; ?><input type="hidden" name="requisition_item[<?php echo $count; ?>]" value="<?php echo $requisition_item_id; ?>"></td>
+                                                                <td><?php echo $item['item_name']; ?></td>
+                                                                <td>
+                                                                <?php
+                                                                 $input_data = array(
+                                                                            'type'          => 'number',
+                                                                            'name'          => "qty_received[$requisition_item_id]",
+                                                                            'class'         => 'form-control',
+																			'required'	  => 'required'
+                                                                 );
+                                                                 echo form_input($input_data);
+                                                                 ?>
+                                                                 </td>
+                                                               	 <td>
+                                                                <?php
+                                                                 $input_data = array(
+                                                                            'type'          => 'number',
+                                                                            'name'          => "qty_accepted[$requisition_item_id]",
+                                                                            'class'         => 'form-control',
+																			'required'	  => 'required'
+                                                                 );
+                                                                 echo form_input($input_data);
+                                                                 ?>
+                                                                 </td>
+                                                               	 <td>
+                                                                 <textarea name="remarks[<?php echo $requisition_item_id; ?>]" class="form-control"></textarea>
+                                                                 </td>
+                                                            </tr>
+                                                          <?php $count++;}?>
+
+                                                    	</table>
+                                                        
+                                                	</div>
+                                                </div>
 												
                                               <hr />
                                               <div class="row">

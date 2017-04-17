@@ -23,7 +23,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 | a PHP script and you can easily do that on your own.
 |
 */
-$config['base_url'] = 'http://localhost/eProcurement-Application/';
+$config['base_url'] = 'http://localhost/Projects/RDF/eprocurement_application/project/eProcurement-Application/';
 
 /*
 |--------------------------------------------------------------------------
@@ -524,8 +524,10 @@ $config['proxy_ips'] = '';
 |--------------------------------------------------------------------------
 |
 */
-$config['login_logo'] = 'Login';
-$config['logo'] = 'E-Commerce';
+$config['login_logo'] = 'includes/images/logo.png';
+$config['logo'] = 'includes/images/logo.png';
+$config['site_name'] = 'RDF';
+$config['site_desc'] = 'Research and Development Foundation';
 
 /*
 |--------------------------------------------------------------------------
@@ -565,5 +567,15 @@ $config['youtube_http'] = "https://www.youtube.com/embed/";
 */
 $config['activeFlag'] = 1; 
 $config['inactiveFlag'] = 2; 
-$config['sentFlag'] = 3; 
+$config['sentFlag'] = 3;
 $config['receivedFlag'] = 4;
+$config['addedComparative'] = 5;
+$config['addedPO'] = 6;
+
+/*
+|--------------------------------------------------------------------------
+| System Generated Numbers Seperator
+|--------------------------------------------------------------------------
+|
+*/
+$config['numSeperator'] = '-';

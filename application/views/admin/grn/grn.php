@@ -90,13 +90,12 @@
                             <table class="table table-striped table-bordered table-hover" id="order_table">
                                 <thead>
                                     <tr>
+                                        <th class="center">S.No.</th>
                                         <th class="center">Grn Date</th>
                                         <th class="center">Grn No.</th>
-                                        <th class="center">Delivery Challan NO.</th>
+                                        <th class="center">Delivery Challan No.</th>
                                         <th class="center">Description</th>
                                         <th class="center">Vendor</th>
-                                        <th class="center">Received Quantity</th>
-                                        <th class="center">Accepted Quantity</th>
                                         <th class="center">Action</th>
                                     </tr>
                                 </thead>
@@ -200,8 +199,7 @@
                 null,
                 null,
                 null,
-                null,
-                null,
+				null,
                 null
             ],
             "pageLength": 20,

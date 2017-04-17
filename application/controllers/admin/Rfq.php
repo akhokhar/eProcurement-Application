@@ -145,6 +145,10 @@ class Rfq extends CI_Controller {
                 $this->session->set_flashdata('message', '<p class="error_msg">You do not have access privileges to add RFQ.</p>');
                 redirect('admin/requisition');		
         }
+		
+		$rfq_num = $this->get_rfq_num_detail();
+		$this->data['req_num'] = $rfq_num;
+		
 		if($this->input->post()) {
             //echo '<pre>'; print_r($this->input->post()); die();
 			// load validation helper
@@ -265,6 +269,29 @@ class Rfq extends CI_Controller {
 	function change_rfq_status($rfq_id, $status) {
 		$this->Quotation_model->change_rfq_status($rfq_id, $status);
 		redirect('admin/rfq/');
+	}
+	
+    function get_rfq_num_detail() {
+		$rfqDate = $this->input->get('rfqDate');
+		$echo = $this->input->get('echo');
+		$req_date_year = date('Y', strtotime($rfqDate));
+		$req_date_month = date('m', strtotime($rfqDate));
+		$numSeperator = $this->config->item('numSeperator');
+		$rfq_num = $this->Quotation_model->get_rfq_num_detail($req_date_year, $req_date_month);
+		if (!!$rfq_num) {
+			$rfq_num = explode($numSeperator, $rfq_num);
+			$rfq_num[count($rfq_num)-1] = $rfq_num[count($rfq_num)-1]+1;
+			$rfq_num = implode($numSeperator, $rfq_num);
+		}
+		else {
+			$rfq_num = date('Y-m-').'01';
+		}
+		if (!!$echo) {
+			echo $rfq_num;
+		}
+		else {
+			return $rfq_num;
+		}
 	}
 	
 	function generate_rfq_pdf($rfq_id){

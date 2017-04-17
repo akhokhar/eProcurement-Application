@@ -197,5 +197,102 @@ class General_model extends CI_Model {
         return $return[0];
     }
     /*---- end: list_managers function ----*/
+
+	/*start: Count Requisitions*/
+	function requisition_count() {
+        
+    	$this->db->select('r.requisition_id');
+        
+        $this->db->or_where('r.status', $this->config->item('activeFlag'));
+        $this->db->or_where('r.status', $this->config->item('inactiveFlag'));
+        $this->db->or_where('r.status', $this->config->item('sentFlag'));
+        $this->db->or_where('r.status', $this->config->item('receivedFlag'));
+        $this->db->join('project p', 'r.project_id = p.project_id', 'LEFT');
+        $this->db->join('location l', 'r.location_id = l.location_id', 'LEFT');
+        $this->db->join('donor d', 'r.donor_id = d.donor_id', 'LEFT');
+        $this->db->join('budget_head b', 'r.budget_head_id = b.budget_head_id', 'LEFT');
+		$this->db->join('user_accounts ua', 'r.approving_authority = ua.uacc_id', 'LEFT');
+        $this->db->join('user_profiles up', 'up.upro_uacc_fk = ua.uacc_id', 'left');
+		$result = $this->db->get('requisition r');
+	
+		return $result->num_rows();
+	
+    }
+	/*end: Count Requisitions*/
+	
+	/*start: Count RFQ*/
+	function rfq_count() {
+        
+    	$this->db->select('r.rfq_id');
+        
+        $this->db->or_where('r.status', $this->config->item('activeFlag'));
+        $this->db->or_where('r.status', $this->config->item('sentFlag'));
+        $this->db->or_where('r.status', $this->config->item('receivedFlag'));
+        $this->db->or_where('r.status', $this->config->item('addedComparative'));
+        $this->db->group_by('r.requisition_id');
+		$result = $this->db->get('rfq r');
+	
+		return $result->num_rows();
+	
+    }
+	/*end: Count RFQ*/
+	
+	/*start: Count Comparative Quotations*/
+	function comparative_q_count() {
+        
+    	$this->db->select('r.rfq_id');
+        
+        $this->db->where('r.status', $this->config->item('addedComparative'));
+        $this->db->group_by('r.requisition_id');
+		$result = $this->db->get('rfq r');
+	
+		return $result->num_rows();
+	
+    }
+	/*end: Count Comparative Quotations*/
+	
+	/*start: Count Purchase Orders*/
+	function po_count() {
+        
+    	$this->db->select('po.po_id');
+        
+        $this->db->or_where('po.status', $this->config->item('activeFlag'));
+        $this->db->or_where('po.status', $this->config->item('sentFlag'));
+        $this->db->group_by('po.requisition_id');
+		$result = $this->db->get('purchase_order po');
+	
+		return $result->num_rows();
+	
+    }
+	/*end: Count Purchase Orders*/
+	
+	/*start: Count GRN*/
+	function grn_count() {
+        
+    	$this->db->select('g.grn_id');
+        
+        $this->db->or_where('g.status', $this->config->item('activeFlag'));
+        $this->db->or_where('g.status', $this->config->item('sentFlag'));
+        $this->db->group_by('g.purchase_order_id');
+		$result = $this->db->get('grn g');
+	
+		return $result->num_rows();
+	
+    }
+	/*end: Count GRN*/
+	
+	/*start: Count Payment Requests*/
+	function pr_count() {
+        
+    	$this->db->select('pr.pr_id');
+        
+        $this->db->where('pr.status', $this->config->item('activeFlag'));
+        $this->db->group_by('pr.requisition_id');
+		$result = $this->db->get('payment_request pr');
+	
+		return $result->num_rows();
+	
+    }
+	/*end: Count Payment Requests*/
 }
     

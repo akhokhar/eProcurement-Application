@@ -1,3 +1,28 @@
+<style type="text/css">
+	table {
+		font-family:Arial, Helvetica, sans-serif;
+	}
+</style>
+<table border="0" style="width: 100%;">
+    <tr>
+        <td style="width: 20%;">
+            <img src="<?php echo $base_url . $this->config->item('logo'); ?>" alt="<?php echo $this->config->item('site_name'); ?>" />
+        </td>
+        <td style="width: 30%;">
+            <?php echo $this->config->item('site_desc'); ?>
+        </td>
+        <td style="width: 25%;">
+        </td>
+        <td style="width: 25%; vertical-align:top;">
+            <table border="0">
+                <tr>
+                    <td><u>Date: <?php echo date('d/m/Y', strtotime($order['po_date'])); ?></u></td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+
 <table border="0" style="width: 100%;" align="center">
 <tr>
 	<td align="center">
@@ -20,7 +45,7 @@
 </tr>
 <tr>
 	<td>Date</td>
-	<td style="border-bottom: solid 1px;"><?php echo date("d/M/Y", strtotime($order['po_date']));?></td>
+	<td style="border-bottom: solid 1px;"><?php echo date("d/m/Y", strtotime($order['po_date']));?></td>
 	<td>&nbsp;</td>
 	<td>&nbsp;</td>
 </tr>
@@ -37,15 +62,15 @@
 
 <table border="0" style="width: 100%;" align="center">
 <tr>
-	<td style="width: 40%";>Entry Delivery Address</td>
-	<td style="border-bottom: solid 1px;">&nbsp;</td>
+	<td style="width: 30%";>Delivery Address</td>
+	<td style="border-bottom: solid 1px;"><?php echo $order['delivery_address'];?></td>
 	
 </tr>
 <tr>
 	<td colspan="2" style="border-bottom: solid 1px;">&nbsp;</td>
 </tr>
 <tr>
-	<td style="width: 40%";>Entry Delivery Date (On or Before)</td>
+	<td style="width: 30%";>Delivery Date (On or Before)</td>
 	<td style="border-bottom: solid 1px;">&nbsp;</td>
 	
 </tr>
@@ -62,20 +87,20 @@
 	  <th width="15%">Cost</th>
 	</tr>
 	
-	<?php if(isset($requisitionItems) && count($requisitionItems) > 0){
+	<?php if(isset($requisition['items']) && count($requisition['items']) > 0){
 			$count = 1;
 			$unitRate = 0;
 			$totalAmount = 0;
-			foreach($requisitionItems as $quote){ ?>
+			foreach($requisition['items'] as $item){ ?>
 			<tr>
 				<td><?php echo $count;?></td>
-				<td><?php echo $quote['unit'];?></td>
-				<td><?php echo $quote['quantity'];?></td>
-				<td><?php echo $quote['unit_price'];?></td>
-				<td><?php echo $quote['item_desc'];?></td>
+				<td><?php echo $item['unit'];?></td>
+				<td><?php echo $item['quantity'];?></td>
+				<td><?php echo $item['rfq_rate'];?></td>
+				<td><?php echo $item['item_desc'];?></td>
 				
 				<?php
-					$amount = ($quote['quantity'] * $quote['unit_price']);
+					$amount = ($item['quantity'] * $item['rfq_rate']);
 					$totalAmount += $amount;
 				?>
 				<td><?php echo $amount;?></td>
@@ -103,8 +128,8 @@
 		</td>
 	</tr>
 	<tr>
-		<td style="width:40%"> Prepared By: Procuremnt Section:</td>
-		<td style="border-bottom: solid 1px;"> &nbsp; </td>
+		<td style="width:40%"> Prepared By: Procurement Section:</td>
+		<td style="border-bottom: solid 1px;">&nbsp;  </td>
 	</tr>
   </table>
   

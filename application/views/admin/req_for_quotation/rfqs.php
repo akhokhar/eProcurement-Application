@@ -79,7 +79,7 @@
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <i class="fa fa-external-link-square"></i>
-                            Quotation(s)
+                            RFQ(s)
                             
                         </div>
                         <div class="panel-body">
@@ -90,9 +90,11 @@
                             <table class="table table-striped table-bordered table-hover" id="rfq_table">
                                 <thead>
                                     <tr>
+                                        <th class="center">S.no.</th>
                                         <th class="center">Rfq #</th>
                                         <th class="center">Rfq Date</th>
                                         <th class="center">Rfq Due Date</th>
+                                        <th class="center">Status</th>
                                         <th class="center">Action</th>
                                     </tr>
                                 </thead>
@@ -193,6 +195,8 @@
                 //{ "orderable": false, "targets": 4 },
             ],
             "columns": [
+                null,
+                null,
                 null,
                 null,
                 null,

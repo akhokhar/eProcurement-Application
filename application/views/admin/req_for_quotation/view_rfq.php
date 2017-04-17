@@ -98,10 +98,10 @@
                               <td>Due Date</td>
                               <td><?php echo date('d-m-Y', strtotime($quotation['due_date'])); ?></td>
                             </tr>
-                            <tr>
+                            <?php /*?><tr>
                               <td>Unit Rate</td>
                               <td><?php echo $quotation['unit_rate']; ?></td>
-                            </tr>
+                            </tr><?php */?>
                             <tr>
                               <td>Vendor</td>
                               <td>
@@ -130,7 +130,7 @@
                             </a>
 						  <?php }
 						  else if ($quotation['status'] == $this->config->item('receivedFlag')) { ?>             
-                            <a href="<?php echo base_url()?>admin/comparative_quotation/add/<?php echo $quotation['rfq_id'];?>/<?php echo $this->config->item('receivedFlag');?>">
+                            <a href="<?php echo base_url()?>admin/comparative_quotation/add/<?php echo $quotation['rfq_id'];?>/">
                               <button type="button" class="btn btn-success pull-right">Add to Comparative</button>
                             </a>
 						  <?php } ?>

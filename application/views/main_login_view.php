@@ -17,7 +17,7 @@
     <!-- start: BODY -->
     <body class="login example2">
         <div class="main-login col-sm-4 col-sm-offset-4">
-            <div class="logo"><?php echo $this->config->item('login_logo'); ?></div>
+            <div class="logo"><img src="<?php echo $base_url . $this->config->item('login_logo'); ?>" alt="<?php echo $this->config->item('site_name'); ?>" /></div>
             <!-- start: Success and error message -->
             <?php if (!empty($message)) { ?>
                 <div id="message">

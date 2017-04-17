@@ -184,6 +184,8 @@ class Grn extends CI_Controller {
 		$grnData = $this->Grn_model->get_grn(array('grn.grn_id'), array($grn_id));
 		$grn = $grnData[0];
 		
+		$grnItems = $this->Grn_model->get_grn_items(array('gid.grn_id'), array($grn_id));
+		
 		$orderData = $this->Purchase_model->get_orders(array('po_id'), array($grn['purchase_order_id']));
 		$order = $orderData[0];
 		
@@ -193,16 +195,25 @@ class Grn extends CI_Controller {
 		$requisitionData = $this->Requisition_model->get_requisition(array('r.requisition_id', 'r.status'), array($quotation['requisition_id'], $this->config->item('sentFlag') ));
 		$requisition = $requisitionData[0];
 		
-		$requisitionItems = $this->Requisition_model->get_requisition_items($quotation['requisition_id']);
+		//$requisitionItems = $this->Requisition_model->get_requisition_items($quotation['requisition_id']);
 		
+		foreach ($grnItems as $grnItem) {
+			$data['grnItems'][$grnItem['requisition_item_id']] = $grnItem;
+		}
+		
+		foreach ($requisition['items'] as $key => $item) {
+			$rfq_rate = $this->Quotation_model->get_rfq_vender_items($item['requisition_item_id'], $order['vendor_id']);			
+			$requisition['items'][$key]['rfq_rate'] = $rfq_rate[0]['unit_rate'];
+		}
+		
+		$data['grn'] = $grn;
 		$data['order'] = $order;
 		$data['quotation'] = $quotation;
 		$data['requisition'] = $requisition;
-		$data['requisitionItems'] = $requisitionItems;
-		
+		//$data['requisitionItems'] = $requisitionItems;
 		//echo "<pre>";
 		//print_r($data);
-		
+		//die();
 		$html = $this->load->view('admin/grn/grn_report', $data, true);
 		
 		//this the the PDF filename that user will get to download

@@ -64,7 +64,7 @@
                     <?php } ?>
                     <!-- end: Success and error message -->
                     <div class="page-header row">
-                        <h1 class="col-sm-6">View all Quotations</h1>
+                        <h1 class="col-sm-6">View all Comparative (Quotations)</h1>
                         
                     </div>
                     <!-- end: PAGE TITLE & BREADCRUMB -->
@@ -79,7 +79,7 @@
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <i class="fa fa-external-link-square"></i>
-                            Quotation(s)
+                            Comparative(s)
                             
                         </div>
                         <div class="panel-body">
@@ -90,9 +90,11 @@
                             <table class="table table-striped table-bordered table-hover" id="rfq_table">
                                 <thead>
                                     <tr>
+                                        <th class="center">S.No.</th>
                                         <th class="center">Rfq #</th>
                                         <th class="center">Rfq Date</th>
                                         <th class="center">Rfq Due Date</th>
+                                        <th class="center">Vendor(s)</th>
                                         <th class="center">Action</th>
                                     </tr>
                                 </thead>
@@ -193,6 +195,8 @@
                 //{ "orderable": false, "targets": 4 },
             ],
             "columns": [
+                null,
+                null,
                 null,
                 null,
                 null,

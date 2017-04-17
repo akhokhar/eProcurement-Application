@@ -128,16 +128,17 @@
                                                         </div>
                                                     </div>
                                                     <div class="form-group">
-                                                      <label for="refNumber">Ref#</label>
+                                                      <label for="req_num">Ref#</label>
                                                          <?php
+														  $req_num = $req_num ? $req_num : set_value('req_num');
                                                           $input_data = array(
-                                                                    'type'          => 'number',
-                                                                    'name'          => 'refNumber',
-                                                                    'id'            => 'refNumber',
-																	'disabled'	  => true,
-                                                                    'value'         => set_value('refNumber'),
+                                                                    'type'          => 'text',
+                                                                    'name'          => 'req_num',
+                                                                    'id'            => 'req_num',
+																	'readonly'	  => 'readonly',
+                                                                    'value'         => $req_num,
                                                                     'class'         => 'form-control',
-                                                                    'placeholder'   => '10-16-1'
+                                                                    'placeholder'   => $req_num
                                                           );
                                                           echo form_input($input_data);
                                                           ?>
@@ -639,6 +640,18 @@ $(function () {
     });
   }
   removeRowFromTable('#removeRow', '#itemsDataTable');
+  
+  $('#requisitionDate').on('change', function() {
+		$.ajax({
+			url: '<?php echo base_url(); ?>admin/requisition/get_requisition_num_detail',
+			type: 'GET',
+			data: {req_date: $(this).val(), echo: true},
+			success: function(data) {
+				$('#req_num').val(data);
+				$('#req_num').attr('placeholder', data);
+			}
+		});
+  });
 
   //data table
     /*$('#itemsDataTable').DataTable({

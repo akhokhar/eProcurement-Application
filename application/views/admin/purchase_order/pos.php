@@ -90,6 +90,7 @@
                             <table class="table table-striped table-bordered table-hover" id="order_table">
                                 <thead>
                                     <tr>
+                                        <th class="center">S.No.</th>
                                         <th class="center">Purchase Date</th>
                                         <th class="center">Description</th>
                                         <th class="center">Vendor</th>
@@ -192,6 +193,7 @@
                 //{ "orderable": false, "targets": 4 },
             ],
             "columns": [
+                null,
                 null,
                 null,
                 null,

@@ -190,21 +190,23 @@ class Purchase_Order extends CI_Controller {
 		$orderData = $this->Purchase_model->get_orders(array('po_id'), array($order_id));
 		$order = $orderData[0];
 		
-		$quotationData = $this->Quotation_model->get_rfq(array('rfq_id'), array($order['rfq_id']));
+		$quotationData = $this->Quotation_model->get_rfq(array('r.requisition_id'), array($order['requisition_id']));
 		$quotation = $quotationData[0];
 		
 		$requisitionData = $this->Requisition_model->get_requisition(array('r.requisition_id', 'r.status'), array($quotation['requisition_id'], $this->config->item('sentFlag') ));
 		$requisition = $requisitionData[0];
 		
-		$requisitionItems = $this->Requisition_model->get_requisition_items($quotation['requisition_id']);
+		foreach ($requisition['items'] as $key => $item) {
+			$rfq_rate = $this->Quotation_model->get_rfq_vender_items($item['requisition_item_id'], $order['vendor_id']);			
+			$requisition['items'][$key]['rfq_rate'] = $rfq_rate[0]['unit_rate'];
+		}
 		
 		$data['order'] = $order;
 		$data['quotation'] = $quotation;
 		$data['requisition'] = $requisition;
-		$data['requisitionItems'] = $requisitionItems;
 		
 		//echo "<pre>";
-		//print_r($data);
+		//print_r($data);die();
 		
 		$html = $this->load->view('admin/purchase_order/order', $data, true);
 		

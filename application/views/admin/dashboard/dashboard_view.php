@@ -60,7 +60,75 @@
             
             <!-- start: PAGE CONTENT -->
             <div class="row">
-                
+                <div class="col-sm-12">
+                    <div class="row space12">
+                        <ul class="mini-stats col-sm-12">
+                            <li class="col-sm-4">
+                                <div class="sparkline_bar_good">
+                                    <span><canvas width="41" height="24" style="display: inline-block; width: 41px; height: 24px; vertical-align: top;"></canvas></span><!--+10%-->
+                                </div>
+                                <div class="values">
+                                    <strong><?php echo $requisition_count; ?></strong>
+                                    Requisitions
+                                </div>
+                            </li>
+                            <li class="col-sm-4">
+                                <div class="sparkline_bar_neutral">
+                                    <span><canvas width="47" height="24" style="display: inline-block; width: 47px; height: 24px; vertical-align: top;"></canvas></span>
+                                </div>
+                                <div class="values">
+                                    <strong><?php echo $rfq_count; ?></strong>
+                                    Request for Quotations (RFQs)
+                                </div>
+                            </li>
+                            <li class="col-sm-4">
+                                <div class="sparkline_bar_bad">
+                                    <span><canvas width="41" height="24" style="display: inline-block; width: 41px; height: 24px; vertical-align: top;"></canvas></span>
+                                </div>
+                                <div class="values">
+                                    <strong><?php echo $comparative_q_count; ?></strong>
+                                    Comparative (Quotations)
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="row space12">
+                        <ul class="mini-stats col-sm-12">
+                            <li class="col-sm-4">
+                                <div class="sparkline_bar_good">
+                                    <span><canvas width="41" height="24" style="display: inline-block; width: 41px; height: 24px; vertical-align: top;"></canvas></span>
+                                </div>
+                                <div class="values">
+                                    <strong><?php echo $po_count; ?></strong>
+                                    Purchase Orders
+                                </div>
+                            </li>
+                            <li class="col-sm-4">
+                                <div class="sparkline_bar_neutral">
+                                    <span><canvas width="47" height="24" style="display: inline-block; width: 47px; height: 24px; vertical-align: top;"></canvas></span>
+                                </div>
+                                <div class="values">
+                                    <strong><?php echo $grn_count; ?></strong>
+                                    Goods / Services Receiving Notes
+                                </div>
+                            </li>
+                            <li class="col-sm-4">
+                                <div class="sparkline_bar_bad">
+                                    <span><canvas width="41" height="24" style="display: inline-block; width: 41px; height: 24px; vertical-align: top;"></canvas></span>
+                                </div>
+                                <div class="values">
+                                    <strong><?php echo $pr_count; ?></strong>
+                                    Payment Requests
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
             </div>
             
         </div>

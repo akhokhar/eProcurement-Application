@@ -1,3 +1,39 @@
+<style type="text/css">
+	table {
+		font-family:Arial, Helvetica, sans-serif;
+	}
+</style>
+<table border="0" style="width: 100%;">
+<tr>
+    <td colspan="3" style="text-align: center; width: 100%;">
+    	<h2>REQUEST FOR QUOTATION</h2>
+    </td>
+</tr>
+<tr>
+    <td style="width: 30%;">
+    	To,<br />
+        _______________________________<br /><br />
+        _______________________________<br /><br />
+        _______________________________
+    </td>
+	<td style="width: 45%;">&nbsp;</td>
+    <td style="width: 25%; vertical-align:top;">
+		<img src="<?php echo $base_url . $this->config->item('logo'); ?>" alt="<?php echo $this->config->item('site_name'); ?>" width="100px;" />
+    	<table border="0" style="border: 2px solid #000; margin-top: 20px;">
+        	<tr>
+                <td style="border: 2px solid #000;">RFQ# <?php echo $quotation['rfq_num']; ?></td>
+        	</tr>
+            <tr>
+                <td style="border: 2px solid #000;">&nbsp;</td>
+        	</tr>
+            <tr>
+            	<td style="border: 2px solid #000;">Date: <?php echo date('d/m/Y', strtotime($requisition['date_req'])); ?></td>
+        	</tr>
+        </table>
+    </td>
+</tr>
+</table>
+
 <table border="0" style="width: 100%;">
 <tr>
 	<td>
@@ -25,8 +61,6 @@
 	</tr>
 	<?php if(isset($requisitionItems) && count($requisitionItems) > 0){
 			$count = 1;
-			$unitRate = 0;
-			$totalAmount = 0;
 			foreach($requisitionItems as $quote){ ?>
 			<tr>
 				<td><?php echo $count;?></td>
@@ -34,18 +68,14 @@
 				<td><?php echo $quote['item_desc'];?></td>
 				<td><?php echo $quote['unit'];?></td>
 				<td><?php echo $quote['quantity'];?></td>
-				
-				<?php $unitRate += $quote['unit_price'];?>
-				<td><?php echo $quote['unit_price'];?></td>
-				
-				<?php $totalAmount += ($quote['quantity'] * $quote['unit_price']);?>
-				<td><?php echo ($quote['quantity'] * $quote['unit_price']);?></td>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
 			</tr>
 			<?php $count++; } ?>
 			<tr>
 				<td colspan="5" align="center">Total</td>
-				<td><?php echo $unitRate;?></td>
-				<td><?php echo $totalAmount;?></td>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
 			</tr>
 		<?php } ?>
   </table>

@@ -70,6 +70,9 @@ class Payment_Request extends CI_Controller {
         $check_slash = ($check_slash == "/")?$this->data['sub_menu']:$this->data['sub_menu']."/";
         $check_slash = str_replace("//","/",$check_slash);
 
+		$this->load->model('admin/grn_model');
+		$this->load->model('admin/payment_model');
+		$this->load->model('admin/purchase_model');
 		$this->load->model('admin/requisition_model');
 		$this->load->model('admin/quotation_model');
 		$this->load->model('admin/general_model');
@@ -99,7 +102,7 @@ class Payment_Request extends CI_Controller {
         // Check user has privileges to view product, else display a message to notify the user they do not have valid privileges.
         if (! $this->flexi_auth->is_privileged($this->uri_privileged))
         {
-                $this->session->set_flashdata('message', '<p class="error_msg">You do not have access privileges to view requisitions.</p>');
+                $this->session->set_flashdata('message', '<p class="error_msg">You do not have access privileges to view payment requests.</p>');
                 if($this->flexi_auth->is_admin())
                     redirect('auth_admin');
                 else
@@ -111,23 +114,17 @@ class Payment_Request extends CI_Controller {
         $this->data['message'] = $this->session->flashdata('message');
         
         // unshift crumb
-        $this->breadcrumbs->unshift('Requisitions', base_url().'admin/requisition');
+        $this->breadcrumbs->unshift('Payment Requests', base_url().'admin/payment_request');
         
         
-        $btn_array["Add"]["action"] = "admin/requisition/add/";
+        $btn_array["Add"]["action"] = "admin/payment_request/add/";
         //$btn_array["checkbox_disabled"]["action"] = "admin/product/delete_checked_checkbox/";
         $add_category = $this->menu_model->get_privilege_name($btn_array);
         
-        $this->data['page_title'] = 'List Requisitions';
+        $this->data['page_title'] = 'List Payment Requests';
 		
-		$this->requisition_model->get_requisition();
-		
-		$this->data['projects'] = $this->general_model->list_projects();
-		$this->data['locations'] = $this->general_model->list_locations();
-		$this->data['donors'] = $this->general_model->list_donors();
-        
         $this->load->view('admin/includes/header', $this->data);
-        $this->load->view('admin/comparative_quotation/comparatives', $this->data);
+        $this->load->view('admin/payment_request/pr', $this->data);
         
     }
     /*---- end: index function ----*/
@@ -138,52 +135,62 @@ class Payment_Request extends CI_Controller {
     | start: add function
     |------------------------------------------------
     |
-    | This function add new requisition
+    | This function add new
     |
    */
-    function add($rfq_id) {
-        
+    function add($grn_id) {
         		
 		if($this->input->post()) {
-			
-			foreach($_POST['item'] as $count => $item){
-				foreach($_POST['unit'][$count] as $vendor => $rate){
-					$this->quotation_model->add_comparative($rfq_id, $vendor, $item, $rate);
-				}
-			}
-			redirect('admin/rfq');
+			$this->payment_model->add_payment_request($grn_id);
+			redirect('admin/payment_request');
 		}
 		
-		$this->load->model('Requisition_model');
 		// Set Flash Message
         $this->data['message'] = $this->session->flashdata('message');
         
         // unshift crumb
-        $this->breadcrumbs->unshift('Quotations', base_url().'admin/rfq');
+        $this->breadcrumbs->unshift('Payment Request', base_url().'admin/payment_request');
         
         
         $btn_array["Add"]["action"] = "";
         //$btn_array["checkbox_disabled"]["action"] = "admin/product/delete_checked_checkbox/";
         $add_category = $this->menu_model->get_privilege_name($btn_array);
 		
-		$quotation = $this->quotation_model->get_rfq(array('r.rfq_id'), array($rfq_id));
-		$quotation = $quotation[0];
-		$this->data['quotation'] = $quotation;
 		
-		$requisition = $this->requisition_model->get_requisition(array('r.requisition_id'), $quotation['requisition_id']);
-		$this->data['requisition'] = $requisition[0];
+		$grnData = $this->grn_model->get_grn(array('grn.grn_id'), array($grn_id));
+		$grn = $grnData[0];
 		
-		$this->data['requisitionItems'] = $this->requisition_model->get_requisition_items($quotation['requisition_id']);
+		$grnItems = $this->grn_model->get_grn_items(array('gid.grn_id'), array($grn_id));
 		
-		$this->data['rfqVendors'] = $this->quotation_model->get_rfq(array('r.requisition_id'), array($quotation['requisition_id']));
+		$orderData = $this->purchase_model->get_orders(array('po_id'), array($grn['purchase_order_id']));
+		$order = $orderData[0];
 		
-		$this->data['page_title'] = 'Add Purchase Order';
+		$quotationData = $this->quotation_model->get_rfq(array('rfq_id'), array($order['rfq_id']));
+		$quotation = $quotationData[0];
 		
-		$vendor_ids = explode(',', $quotation['vendor_id']);
-		foreach($vendor_ids as $vendor_id) {
-			$vendors[] = $this->general_model->list_vendors(false, array('vendor_id'), array($vendor_id));
+		$requisitionData = $this->requisition_model->get_requisition(array('r.requisition_id', 'r.status'), array($quotation['requisition_id'], $this->config->item('sentFlag') ));
+		$requisition = $requisitionData[0];
+		
+		//$requisitionItems = $this->Requisition_model->get_requisition_items($quotation['requisition_id']);
+		
+		foreach ($grnItems as $grnItem) {
+			$data['grnItems'][$grnItem['requisition_item_id']] = $grnItem;
 		}
-        $this->data['vendors'] = $vendors;
+		
+		foreach ($requisition['items'] as $key => $item) {
+			$rfq_rate = $this->quotation_model->get_rfq_vender_items($item['requisition_item_id'], $order['vendor_id']);			
+			$requisition['items'][$key]['rfq_rate'] = $rfq_rate[0]['unit_rate'];
+		}
+		
+		
+		$this->data['grn'] = $grn;
+		$this->data['grnItems'] = $data['grnItems'];
+		$this->data['order'] = $order;
+		$this->data['quotation'] = $quotation;
+		$this->data['requisition'] = $requisition;
+		
+		$this->data['page_title'] = 'Add Payment Request';
+
         $this->load->view('admin/includes/header', $this->data);
         $this->load->view('admin/payment_request/add_new_pr', $this->data);
 		
@@ -199,70 +206,6 @@ class Payment_Request extends CI_Controller {
     | This function update requisition
     |
    */
-    function edit($requisition_id) {
-        
-        // Check user has privileges to edit requisition, else display a message to notify the user they do not have valid privileges.
-        if (! $this->flexi_auth->is_privileged($this->uri_privileged))
-        {
-                $this->session->set_flashdata('message', '<p class="error_msg">You do not have access privileges to edit requisition.</p>');
-                redirect('admin/requisition');
-        }
-        
-        // active menu
-        $this->data['sub_menu'] = $this->data['uri_1'].'/requisition/';
-        
-        // start: add breadcrumbs
-        $this->breadcrumbs->push('Edit Requisition', base_url().'admin/requisition/edit');
-        
-        // unshift crumb
-        $this->breadcrumbs->unshift('Catalog', base_url().'admin/requisition');
-        
-        if($this->input->post()) {
-            
-            //echo '<pre>'; print_r($this->input->post()); die();
-            
-            // load validation helper
-            $this->load->library('form_validation');
-            
-            $this->form_validation->set_rules('requisitionDate', 'Requisition Date', 'required');
-            $this->form_validation->set_rules('requiredUntilDate', 'Required Until Date', 'required');
-            $this->form_validation->set_rules('project', 'Project', 'required');
-            $this->form_validation->set_rules('budgetHead', 'Budget Head', 'required');
-            $this->form_validation->set_rules('location', 'Location', 'required');
-            $this->form_validation->set_rules('donor', 'Donor', 'required');
-            $this->form_validation->set_rules('approvingAuthority', 'Approving Authority', 'required');
-            
-            if ($this->form_validation->run()) {
-                
-                if($this->requisition_model->edit_requisition($requisition_id)) {
-                    //echo '<pre>'; print_r($this->input->post()); die();
-                    $this->session->set_flashdata('message', '<p class="status_msg">Requisition updated successfully.</p>');
-                    redirect('admin/requisition/view_requisition_detail/'.$requisition_id);
-                }
-                
-            }
-            
-        }
-        
-        // ************************************
-        // start: get requisition by id
-        // ************************************
-        $db_where_column    = array('requisition_id');
-        $db_where_value     = array($requisition_id);
-        
-        $this->data['requisition'] = $this->requisition_model->get_requisition($db_where_column, $db_where_value);
-        $this->data['requisition'] = $this->data['requisition'][0];
-        
-		
-        $this->data['currentPage'] = $this;
-
-        $this->data['page_title'] = 'Update Requisition';
-        
-        $this->load->view('admin/includes/header', $this->data);
-        $this->load->view('admin/requisition/edit_requisition', $this->data);
-        
-    }
-    /*---- end: edit_requisition function ----*/
     
 	function view_all() {
 		$this->index();
@@ -312,195 +255,58 @@ class Payment_Request extends CI_Controller {
 	}
 	
 	
-	
-	public function generate_comparative($rfq_id){
+	function generate_pr_pdf($pr_id){
 		
-		$this->load->model('Requisition_model');
+		$prData = $this->payment_model->get_prs(array('pr.pr_id'), array($pr_id));
+		$pr = $prData[0];
 		
-		$quotationData = $this->quotation_model->get_rfq(array('rfq_id'), array($rfq_id));
+		$grnData = $this->grn_model->get_grn(array('grn.grn_id'), array($grn_id));
+		$grn = $grnData[0];
+		
+		$grnItems = $this->grn_model->get_grn_items(array('gid.grn_id'), array($grn_id));
+		
+		$orderData = $this->purchase_model->get_orders(array('po_id'), array($grn['purchase_order_id']));
+		$order = $orderData[0];
+		
+		$quotationData = $this->quotation_model->get_rfq(array('rfq_id'), array($order['rfq_id']));
 		$quotation = $quotationData[0];
 		
-		
-		$rfqVendorItemDetails = $this->quotation_model->get_rfq_vender_items($rfq_id);
-		$this->data['rfqVendorItemDetails'] = $rfqVendorItemDetails;
-		
-		$requisitionData = $this->requisition_model->get_requisition(array('r.requisition_id'), array($quotation['requisition_id']));
+		$requisitionData = $this->requisition_model->get_requisition(array('r.requisition_id', 'r.status'), array($quotation['requisition_id'], $this->config->item('sentFlag') ));
 		$requisition = $requisitionData[0];
 		
-		$requisitionItems = $this->requisition_model->get_requisition_items($quotation['requisition_id']);
+		//$requisitionItems = $this->Requisition_model->get_requisition_items($quotation['requisition_id']);
 		
-		// Create Object of PHP Excel
-		$objPHPExcel = new PHPExcel();
-		$objPHPExcel->setActiveSheetIndex(0);
-		
-		$styleArray = array(
-		'font'  => array(
-			'bold'  => true,
-			'size'  => 16,
-			'name'  => 'Calibri'
-		));
-		$styleArray2 = array(
-		'font'  => array(
-			'bold'  => true,
-			'size'  => 14,
-			'name'  => 'Calibri'
-		));
-		$styleArray3 = array(
-		'font'  => array(
-			'size'  => 14,
-			'name'  => 'Calibri'
-		));
-		$styleArray4 = array(
-			'font'  => array(
-				'size'  => 11,
-				'name'  => 'Calibri'
-			),
-			'borders' => array(
-			  'allborders' => array(
-				  'style' => PHPExcel_Style_Border::BORDER_THIN,
-				  )
-			 ),
-		);
-		
-		$styleArray5 = array(
-			'font'  => array(
-				'bold'  => true,
-				'size'  => 11,
-				'name'  => 'Calibri'
-			),
-			'fill' => array(
-				'type' 	=> PHPExcel_Style_Fill::FILL_SOLID,
-				'color' => array('rgb' => 'FF0000')
-			)
-		);
-		
-		// 1st two lines
-		$objPHPExcel->getActiveSheet()->SetCellValue('A1', 'Research and Development Foundation');
-		$objPHPExcel->getActiveSheet()->getStyle('A1')->applyFromArray($styleArray);
-		$objPHPExcel->getActiveSheet()->SetCellValue('A2', 'Supplier Quotations Evaluation');
-		$objPHPExcel->getActiveSheet()->getStyle('A2')->applyFromArray($styleArray2);
-		
-		// Project Details
-		$objPHPExcel->getActiveSheet()->SetCellValue('A3', 'Project Detail');
-		$objPHPExcel->getActiveSheet()->getStyle('A3')->applyFromArray($styleArray3);
-		$objPHPExcel->getActiveSheet()->mergeCells('C3:H3');
-		$objPHPExcel->getActiveSheet()->SetCellValue('C3', $requisition['description']);
-		$objPHPExcel->getActiveSheet()->mergeCells('I3:J3');
-		$objPHPExcel->getActiveSheet()->SetCellValue('I3', 'Date of Joining');
-		$joiningDate = date("d/m/Y", strtotime($requisition['date_req']));
-		$objPHPExcel->getActiveSheet()->SetCellValue('K3', $joiningDate );
-		
-		$objPHPExcel->getActiveSheet()->SetCellValue('A4', 'Requisition No');
-		$objPHPExcel->getActiveSheet()->getStyle('A4')->applyFromArray($styleArray3);
-		$objPHPExcel->getActiveSheet()->SetCellValue('C4', $requisition['requisition_num']);
-		$objPHPExcel->getActiveSheet()->SetCellValue('D4', 'PR Date');
-		$joiningDate = date("d/m/Y", strtotime($requisition['date_req']));
-		$objPHPExcel->getActiveSheet()->SetCellValue('E4', $joiningDate );
-		
-		$objPHPExcel->getActiveSheet()->SetCellValue('F4', 'RFQ Ref#:');
-		//$objPHPExcel->getActiveSheet()->getStyle('F4','G4','I4','K4')->applyFromArray($styleArray4);
-		$objPHPExcel->getActiveSheet()->SetCellValue('G4', $quotation['rfq_num']);
-		//$objPHPExcel->getActiveSheet()->getStyle('G4')->applyFromArray($styleArray4);
-		$objPHPExcel->getActiveSheet()->SetCellValue('I4', 'RFQ Date');
-		//$objPHPExcel->getActiveSheet()->getStyle('I4')->applyFromArray($styleArray4);
-		$rfqDate = date("d/m/Y", strtotime($quotation['rfq_date']));
-		$objPHPExcel->getActiveSheet()->SetCellValue('K4', $rfqDate);
-		//$objPHPExcel->getActiveSheet()->getStyle('K4')->applyFromArray($styleArray4);
-		$objPHPExcel->getActiveSheet()->getStyle('F4','G4','I4','K4')->applyFromArray($styleArray4);
-		
-		$objPHPExcel->getActiveSheet()->SetCellValue('A5', 'Purchasing Detail');
-		$objPHPExcel->getActiveSheet()->getStyle('A5')->applyFromArray($styleArray3);
-		$objPHPExcel->getActiveSheet()->mergeCells('C5:K5');
-		$objPHPExcel->getActiveSheet()->SetCellValue('C5', $requisition['description']);
-		$objPHPExcel->getActiveSheet()->getStyle('C5')->applyFromArray($styleArray4);
-		
-		// Items Heading
-		$objPHPExcel->getActiveSheet()->SetCellValue('A7', 'S.No');
-		$objPHPExcel->getActiveSheet()->SetCellValue('B7', 'Item Name');
-		$objPHPExcel->getActiveSheet()->SetCellValue('C7', 'Item Description');
-		$objPHPExcel->getActiveSheet()->SetCellValue('D7', 'Unit');
-		$objPHPExcel->getActiveSheet()->SetCellValue('E7', 'Quantity Required');
-		$objPHPExcel->getActiveSheet()->getStyle('A7:E7')->applyFromArray($styleArray5);
-		
-		$vendors = $this->quotation_model->get_rfq_vender_items($requisitionItems[0]['requisition_item_id']);
-		//65-90 A-Z
-		//69E
-		$vCount = 1;
-		$unitColNo = 70;
-		$amountColNO = $unitColNo+1;
-		foreach($vendors as $vendor){
-				if($vCount == 1){
-					$unitcolumn = chr($unitColNo);
-				} else{
-					$unitColNo = $amountColNO+1;
-					$unitcolumn = chr($unitColNo);
-				}
-				$amountColNO = $unitColNo+1;
-				$amountColumn = chr($amountColNO);
-			
-			$ucCol = $unitcolumn."7";
-			$amCol = $amountColumn."7";
-			//echo $ucCol." ".$amCol." ";
-			
-			$objPHPExcel->getActiveSheet()->mergeCells("$ucCol:$amCol");
-			$objPHPExcel->getActiveSheet()->SetCellValue($ucCol, $vendor['vendor_name']);
-			$objPHPExcel->getActiveSheet()->getStyle($ucCol)->applyFromArray($styleArray5);
-			//$objPHPExcel->getActiveSheet()->getStyle($ucCol)->applyFromArray($styleArray5);
-			//$objPHPExcel->getActiveSheet()->SetCellValue($amCol, 'Amount');
-			//$objPHPExcel->getActiveSheet()->getStyle($amCol)->applyFromArray($styleArray5);
-			
-			$vCount++;
+		foreach ($grnItems as $grnItem) {
+			$data['grnItems'][$grnItem['requisition_item_id']] = $grnItem;
 		}
 		
-		
-		// Set Items Data against each vendor
-		$srNo = 1;
-		$startingRow = 8;
-		foreach($requisitionItems as $rfqItem){
-			$objPHPExcel->getActiveSheet()->SetCellValue("A$startingRow", $srNo);
-			$objPHPExcel->getActiveSheet()->SetCellValue("B$startingRow", $rfqItem['item_name']);
-			$objPHPExcel->getActiveSheet()->SetCellValue("C$startingRow", $rfqItem['item_desc']);
-			$objPHPExcel->getActiveSheet()->SetCellValue("D$startingRow", $rfqItem['unit']);
-			$objPHPExcel->getActiveSheet()->SetCellValue("E$startingRow", $rfqItem['quantity']);
-			$vendors = $this->quotation_model->get_rfq_vender_items($rfqItem['requisition_item_id']);
-			//65-90 A-Z
-			//69E
-			$vCount = 1;
-			$unitColNo = 70;
-			$amountColNO = $unitColNo+1;
-			foreach($vendors as $vendor){
-					if($vCount == 1){
-						$unitcolumn = chr($unitColNo);
-					} else{
-						$unitColNo = $amountColNO+1;
-						$unitcolumn = chr($unitColNo);
-					}
-					$amountColNO = $unitColNo+1;
-					$amountColumn = chr($amountColNO);
-				
-				$amount = ($rfqItem['quantity'] * $vendor['unit_rate']);
-				$objPHPExcel->getActiveSheet()->SetCellValue("$unitcolumn$startingRow", $vendor['unit_rate']);
-				$objPHPExcel->getActiveSheet()->SetCellValue("$amountColumn$startingRow", $amount);
-				
-				$vCount++;
-			}
-			$srNo++;
-			$startingRow++;
+		foreach ($requisition['items'] as $key => $item) {
+			$rfq_rate = $this->quotation_model->get_rfq_vender_items($item['requisition_item_id'], $order['vendor_id']);			
+			$requisition['items'][$key]['rfq_rate'] = $rfq_rate[0]['unit_rate'];
 		}
 		
-		//foreach($rfqVendorItemDetails as $rfqItem){
-		//	print_r($rfqItem);
-		//}exit;
+		$data['pr'] = $pr;
+		$data['grn'] = $grn;
+		$data['order'] = $order;
+		$data['quotation'] = $quotation;
+		$data['requisition'] = $requisition;
+		//$data['requisitionItems'] = $requisitionItems;
+		//echo "<pre>";
+		//print_r($data);
+		//die();
+		$html = $this->load->view('admin/payment_request/pr_report', $data, true);
 		
-		//$objPHPExcel->getActiveSheet()->SetCellValue('E7', 'Quantity Required');
-		
-		$objWriter = new PHPExcel_Writer_Excel2007($objPHPExcel);
-		
-		// We'll be outputting an excel file
-		header('Content-type: application/vnd.ms-excel');
-		// It will be called file.xls
-		header('Content-Disposition: attachment; filename="comparative.xlsx"');
-		$objWriter->save('php://output');
+		//this the the PDF filename that user will get to download
+		$pdfFilePath = "Payment_Request_report.pdf";
 
+		//load mPDF library
+		$this->load->library('m_pdf');
+		//actually, you can pass mPDF parameter on this load() function
+		$pdf = $this->m_pdf->load($html);
+		//generate the PDF!
+		$pdf->WriteHTML($html);
+		//offer it to user via browser download! (The PDF won't be saved on your server HDD)
+		$pdf->Output($pdfFilePath, "D");
+		
 	}
 }

@@ -27,8 +27,8 @@
                     <!-- start: LOGO -->                   
                     <div class="logo_img">
                         <a class="navbar-brand" href="<?php echo $base_url . 'auth_admin/'; ?>">
-                            <!--<img src="<?php echo $this->config->item('logo'); ?>">-->
-                            <img src="<?php echo $base_url . 'upload/' . $this->session->userdata('header_image') . '?' . time(); ?>">
+                            <img src="<?php echo $base_url . $this->config->item('logo'); ?>">
+                            <!--<img src="<?php echo $base_url . 'upload/' . $this->session->userdata('header_image') . '?' . time(); ?>">-->
                         </a>
                     </div>
                     <!-- end: LOGO -->
@@ -39,7 +39,7 @@
                         <!-- start: USER DROPDOWN -->
                         <li class="dropdown current-user">
                             <a data-toggle="dropdown" data-hover="dropdown" class="dropdown-toggle" data-close-others="true" href="#">
-                                <img src="<?php echo $includes_dir; ?>admin/images/avatar-1-small.jpg" class="circle-img" alt="">
+                                <img src="<?php echo $includes_dir; ?>admin/images/avatar-1.png" width="40" class="circle-img" alt="">
                                 <span class="username"><?php echo $user_name; ?></span>
                                 <i class="clip-chevron-down"></i>
                             </a>

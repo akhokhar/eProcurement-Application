@@ -14,10 +14,9 @@ class Quotation_model extends CI_Model {
         
         $rfq   = $this->input->post();
         $user_id    = $this->flexi_auth->get_user_id();
-		$rfqNum = '1-10-17';
-        
+		
         $data = array(
-				'rfq_num'			  		=> $rfqNum,
+				'rfq_num'			  		=> $rfq['refNumber'],
 				'requisition_id'			=> $requisition_id,
                 'rfq_date'            	  	=> date("Y-m-d H:i:s", strtotime($rfq['rfqDate'])),
                 'due_date'            		=> date("Y-m-d H:i:s", strtotime($rfq['rfqDueDate'])),
@@ -130,11 +129,13 @@ class Quotation_model extends CI_Model {
                 $this->db->order_by($get_order['title'], $get_order['order_by']);
             } 
         }
-        
+		
+        $this->db->group_by('r.rfq_id');
+		
         //$this->db->where('r.status', 1);
-        $this->db->join('rfq_vendor rv', 'r.rfq_id = rv.rfq_id', 'LEFT');
-        $this->db->join('vendor v', 'rv.vendor_id = v.vendor_id', 'LEFT');
-        $this->db->join('requisition rq', 'r.requisition_id = rq.requisition_id', 'LEFT');
+        $this->db->join('rfq_vendor rv', 'r.rfq_id = rv.rfq_id', 'INNER');
+        $this->db->join('vendor v', 'rv.vendor_id = v.vendor_id', 'INNER');
+        $this->db->join('requisition rq', 'r.requisition_id = rq.requisition_id', 'INNER');
 		$result = $this->db->get('rfq r');
 		
         $data = array();
@@ -234,15 +235,19 @@ class Quotation_model extends CI_Model {
 		}
     }
 	
-	function get_rfq_vender_items($item_id) {
+	function get_rfq_vender_items($item_id, $vendor_id = 0) {
         
         $this->db->select('rvi.*, v.vendor_name');
         
+		if ($vendor_id > 0) {
+			$this->db->where('rvi.vendor_id', $vendor_id);
+		}
+		$this->db->where('rvi.requisition_item_id', $item_id);
+		
 		//$this->db->join('requisition_item ri', 'ri.requisition_item_id = rvi.requisition_item_id', 'LEFT');
         $this->db->join('vendor v', 'rvi.vendor_id = v.vendor_id', 'LEFT');
         $this->db->join('rfq r', 'r.rfq_id = rvi.rfq_id', 'LEFT');
 		
-		$this->db->where('rvi.requisition_item_id', $item_id);
         $result = $this->db->get('rfq_vender_item_details rvi');
 		
         $data = array();
@@ -329,10 +334,84 @@ class Quotation_model extends CI_Model {
             return FALSE;
         } else {
             $b = $this->db->trans_commit();
-            
+            $this->change_rfq_status($rfq_id, $this->config->item('addedComparative'));
             return TRUE;
         }
         
     }
 
+	function get_all_comparatives($db_where_column = null, $db_where_value = null, $db_where_column_or = null, $db_where_value_or = null, $db_limit = null, $db_order = null, $db_select_column = null) {
+        
+        if($db_select_column)
+            $this->db->select($db_select_column);
+        else
+            $this->db->select('r.*, GROUP_CONCAT(v.vendor_name) as vendor_name');
+
+        if($db_where_column_or) {
+            foreach($db_where_column_or as $key => $column) {
+                if (!empty($db_where_value_or[$key])) {
+                    $this->db->or_where($column, $db_where_value_or[$key]);
+                }
+            }
+        }
+        
+        if($db_where_column) {
+            foreach ($db_where_column as $key => $column) {
+                if ($db_where_value[$key]!="") {
+					if($column == "rfq_id"){ $column = "r.rfq_id"; }
+                    $this->db->where($column, $db_where_value[$key]);
+                }
+            }
+        }
+        
+        if ($db_limit) {
+            $this->db->limit($db_limit['limit'], $db_limit['pageStart']);
+        }
+        
+        if($db_order) {
+            foreach($db_order as $get_order) {
+                $this->db->order_by($get_order['title'], $get_order['order_by']);
+            } 
+        }
+        
+        $this->db->group_by('r.rfq_id');
+        $this->db->where('r.status', 5);
+        $this->db->join('rfq_vendor rv', 'rv.rfq_id = r.rfq_id', 'INNER');
+        $this->db->join('vendor v', 'v.vendor_id = rv.vendor_id', 'INNER');
+        $result = $this->db->get('rfq r');
+		
+        $data = array();
+        if($result->num_rows() > 0) {
+            $data = $result->result_array();
+            return $data;
+        }
+        else{
+            return FALSE;
+		}
+    }
+		/*---- start: get_requisition num details----*/
+    function get_rfq_num_detail($date_year = null, $date_month = null) {
+        
+        $this->db->select('MAX(r.rfq_num) as rfq_num');
+
+		$current_date = 'DATE()';
+		$date_year = !!$date_year ? $date_year : $current_date;
+		$date_month = !!$date_month ? $date_month : $current_date;
+        $this->db->where('YEAR(r.rfq_date)', $date_year);
+        $this->db->where('MONTH(r.rfq_date)', $date_month);
+		$this->db->group_by('YEAR(r.rfq_date)', 'MONTH(r.rfq_date)');
+		$result = $this->db->get('rfq r');
+		
+		if($result->num_rows() > 0) {
+            $data = array();
+            if($get_record = $result->result_array()) {
+                $data = $get_record[0]['rfq_num'];
+            }
+            return $data;
+        }
+        else{
+            return FALSE;
+		}
+    }
+    /*---- end: get_requisition num details----*/
 }

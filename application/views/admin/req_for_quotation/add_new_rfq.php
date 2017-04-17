@@ -115,14 +115,15 @@
                                                     <div class="form-group">
                                                       <label for="refNumber">Ref#</label>
                                                          <?php
+														 $req_num = $req_num ? $req_num : set_value('refNumber');
                                                           $input_data = array(
-                                                                    'type'          => 'number',
+                                                                    'type'          => 'text',
                                                                     'name'          => 'refNumber',
                                                                     'id'            => 'refNumber',
-																	'disabled'	  => true,
-                                                                    'value'         => set_value('refNumber'),
+																	'readonly'	  => 'readonly',
+                                                                    'value'         => $req_num,
                                                                     'class'         => 'form-control',
-                                                                    'placeholder'   => '10-16-1'
+                                                                    'placeholder'   => $req_num
                                                           );
                                                           echo form_input($input_data);
                                                           ?>
@@ -244,6 +245,20 @@ $(function () {
   $('.select2').select2({
     width: '100%'
   });
+  
+  
+  $('#rfqDate').on('change', function() {
+		$.ajax({
+			url: '<?php echo base_url(); ?>admin/rfq/get_rfq_num_detail',
+			type: 'GET',
+			data: {rfqDate: $(this).val(), echo: true},
+			success: function(data) {
+				$('#refNumber').val(data);
+				$('#refNumber').attr('placeholder', data);
+			}
+		});
+  });
+  
 });  
 </script>
 

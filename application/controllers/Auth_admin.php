@@ -62,7 +62,9 @@ class Auth_admin extends CI_Controller {
                 
                 $this->data['menu'] = $this->data['uri_1'];
 
-                
+                //Get General Model
+                $this->load->model('admin/general_model');
+				
                 // Get User Privilege 
                 $this->load->model('admin/menu_model');
                 $check_slash = substr($this->data['sub_menu'], -1);
@@ -182,6 +184,13 @@ class Auth_admin extends CI_Controller {
 		
 		// Check Privilege for current user for inner page
 		$user_privileges = $this->menu_model->get_privilege_name($btn_array);
+		
+		$this->data['requisition_count'] = $this->general_model->requisition_count();
+		$this->data['rfq_count'] = $this->general_model->rfq_count();
+		$this->data['comparative_q_count'] = $this->general_model->comparative_q_count();
+		$this->data['po_count'] = $this->general_model->po_count();
+		$this->data['grn_count'] = $this->general_model->grn_count();
+		$this->data['pr_count'] = $this->general_model->pr_count();
 		
 		if($this->config->item('flexi_theme')) {
 			$this->load->view('demo/admin_examples/dashboard_view', $this->data);

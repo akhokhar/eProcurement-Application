@@ -81,8 +81,8 @@
 											'data-required-error' => 'Select'
 								  );
 								  $approve_reject = array(
-											1	=>	'Approve',
-											2	=>	'Reject'
+											$this->config->item('activeFlag')	  =>	'Approve',
+											$this->config->item('inactiveFlag')	=>	'Reject'
 										);
 								  echo form_dropdown('approve_reject', $approve_reject, '', $dropdown_data);
                               ?>
@@ -92,7 +92,13 @@
                             <?php echo form_close(); ?>
                             <?php } ?>
                             
-                            <?php if ($requisition['is_approved'] == 1 && in_array($user_group, array("Master Admin", "Manager", "Logistics"))){ ?>
+                            <?php if ($requisition['is_approved'] != 0) { ?>
+                                <a href="<?php echo base_url()?>admin/requisition/generate_requisition_pdf/<?php echo $requisition_id;?>">
+                                  <button type="button" class="btn btn-primary pull-right">Download Requisition</button>
+                                </a>
+                            <?php } ?>
+                            
+                            <?php if ($requisition['is_approved'] == 1 && $requisition['status'] == $this->config->item('activeFlag') && in_array($user_group, array("Master Admin", "Manager", "Logistics"))){ ?>
                               <a href="<?php echo base_url(); ?>admin/rfq/add/<?php echo $requisition_id;?>" class="btn btn-primary pull-right">Request for Quotation</a> 
                             <?php } ?>
                          </div>
@@ -150,7 +156,7 @@
                               <td><?php echo $requisition['approving_authority']; ?></td>
                             </tr>
                             <tr>
-                              <td>Status</td>
+                              <td>Approval Status</td>
                               <td><?php 
 							  	if ($requisition['is_approved'] == 1) {
 									echo 'Approved';
@@ -160,6 +166,26 @@
 								}
 								else {
 									echo 'Not Approved';
+								}
+								?></td>
+                            </tr>
+                            <tr>
+                              <td>Status</td>
+                              <td><?php 
+							  	if ($requisition['status'] == $this->config->item('activeFlag')) {
+									echo 'Approved';
+								}
+								else if ($requisition['status'] == $this->config->item('inactiveFlag')) {
+									echo 'Rejected';
+								}
+								else if ($requisition['status'] == $this->config->item('sentFlag')) {
+									echo 'RFQ Created';
+								}
+								else if ($requisition['status'] == $this->config->item('receivedFlag')) {
+									echo 'Received';
+								}
+								else {
+									echo '-';
 								}
 								?></td>
                             </tr>

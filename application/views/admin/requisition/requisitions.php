@@ -81,7 +81,7 @@
             <!-- end: PAGE HEADER -->
             
             <!-- start: PAGE CONTENT -->
-            <div class="row">
+            <?php /*?><div class="row">
                 <div class="col-sm-12">
                     <!-- start: TEXT FIELDS PANEL -->
                     <div class="panel panel-default">
@@ -227,7 +227,7 @@
                     </div>
                     <!-- end: TEXT FIELDS PANEL -->
                 </div>
-            </div>
+            </div><?php */?>
             <!-- end: PAGE CONTENT-->
             
             
@@ -249,7 +249,7 @@
                             <table class="table table-striped table-bordered table-hover" id="requisition_table">
                                 <thead>
                                     <tr>
-                                        <th class="center">
+                                        <th class="center">S.no.
                                             <!--<div class="checkbox-table">
                                                 <label>
                                                     <input type="checkbox" class="flat-grey">
@@ -262,7 +262,7 @@
                                         <th class="center">Project</th>
                                         <th class="hidden-xs">Location</th>
                                         <th class="hidden-xs">Approving Authority</th>
-                                        <th class="center">Status</th>
+                                        <th class="center">Approving Status</th>
                                         <th class="center">Action</th>
                                     </tr>
                                 </thead>
