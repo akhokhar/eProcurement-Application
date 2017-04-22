@@ -120,6 +120,24 @@
                                                     </div>
 												</div>
                                                
+											   <div class="row">
+													<div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label for="category">
+                                                                Category <span class="symbol required"></span>
+                                                            </label>
+                                                            <?php
+															$dropdown_data = array(
+																'id'            	  	=> 'category',
+																'class'         	   	=> 'form-control select2',
+																'required'	  			=> 'required',
+																'data-required-error' 	=> 'Select a Category'
+                                                              );
+                                                              echo form_dropdown('category', $categories, '', $dropdown_data);
+															?>
+                                                        </div>
+                                                    </div>
+											   </div>
 											   
 												<div class="row">
 													<div class="col-md-12">

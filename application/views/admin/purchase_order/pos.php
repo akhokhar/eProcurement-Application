@@ -92,6 +92,7 @@
                                     <tr>
                                         <th class="center">S.No.</th>
                                         <th class="center">Purchase Date</th>
+                                        <th class="center">Delivery Date</th>
                                         <th class="center">Description</th>
                                         <th class="center">Vendor</th>
                                         <th class="center">Delivery Address</th>
@@ -198,6 +199,7 @@
                 null,
                 null,
                 null,
+                null,
                 null
             ],
             "pageLength": 20,
@@ -207,7 +209,7 @@
                 $(".group1").colorbox();
             }
         }).on( 'draw', function () {
-            $('tr td:nth-child(1), tr td:nth-child(2)').each(function (){
+            $('tr td:nth-child(1), tr td:nth-child(2), tr td:nth-child(3)').each(function (){
                   $(this).addClass('center');
             })
             

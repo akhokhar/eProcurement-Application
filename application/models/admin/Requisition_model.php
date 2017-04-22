@@ -14,21 +14,22 @@ class Requisition_model extends CI_Model {
         
         //$requisition   = $this->input->post();
         $user_id    = $this->flexi_auth->get_user_id();
-        
         $data = array(
-                'requisition_num'            => $requisition['req_num'],
+                'requisition_num'			=> $requisition['req_num'],
                 'description'            	=> $requisition['purchasing_detail'],
-                'date_req'            	  => date("Y-m-d H:i:s", strtotime($requisition['requisitionDate'])),
+                'requisition_description'	=> $requisition['requisition_description'],
+                'date_req'            	  	=> date("Y-m-d H:i:s", strtotime($requisition['requisitionDate'])),
                 'date_req_until'            => date("Y-m-d H:i:s", strtotime($requisition['requiredUntilDate'])),
+                'cat_id'				  	=> $requisition['category'],
                 'project_id'			  	=> $requisition['project'],
                 'budget_head_id'          	=> $requisition['budgetHead'],
-                'location_id'       			=> $requisition['location'],
+                'location_id'				=> $requisition['location'],
                 'donor_id'            	  	=> $requisition['donor'],
                 'approving_authority'       => $requisition['approvingAuthority'],
                 'created_by'       			=> $user_id,
 				'is_approved'			   	=> 0,
 				'is_tendered'			   	=> 0,
-				'date_created'			  => date("Y-m-d H:i:s", time()),
+				'date_created'			  	=> date("Y-m-d H:i:s", time()),
 				'status'					=> 1,
         ); 
         
@@ -117,7 +118,7 @@ class Requisition_model extends CI_Model {
             $this->db->select($db_select_column);
         else
             //$this->db->select('*, r.*');
-            $this->db->select('r.requisition_id, r.requisition_num, r.description, r.date_req, r.date_req_until, p.project_name, b.budget_head, l.location_name, d.donor_name, r.approving_authority, CONCAT(up.upro_first_name, " ", up.upro_last_name) AS approving_authority_name, r.approved_by, r.created_by, r.is_approved, r.status');
+            $this->db->select('r.requisition_id, r.requisition_num, r.description, r.date_req, r.date_req_until, p.project_name, b.budget_head, l.location_name, d.donor_name, r.approving_authority, CONCAT(up.upro_first_name, " ", up.upro_last_name) AS approving_authority_name, r.approved_by, r.created_by, r.is_approved, r.status, c.category');
 
         if($db_where_column_or) {
             foreach($db_where_column_or as $key => $column) {
@@ -146,6 +147,7 @@ class Requisition_model extends CI_Model {
         }
         
         //$this->db->where('r.status', 1);
+        $this->db->join('vendor_categories c', 'r.cat_id = c.cat_id', 'LEFT');
         $this->db->join('project p', 'r.project_id = p.project_id', 'LEFT');
         $this->db->join('location l', 'r.location_id = l.location_id', 'LEFT');
         $this->db->join('donor d', 'r.donor_id = d.donor_id', 'LEFT');
@@ -338,7 +340,7 @@ class Requisition_model extends CI_Model {
 	/*---- start: get_requisition num details----*/
     function get_requisition_num_detail($date_year = null, $date_month = null) {
         
-        $this->db->select('MAX(r.requisition_num) as requisition_num');
+        $this->db->select('MAX(r.requisition_num) as requisition_num, MAX(r.requisition_id)+1 AS reqId');
 
 		$current_date = 'DATE()';
 		$date_year = !!$date_year ? $date_year : $current_date;
@@ -351,7 +353,7 @@ class Requisition_model extends CI_Model {
 		if($result->num_rows() > 0) {
             $data = array();
             if($get_record = $result->result_array()) {
-                $data = $get_record[0]['requisition_num'];
+                $data = $get_record[0]['requisition_num']."/".$get_record[0]['reqId'];
             }
             return $data;
         }
@@ -413,5 +415,63 @@ class Requisition_model extends CI_Model {
         }
         
     }
+	
+	// Get coming requisitionId;
+	function get_coming_requisition_id() {
+        
+        $this->db->select('MAX(r.requisition_id)+1 as reqId');
+		$result = $this->db->get('requisition r');
+		
+		if($result->num_rows() > 0) {
+            $data = array();
+            if($get_record = $result->result_array()) {
+                $data = $get_record[0]['reqId'];
+            }
+            return $data;
+        }
+        else{
+            return FALSE;
+		}
+    }
+	
+	/*
+    |------------------------------------------------
+    | start: add_requisition_files function
+    |------------------------------------------------
+    |
+    | This function add supporting files of the requisition
+	| @param: requisition_id, $fileName
+    |
+    */
+    function add_requisition_files($requisition_id, $fileName) {
+        
+		//$user_id    = $this->flexi_auth->get_user_id();
+        
+        $data = array(
+                'requisition_id'		=> $requisition_id,
+                'requisition_file'      => $fileName,
+                'file_status'			=> 1
+        ); 
+        
+        $this->db->trans_begin();
+        
+        $this->db->set($data);
+        $this->db->insert('requisition_files');
+        
+        $requisition_file_id = $this->db->insert_id();
+
+        $this->db->trans_complete();
+        
+        if($this->db->trans_status() === FALSE) {
+            $this->db->trans_rollback();
+            return FALSE;
+        } else {
+            $b = $this->db->trans_commit();
+            
+            return $requisition_file_id;
+        }
+        
+    }
+    /*---- end: add_requisition_item function ----*/
 
 }

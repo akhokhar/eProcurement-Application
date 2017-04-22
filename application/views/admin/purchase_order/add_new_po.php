@@ -106,7 +106,35 @@
                                                             </div>
                                                         </div>
                                                       </div>
-                                                
+													  
+													<div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label for="delivery_date">
+                                                                Delivery Date <span class="symbol required"></span>
+                                                            </label>
+                                                            <div class="input-group date">
+                                                              <div class="input-group-addon">
+                                                                <i class="fa fa-calendar"></i>
+                                                              </div>
+                                                              <?php
+                                                              $input_data = array(
+                                                                        'type'          		=> 'text',
+                                                                        'name'         		=> 'delivery_date',
+                                                                        'id'            	  => 'delivery_date',
+                                                                        'required'	  		=> 'required',
+                                                                        'data-required-error' => 'Delivery Date cannot be empty',
+                                                                        'value'         	   => set_value('delivery_date'),
+                                                                        'class'         	   => 'form-control pull-right datepicker',
+                                                                        'placeholder'   		 => 'DD/MM/YYYY'
+                                                              );
+                                                              echo form_input($input_data);
+                                                              ?>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+												
+												<div class="row">
 													<div class="col-md-6">
                                                         <div class="form-group">
                                                             <label for="vendor">
@@ -131,10 +159,8 @@
                                                               ?>
                                                          </div>     
 													</div>
-												</div>
-                                                
-                                                <div class="row">
-                                                    <div class="col-md-12">
+												
+                                                    <div class="col-md-6">
                                                         <div class="form-group">
                                                             <label for="delivery_address">
                                                                 Enter Delivery Address <span class="symbol required"></span>
@@ -238,6 +264,7 @@
 $(function () {
 	//Date picker
 	$('.datepicker').datepicker({
+		startDate: '+0d',
 		autoclose: true
 	});
 	

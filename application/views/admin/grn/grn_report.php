@@ -38,12 +38,14 @@
 	<tr style="background-color: #000;">
     	<td style="color: #FFF;">Supplier's Identity</td>
         <td style="color: #FFF;">Purchase Order No:</td>
-        <td style="color: #FFF;">Delivery Challan No:</td>
+        <td style="color: #FFF;">Delivery Challan No / Builty No:</td>
+        <td style="color: #FFF;">Receiving Location:</td>
     </tr>
 	<tr>
     	<td><?php echo $grn['vendor_name']; ?></td>
         <td><?php echo $order['po_num']; ?></td>
         <td><?php echo $grn['delivery_challan_no']; ?></td>
+        <td><?php echo $grn['receiving_location']; ?></td>
     </tr>
 	<tr style="background-color: #000;">
     	<td style="color: #FFF;">Invoice Reference:</td>

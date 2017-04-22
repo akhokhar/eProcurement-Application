@@ -99,6 +99,7 @@
                             <table class="table table-striped table-bordered table-hover" id="order_table">
                                 <thead>
                                     <tr>
+                                        <th class="center">Category</th>
                                         <th class="center">Vendor Name</th>
                                         <th class="center">Vendor Address</th>
                                         <th class="center">Date</th>
@@ -189,6 +190,7 @@
                 null,
                 null,
                 null,
+                null,
                 null
             ],
             "pageLength": 20,
@@ -198,7 +200,7 @@
                 $(".group1").colorbox();
             }
         }).on( 'draw', function () {
-            $('tr td:nth-child(5)').each(function (){
+            $('tr td:nth-child(6)').each(function (){
                   $(this).addClass('center');
             })
             

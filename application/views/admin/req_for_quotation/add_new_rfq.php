@@ -239,6 +239,7 @@
 $(function () {
     //Date picker
     $('.datepicker').datepicker({
+		startDate: '+0d',
       autoclose: true
     });
   //select 2

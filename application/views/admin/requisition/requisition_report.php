@@ -18,6 +18,9 @@
                 <tr>
                     <td>Date: <u><?php echo date('d/m/Y', strtotime($requisition['date_req'])); ?></u></td>
                 </tr>
+				<tr>
+                    <td>Category <u><?php echo $requisition['category']; ?></u></td>
+                </tr>
                 <tr>
                     <td>Refs# <u><?php echo $requisition['requisition_num']; ?></u></td>
                 </tr>

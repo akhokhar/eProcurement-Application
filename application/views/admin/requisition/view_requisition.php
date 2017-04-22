@@ -92,7 +92,7 @@
                             <?php echo form_close(); ?>
                             <?php } ?>
                             
-                            <?php if ($requisition['is_approved'] != 0) { ?>
+                            <?php if ($requisition['is_approved'] != 0 && $requisition['is_approved'] != $this->config->item('inactiveFlag')) { ?>
                                 <a href="<?php echo base_url()?>admin/requisition/generate_requisition_pdf/<?php echo $requisition_id;?>">
                                   <button type="button" class="btn btn-primary pull-right">Download Requisition</button>
                                 </a>
@@ -119,6 +119,10 @@
                         </div>
                         <div class="panel-body">
                           <table class="table table-bordered table-hover">
+							<tr>
+                              <td width="40%">Category</td>
+                              <td><?php echo $requisition['category']; ?></td>
+                            </tr>
                             <tr>
                               <td width="40%">Requisition #</td>
                               <td><?php echo $requisition['requisition_num']; ?></td>

@@ -294,5 +294,41 @@ class General_model extends CI_Model {
 	
     }
 	/*end: Count Payment Requests*/
+	
+	
+	/*
+    |--------------------------------------------------------
+    | start: get all categories as dropdown array function 
+    |--------------------------------------------------------
+    |
+    | This function list_categories
+    |
+    */
+    function list_categories($where_col = array(), $where_val = array()) {
+        $this->db->select ( 'cat_id, category' );
+
+        $this->db->from ( 'vendor_categories' );
+		$this->db->where ('category_status', 1);
+		
+		if($where_col) {
+            foreach ($where_col as $key => $column) {
+                if ($where_val[$key]!="") {
+                    $this->db->where($column, $where_val[$key]);
+                }
+            }
+        }
+		
+        $this->db->order_by("category","ASC");
+
+        $query=$this->db->get();
+        $return = array();
+        $return[0] = "Select Category";
+        foreach($query->result_array() as $row)
+        {
+            $return[$row["cat_id"]] = $row['category'];
+        }
+        return $return;
+    }
+    /*---- end: list_managers function ----*/
 }
     

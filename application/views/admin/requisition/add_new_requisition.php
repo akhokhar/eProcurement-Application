@@ -98,10 +98,29 @@
                                     <div class="tab-content">
                                         <div id="panel_tab_general" class="tab-pane active">
 										<?php
-                                        $attributes = array('class' => '', 'method' => 'post', 'role' => 'form', 'data-toggle' => 'validator', 'id' => 'generalRequisitionForm');
+                                        $attributes = array('class' => '', 'method' => 'post', 'role' => 'form', 'data-toggle' => 'validator', 'id' => 'generalRequisitionForm', 'enctype' => 'multipart/form-data');
                                         echo form_open_multipart('', $attributes);
                                         ?>
                                             <div class="panel-body">
+											
+												<div class="row">
+													<div class="col-md-6">
+														<div class="form-group">
+															<label for="location">
+																Category <span class="symbol required"></span>
+															</label>
+															<?php
+															  $dropdown_data = array(
+																		'id'            => 'category',
+																		'class'         => 'form-control select2',
+																		'required'	  => 'required',
+																		'data-required-error' => 'Select a Category'
+															  );
+															  echo form_dropdown('category', $categories, '', $dropdown_data);
+															  ?>
+														</div>
+													</div>
+												</div>
                                               <div class="row">
                                                 <div class="col-md-6">
                                                     <div class="form-group">
@@ -120,7 +139,7 @@
 																	'required'	  		=> 'required',
                                                                     'data-required-error' => 'Requisition Date cannot be empty',
                                                                     'value'         	   => set_value('requisitionDate'),
-                                                                    'class'         	   => 'form-control pull-right datepicker',
+                                                                    'class'         	   => 'form-control pull-right',
                                                                     'placeholder'   		 => 'DD/MM/YYYY'
                                                           );
                                                           echo form_input($input_data);
@@ -249,6 +268,27 @@
                                                         <textarea id="purchasing_detail" name="purchasing_detail" required="required" class="form-control" placeholder="Brief Note of Purchasing"></textarea>
                                                     </div>
                                                 </div>
+												
+												<div class="col-md-12">
+                                                    <div class="form-group">
+                                                        <label for="requisition_description">
+                                                        	Requisition Description
+                                                        </label>
+                                                        <textarea id="requisition_description" name="requisition_description" class="form-control" placeholder="Requisition Description"></textarea>
+                                                    </div>
+                                                </div>
+												
+												<div class="col-md-12">
+                                                    <div class="form-group">
+														<label class="col-sm-3 control-label" for="adveris">
+															Supporting Files
+														</label>
+														<div class="col-sm-9">
+															<input type="file" name="requisitionFile[adveris]" id="adveris">
+														</div>
+													</div>
+                                                </div>
+
                                               </div>
                                               <hr />
                                               <div class="row">
@@ -484,6 +524,11 @@ $(function () {
     //Date picker
     $('.datepicker').datepicker({
       autoclose: true
+    });
+	
+	$('#requisitionDate').datepicker({
+		endDate: '+0d',
+		autoclose: true,
     });
   //select 2
   $('.select2').select2({

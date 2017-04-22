@@ -94,6 +94,7 @@
                                         <th class="center">Grn Date</th>
                                         <th class="center">Grn No.</th>
                                         <th class="center">Delivery Challan No.</th>
+                                        <th class="center">Receiving Location</th>
                                         <th class="center">Description</th>
                                         <th class="center">Vendor</th>
                                         <th class="center">Action</th>
@@ -194,6 +195,7 @@
                 //{ "orderable": false, "targets": 4 },
             ],
             "columns": [
+                null,
                 null,
                 null,
                 null,
