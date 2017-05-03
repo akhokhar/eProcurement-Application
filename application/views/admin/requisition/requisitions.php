@@ -255,6 +255,7 @@
                                                     <input type="checkbox" class="flat-grey">
                                                 </label>
                                             </div>--></th>
+                                        <th class="center">Category</th>
                                         <th class="center">Requisition#</th>
 										<th class="center">Description</th>
                                         <th class="center">Date Requested</th>
@@ -382,12 +383,13 @@
             },
             "order": [[ 1, "desc" ]],
             "columnDefs": [
-                { "orderable": false, "targets": 0 },
-                //{ "orderable": false, "targets": 1 },
+                //{ "orderable": false, "targets": 0 },
+                { "orderable": false, "targets": 1 },
                 { "orderable": false, "targets": 2 },
                 { "orderable": false, "targets": 5 }
             ],
             "columns": [
+                null,
                 null,
                 null,
                 null,
@@ -406,7 +408,7 @@
                 $(".group1").colorbox();
             }
         }).on( 'draw', function () {
-            $('tr td:nth-child(1), tr td:nth-child(3), tr td:nth-child(8)').each(function (){
+            $('tr td:nth-child(2), tr td:nth-child(4), tr td:nth-child(9)').each(function (){
                   $(this).addClass('center')
             })
             

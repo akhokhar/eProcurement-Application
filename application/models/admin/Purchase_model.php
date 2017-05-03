@@ -19,6 +19,7 @@ class Purchase_model extends CI_Model {
         $data = array(
 				'po_num'			  		=> $orderNum,
 				'po_date'					=> date("Y-m-d H:i:s", strtotime($order['poDate'])),
+				'delivery_date'				=> date("Y-m-d H:i:s", strtotime($order['delivery_date'])),
                 'rfq_id'            	  	=> $rfq_id,
                 'vendor_id'            		=> $order['vendor'],
                 'requisition_id'       		=> $order['requisition_id'],
@@ -63,7 +64,7 @@ class Purchase_model extends CI_Model {
             $this->db->select($db_select_column);
         else
 
-            $this->db->select('po.po_id, po.po_num, po.po_date, po.delivery_address, r.requisition_id, r.requisition_num, rfq.rfq_num, v.vendor_id, v.vendor_name, r.description, po.status');
+            $this->db->select('po.po_id, po.po_num, po.po_date, po.delivery_date, po.delivery_address, r.requisition_id, r.requisition_num, rfq.rfq_num, v.vendor_id, v.vendor_name, r.description, po.status');
 
         if($db_where_column_or) {
             foreach($db_where_column_or as $key => $column) {

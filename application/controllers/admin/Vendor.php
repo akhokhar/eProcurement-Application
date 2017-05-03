@@ -154,7 +154,7 @@ class Vendor extends CI_Controller {
 		$this->data['page_title'] = 'Add Vendor';
 		
 		$this->data['locations'] = $this->General_model->list_locations();
-		
+		$this->data['categories'] = $this->General_model->list_categories();
 		
 		$this->load->view('admin/includes/header', $this->data);
         $this->load->view('admin/vendor/add_vendor', $this->data);

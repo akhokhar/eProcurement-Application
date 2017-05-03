@@ -16,7 +16,7 @@
         <td style="width: 25%; vertical-align:top;">
             <table border="0">
                 <tr>
-                    <td><u>Date: <?php echo date('d/m/Y', strtotime($order['po_date'])); ?></u></td>
+                    <td><u>Purchase Date: <?php echo date('d/m/Y', strtotime($order['po_date'])); ?></u></td>
                 </tr>
             </table>
         </td>
@@ -46,8 +46,8 @@
 <tr>
 	<td>Date</td>
 	<td style="border-bottom: solid 1px;"><?php echo date("d/m/Y", strtotime($order['po_date']));?></td>
-	<td>&nbsp;</td>
-	<td>&nbsp;</td>
+	<td style="width:12%;">&nbsp;</td>
+	<td>Delivery Date: <?php echo (!empty($order['delivery_date']) && $order['delivery_date'] != "0000-00-00")?date("d/m/Y", strtotime($order['delivery_date'])):"N/A";?></td>
 </tr>
 </table>
 

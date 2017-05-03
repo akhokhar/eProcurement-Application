@@ -137,13 +137,15 @@ class Requisition extends CI_Controller {
 		$req_date_month = date('m', strtotime($req_date));
 		$numSeperator = $this->config->item('numSeperator');
 		$requisition_num = $this->requisition_model->get_requisition_num_detail($req_date_year, $req_date_month);
+		$reqId = $this->requisition_model->get_coming_requisition_id();
 		if (!!$requisition_num) {
 			$requisition_num = explode($numSeperator, $requisition_num);
 			$requisition_num[count($requisition_num)-1] = $requisition_num[count($requisition_num)-1]+1;
 			$requisition_num = implode($numSeperator, $requisition_num);
+			$requisition_num = $requisition_num."/".$reqId;
 		}
 		else {
-			$requisition_num = date('Y-m-').'01';
+			$requisition_num = date('Y-m-d')."/".$reqId;
 		}
 		if (!!$echo) {
 			echo $requisition_num;
@@ -170,6 +172,7 @@ class Requisition extends CI_Controller {
         }
         
 		$requisition_num = $this->get_requisition_num_detail();
+		
 		$this->data['req_num'] = $requisition_num;
 		
 		if($this->input->post()) {
@@ -186,16 +189,23 @@ class Requisition extends CI_Controller {
             $this->form_validation->set_rules('approvingAuthority', 'Approving Authority', 'required');*/
 			
             if ($this->form_validation->run() || true) {
-                
-				$requisition = array();
+               
+			   $requisition = array();
 				foreach($this->input->post('requisition') as $req){
 					$fieldName = $req['name'];
 					$fieldValue = $req['value'];
 					
 					$requisition[$fieldName] = $fieldValue;
 				}
+				
 				$requisition['req_num'] = $requisition_num;
+				//print_r($requisition);exit;
 				if($requisition_id = $this->requisition_model->add_requisition($requisition)) {
+					
+					//supporting files goes here...
+					if(isset($_FILES['requisitionFile']) && count($_FILES['requisitionFile']) > 0){
+						//$supportingFiles = $this->upload_supporting_files($requisition_id);
+					}
 					// If Requisition added successfully, then add items
 					// Item work goes here....
 					foreach($this->input->post('items') as $items){
@@ -270,6 +280,7 @@ class Requisition extends CI_Controller {
 			$this->data['locations'] = $this->general_model->list_locations();
 			$this->data['donors'] = $this->general_model->list_donors();
 			$this->data['managers'] = $this->general_model->list_managers();
+			$this->data['categories'] = $this->general_model->list_categories();
 			
 			$this->data['page_title'] = 'Add New Requisition';
 			
@@ -374,37 +385,62 @@ class Requisition extends CI_Controller {
 				if($this->requisition_model->approve_and_email_requisition($requisition_id, $approve)) {
 					$requisition = $this->requisition_model->get_requisition(array('requisition_id'), array($requisition_id));
 					
-					/*Setup email for manager starts*/
-					$managerId = $requisition[0]['approving_authority'];
-					$managerData = $this->general_model->get_user_detail($managerId);
+					if($approve == $this->config->item('activeFlag')){ // If manager has approved
+						
+						/*Setup email for manager starts*/
+						$managerId = $requisition[0]['approving_authority'];
+						$managerData = $this->general_model->get_user_detail($managerId);
+						
+						$subjectManager = "You have a new Requisition request.";
+						
+						$bodyManager  	= "Dear ".$managerData['upro_first_name']." ".$managerData['upro_last_name']."\r\n";
+						$bodyManager 	.= "Your have a new Requisition Request \R\n";
+						$bodyManager 	.= "Requisition Number is ".$requisition_id;
+						
+						$toManager = $managerData['uacc_email'];
+						$toManagerName = $managerData['upro_first_name']." ".$managerData['upro_last_name'];
+						
+						$this->send_email($toManager, $toManagerName, $subjectManager, $bodyManager);
+						/*Setup email for manager ends*/
+						
+						/*Setup email for purchaser starts*/
+						$purchaserId = $requisition[0]['created_by'];
+						$purchaserData = $this->general_model->get_user_detail($purchaserId);
+						
+						$subjectPurchaser = "Your Requisition has been approved!";
+						
+						$bodyPurchaser  = "Dear ".$purchaserData['upro_first_name']." ".$purchaserData['upro_last_name']."\r\n";
+						$bodyPurchaser .= "Your Requisition has been created \R\n";
+						$bodyPurchaser .= "Requisition Number is ".$requisition_id;
+						
+						$toPurchaser = $purchaserData['uacc_email'];
+						$toPurchaserName = $purchaserData['upro_first_name']." ".$purchaserData['upro_last_name'];
+						
+						$this->send_email($toPurchaser, $toPurchaserName, $subjectPurchaser, $bodyPurchaser);
+						/*Setup email for purchaser end*/
+						
+					} else{ // If manager has rejected due to any reason
 					
-					$subjectManager = "You have a new Requisition request.";
+						/*Setup rejection email for purchaser starts*/
+						$purchaserId = $requisition[0]['created_by'];
+						$purchaserData = $this->general_model->get_user_detail($purchaserId);
+						
+						$subjectPurchaser = "Your Requisition has been Rejected!";
+						
+						$bodyPurchaser  = "Dear ".$purchaserData['upro_first_name']." ".$purchaserData['upro_last_name']."\r\n";
+						$bodyPurchaser .= "Your Requisition has been rejected due to some reasons. \R\n";
+						$bodyPurchaser .= "If you have any query please contact Us. \R\n \R\n";
+						$bodyPurchaser .= "Thanks";
+						
+						$toPurchaser = $purchaserData['uacc_email'];
+						$toPurchaserName = $purchaserData['upro_first_name']." ".$purchaserData['upro_last_name'];
+						
+						$this->send_email($toPurchaser, $toPurchaserName, $subjectPurchaser, $bodyPurchaser);
+						/*Setup email for purchaser end*/
+						
+					}
 					
-					$bodyManager  	= "Dear ".$managerData['upro_first_name']." ".$managerData['upro_last_name']."\r\n";
-					$bodyManager 	.= "Your have a new Requisition Request \R\n";
-					$bodyManager 	.= "Requisition Number is ".$requisition_id;
 					
-					$toManager = $managerData['uacc_email'];
-					$toManagerName = $managerData['upro_first_name']." ".$managerData['upro_last_name'];
-					
-					$this->send_email($toManager, $toManagerName, $subjectManager, $bodyManager);
-					/*Setup email for manager ends*/
-					
-					/*Setup email for purchaser starts*/
-					$purchaserId = $requisition[0]['created_by'];
-					$purchaserData = $this->general_model->get_user_detail($purchaserId);
-					
-					$subjectPurchaser = "Your Requisition has been approved!";
-					
-					$bodyPurchaser  = "Dear ".$purchaserData['upro_first_name']." ".$purchaserData['upro_last_name']."\r\n";
-					$bodyPurchaser .= "Your Requisition has been created \R\n";
-					$bodyPurchaser .= "Requisition Number is ".$requisition_id;
-					
-					$toPurchaser = $purchaserData['uacc_email'];
-					$toPurchaserName = $purchaserData['upro_first_name']." ".$purchaserData['upro_last_name'];
-					
-					$this->send_email($toPurchaser, $toPurchaserName, $subjectPurchaser, $bodyPurchaser);
-					/*Setup email for purchaser end*/
 					redirect('admin/requisition/view_all');
 				}
 			}
@@ -503,4 +539,58 @@ class Requisition extends CI_Controller {
 		$pdf->Output($pdfFilePath, "D");
 
 	}
+	
+	function upload_supporting_files($requisition_id) {
+
+        $dataForm = $this->input->post();
+
+        $title = time();
+
+        $this->load->library('upload');
+        $upload_conf = array(
+            'upload_path' => 'upload',
+            'allowed_types' => 'jpg|png|jpeg|pdf|doc|docx|xls|xlsx',
+            'max_size' => '30000',
+        );
+
+        $this->upload->initialize($upload_conf);
+
+        // Change $_FILES to new vars and loop them
+        foreach ($_FILES['requisitionFile'] as $key => $val) {
+
+            foreach ($val as $inKey => $v) {
+                $field_name = $inKey;
+                $_FILES[$field_name][$key] = $v;
+            }
+        }
+
+        // Unset the useless one ;)
+        unset($_FILES['requisitionFile']);
+
+        // main action to upload each file
+        foreach ($_FILES as $field_name => $file) {
+
+            if (!$this->upload->do_upload($field_name)) {
+                $blogFile[$field_name] = '';
+            } else {
+
+                // otherwise, put the upload datas here.
+                // if you want to use database, put insert query in this loop
+                $upload_data = $this->upload->data();
+				
+				$file_name = $upload_data['file_name'];
+                $ext = pathinfo($file_name, PATHINFO_EXTENSION);
+                
+                $new_file_name = $title.'.'.$ext;
+
+                rename('upload/' . $upload_data['file_name'], 'upload/' . $new_file_name);
+
+                $blogFile[$field_name] = $new_file_name;
+				
+				$this->Requisition_model->add_requisition_files($requisition_id, $new_file_name);
+            }
+        }
+
+        return $blogFile;
+    }
 }

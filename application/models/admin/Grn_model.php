@@ -20,6 +20,7 @@ class Grn_model extends CI_Model {
 				'vendor_id'			  		=> $grn['vendor'],
 				'purchase_order_id'			=> $order_id,
 				'delivery_challan_no'		=> $grn['challan'],
+				'receiving_location'		=> $grn['receiving_location'],
 				'grn_date'					=> date("Y-m-d H:i:s", strtotime($grn['grnDate'])),
                 'grn_num'            	  	=> $grnNum,
 				'added_by'					=> $user_id,
@@ -67,7 +68,7 @@ class Grn_model extends CI_Model {
         if($db_select_column)
             $this->db->select($db_select_column);
         else
-            $this->db->select('grn.grn_id, grn.grn_num, grn.purchase_order_id, grn.grn_date, grn.delivery_challan_no, r.requisition_id, r.requisition_num, rfq.rfq_num, grn.vendor_id, v.vendor_name, r.description, grn.status');
+            $this->db->select('grn.grn_id, grn.grn_num, grn.purchase_order_id, grn.grn_date, grn.delivery_challan_no, grn.receiving_location, r.requisition_id, r.requisition_num, rfq.rfq_num, grn.vendor_id, v.vendor_name, r.description, grn.status');
 
         if($db_where_column_or) {
             foreach($db_where_column_or as $key => $column) {

@@ -140,7 +140,7 @@
                                                     <div class="col-md-6">
                                                         <div class="form-group">
                                                             <label for="challan">
-                                                                Delivery Challan No <span class="symbol required"></span>
+                                                                Delivery Challan No / Builty No	<span class="symbol required"></span>
                                                             </label>
                                                             <?php
 															$input_data = array(
@@ -148,6 +148,25 @@
 																	'name'         		=> 'challan',
 																	'id'            	=> 'challan',
 																	'value'         	=> set_value('challan'),
+																	'class'         	=> 'form-control pull-right',
+																	'required'			=> 'required',
+                                                              );
+                                                              echo form_input($input_data);
+															?>
+                                                        </div>
+                                                    </div>
+													
+													<div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label for="challan">
+                                                                Receiving Location <span class="symbol required"></span>
+                                                            </label>
+                                                            <?php
+															$input_data = array(
+																	'type'          	=> 'text',
+																	'name'         		=> 'receiving_location',
+																	'id'            	=> 'receiving_location',
+																	'value'         	=> set_value('receiving_location'),
 																	'class'         	=> 'form-control pull-right',
 																	'required'			=> 'required',
                                                               );

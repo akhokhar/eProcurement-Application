@@ -91,7 +91,7 @@ class server_datatables extends CI_Controller {
         //echo '<pre>'; print_r($this->input->post()); die();
         
         // database column for searching
-        $db_column = array('r.requisition_id', 'r.requisition_num', 'r.date_req', 'r.date_req_until', 'r.approving_authority', 'r.is_approved', 'r.status');
+        $db_column = array('r.requisition_id', 'r.requisition_num', 'r.date_req', 'r.date_req_until', 'r.approving_authority', 'r.is_approved', 'r.status', 'c.category');
         
         // load requisition model
         $this->load->model('admin/requisition_model');
@@ -178,7 +178,7 @@ class server_datatables extends CI_Controller {
         $dataCount = $this->requisition_model->get_requisition($db_where_column, $db_where_value, $db_where_column_or, $db_where_value_or);
         // end: get all requisitions or search requisition
         
-        $dt_column = array('requisition_num', 'description', 'date_req', 'date_req_until', 'project_name', 'location_name', 'approving_authority_name', 'is_approved');
+        $dt_column = array('category', 'requisition_num', 'description', 'date_req', 'date_req_until', 'project_name', 'location_name', 'approving_authority_name', 'is_approved');
         
         $data = array();
         $i = 0;
@@ -1729,7 +1729,7 @@ class server_datatables extends CI_Controller {
 	
 	function get_purchase_orders(){
 		// database column for searching
-        $db_column = array('po.vendor_id', 'po.po_date', 'po.po_num', 'po.delivery_address', 'po.status');
+        $db_column = array('po.vendor_id', 'po.po_date', 'po.delivery_date', 'po.po_num', 'po.delivery_address', 'po.status');
 
         // load purchase model
         $this->load->model('admin/Purchase_model');
@@ -1816,7 +1816,7 @@ class server_datatables extends CI_Controller {
         $dataCount = $this->Purchase_model->get_orders($db_where_column, $db_where_value, $db_where_column_or, $db_where_value_or);
         // end: get all orders or search purchase orders
         
-        $dt_column = array('po_date', 'description', 'vendor_name', 'delivery_address');
+        $dt_column = array('po_date', 'delivery_date', 'description', 'vendor_name', 'delivery_address');
         
         $data = array();
         $i = 0;
@@ -1843,6 +1843,13 @@ class server_datatables extends CI_Controller {
                     
                     if($get_dt_column == 'po_date'){
                         $data[$i][] = date("d/M/Y", strtotime($value[$get_dt_column]));
+                    } else if($get_dt_column == 'delivery_date'){
+						if(!empty($value[$get_dt_column]) && $value[$get_dt_column] != "0000-00-00"){
+							$data[$i][] = date("d/M/Y", strtotime($value[$get_dt_column]));
+						} else{
+							$data[$i][] = "N/A";
+						}
+                        
                     }
                     else {
                         $data[$i][] = $value[$get_dt_column];
@@ -1888,7 +1895,7 @@ class server_datatables extends CI_Controller {
 	
 	function get_grns(){
 		// database column for searching
-        $db_column = array('grn.vendor_id', 'grn.grn_date', 'grno.grn', 'grn.delivery_challan_no');
+        $db_column = array('grn.vendor_id', 'grn.grn_date', 'grno.grn', 'grn.delivery_challan_no', 'grn.receiving_location');
 
         // load purchase model
         $this->load->model('admin/Grn_model');
@@ -1975,7 +1982,7 @@ class server_datatables extends CI_Controller {
         $dataCount = $this->Grn_model->get_grn($db_where_column, $db_where_value, $db_where_column_or, $db_where_value_or);
         // end: get all Grns or search Grns
         
-        $dt_column = array('grn_date', 'grn_num', 'delivery_challan_no', 'description', 'vendor_name');
+        $dt_column = array('grn_date', 'grn_num', 'delivery_challan_no', 'receiving_location', 'description', 'vendor_name');
         
         $data = array();
         $i = 0;
@@ -2056,7 +2063,7 @@ class server_datatables extends CI_Controller {
         $dataCount = $this->Vendor_model->get_vendor();
         // end: get all Vendors
         
-        $dt_column = array('vendor_name', 'vendor_address', 'vendor_date', 'location_name');
+        $dt_column = array('category', 'vendor_name', 'vendor_address', 'vendor_date', 'location_name');
         
         $data = array();
         $i = 0;

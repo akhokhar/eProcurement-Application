@@ -19,6 +19,7 @@ class Vendor_model extends CI_Model {
 				'vendor_name'			  	=> $vendor['vendor_name'],
 				'vendor_address'			=> $vendor['vendor_address'],
 				'location_id'				=> $vendor['location'],
+				'cat_id'					=> $vendor['category'],
 				'vendor_date'				=> date("Y-m-d H:i:s", time()),
 				'status'					=> $this->config->item('activeFlag'),
         ); 
@@ -59,7 +60,7 @@ class Vendor_model extends CI_Model {
         if($db_select_column)
             $this->db->select($db_select_column);
         else
-            $this->db->select('v.vendor_id, v.vendor_name, v.vendor_address, v.location_id, v.vendor_date, l.location_name');
+            $this->db->select('v.vendor_id, v.vendor_name, v.vendor_address, v.location_id, c.category, v.vendor_date, l.location_name');
 
         if($db_where_column_or) {
             foreach($db_where_column_or as $key => $column) {
@@ -84,6 +85,7 @@ class Vendor_model extends CI_Model {
 		$this->db->where('v.status', 1);
 		$this->db->order_by("vendor_name", "ASC");
         $this->db->join('location l', 'v.location_id = l.location_id', 'LEFT');
+        $this->db->join('vendor_categories c', 'v.cat_id = c.cat_id', 'LEFT');
         $result = $this->db->get('vendor v');
 		
         $data = array();
